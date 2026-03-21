@@ -1,5 +1,18 @@
 # MyFirstApp
 
+## Branch naming
+
+Always use the following prefixes when creating branches:
+
+- `feature/` — new feature
+- `bugfix/` — bug fix
+- `chore/` — maintenance, dependencies, tooling
+- `docs/` — documentation changes
+- `refactor/` — code restructuring without behavior change
+- `hotfix/` — urgent production fix
+
+Example: `feature/user-authentication`, `bugfix/login-crash`, `docs/update-readme`
+
 ## gstack
 
 For web browsing, always use the `/browse` skill.
