@@ -6,7 +6,7 @@ DerivedData/
 xcuserdata/
 
 # Config (contains API keys)
-Config.xcconfig
+Config.local.xcconfig
 
 # macOS
 .DS_Store
