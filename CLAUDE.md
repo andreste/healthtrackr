@@ -6,6 +6,12 @@ Always use the Linear-generated branch name for the ticket you're working on. Yo
 
 Example: `HEA-5`, `HEA-9`
 
+## PR titles
+
+Use the format `TICKET-ID: Ticket title` for PR titles.
+
+Example: `HEA-5: Project setup & configuration`
+
 ## gstack
 
 For web browsing, always use the `/browse` skill.
