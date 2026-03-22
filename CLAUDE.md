@@ -2,16 +2,9 @@
 
 ## Branch naming
 
-Always use the following prefixes when creating branches:
+Always use the Linear-generated branch name for the ticket you're working on. You can find it in the `gitBranchName` field of the Linear issue.
 
-- `feature/` — new feature
-- `bugfix/` — bug fix
-- `chore/` — maintenance, dependencies, tooling
-- `docs/` — documentation changes
-- `refactor/` — code restructuring without behavior change
-- `hotfix/` — urgent production fix
-
-Example: `feature/user-authentication`, `bugfix/login-crash`, `docs/update-readme`
+Example: `HEA-5`, `HEA-9`
 
 ## gstack
 
