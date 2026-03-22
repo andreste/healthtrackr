@@ -12,37 +12,37 @@
 			containerPortal = ED0669D92F6F4CE5003122E6 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = ED0669E02F6F4CE5003122E6;
-			remoteInfo = MyFirstApp;
+			remoteInfo = healthtrackr;
 		};
 		ED0669F92F6F4CE6003122E6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = ED0669D92F6F4CE5003122E6 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = ED0669E02F6F4CE5003122E6;
-			remoteInfo = MyFirstApp;
+			remoteInfo = healthtrackr;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		ED0669E12F6F4CE5003122E6 /* MyFirstApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyFirstApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED0669EE2F6F4CE6003122E6 /* MyFirstAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyFirstAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED0669F82F6F4CE6003122E6 /* MyFirstAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyFirstAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED0669E12F6F4CE5003122E6 /* healthtrackr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = healthtrackr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED0669EE2F6F4CE6003122E6 /* healthtrackrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = healthtrackrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED0669F82F6F4CE6003122E6 /* healthtrackrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = healthtrackrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		ED0669E32F6F4CE5003122E6 /* MyFirstApp */ = {
+		ED0669E32F6F4CE5003122E6 /* healthtrackr */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MyFirstApp;
+			path = healthtrackr;
 			sourceTree = "<group>";
 		};
-		ED0669F12F6F4CE6003122E6 /* MyFirstAppTests */ = {
+		ED0669F12F6F4CE6003122E6 /* healthtrackrTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MyFirstAppTests;
+			path = healthtrackrTests;
 			sourceTree = "<group>";
 		};
-		ED0669FB2F6F4CE6003122E6 /* MyFirstAppUITests */ = {
+		ED0669FB2F6F4CE6003122E6 /* healthtrackrUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MyFirstAppUITests;
+			path = healthtrackrUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		ED0669D82F6F4CE5003122E6 = {
 			isa = PBXGroup;
 			children = (
-				ED0669E32F6F4CE5003122E6 /* MyFirstApp */,
-				ED0669F12F6F4CE6003122E6 /* MyFirstAppTests */,
-				ED0669FB2F6F4CE6003122E6 /* MyFirstAppUITests */,
+				ED0669E32F6F4CE5003122E6 /* healthtrackr */,
+				ED0669F12F6F4CE6003122E6 /* healthtrackrTests */,
+				ED0669FB2F6F4CE6003122E6 /* healthtrackrUITests */,
 				ED0669E22F6F4CE5003122E6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		ED0669E22F6F4CE5003122E6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				ED0669E12F6F4CE5003122E6 /* MyFirstApp.app */,
-				ED0669EE2F6F4CE6003122E6 /* MyFirstAppTests.xctest */,
-				ED0669F82F6F4CE6003122E6 /* MyFirstAppUITests.xctest */,
+				ED0669E12F6F4CE5003122E6 /* healthtrackr.app */,
+				ED0669EE2F6F4CE6003122E6 /* healthtrackrTests.xctest */,
+				ED0669F82F6F4CE6003122E6 /* healthtrackrUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		ED0669E02F6F4CE5003122E6 /* MyFirstApp */ = {
+		ED0669E02F6F4CE5003122E6 /* healthtrackr */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED066A022F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstApp" */;
+			buildConfigurationList = ED066A022F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackr" */;
 			buildPhases = (
 				ED0669DD2F6F4CE5003122E6 /* Sources */,
 				ED0669DE2F6F4CE5003122E6 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				ED0669E32F6F4CE5003122E6 /* MyFirstApp */,
+				ED0669E32F6F4CE5003122E6 /* healthtrackr */,
 			);
-			name = MyFirstApp;
+			name = healthtrackr;
 			packageProductDependencies = (
 			);
-			productName = MyFirstApp;
-			productReference = ED0669E12F6F4CE5003122E6 /* MyFirstApp.app */;
+			productName = healthtrackr;
+			productReference = ED0669E12F6F4CE5003122E6 /* healthtrackr.app */;
 			productType = "com.apple.product-type.application";
 		};
-		ED0669ED2F6F4CE6003122E6 /* MyFirstAppTests */ = {
+		ED0669ED2F6F4CE6003122E6 /* healthtrackrTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED066A052F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstAppTests" */;
+			buildConfigurationList = ED066A052F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackrTests" */;
 			buildPhases = (
 				ED0669EA2F6F4CE6003122E6 /* Sources */,
 				ED0669EB2F6F4CE6003122E6 /* Frameworks */,
@@ -131,18 +131,18 @@
 				ED0669F02F6F4CE6003122E6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				ED0669F12F6F4CE6003122E6 /* MyFirstAppTests */,
+				ED0669F12F6F4CE6003122E6 /* healthtrackrTests */,
 			);
-			name = MyFirstAppTests;
+			name = healthtrackrTests;
 			packageProductDependencies = (
 			);
-			productName = MyFirstAppTests;
-			productReference = ED0669EE2F6F4CE6003122E6 /* MyFirstAppTests.xctest */;
+			productName = healthtrackrTests;
+			productReference = ED0669EE2F6F4CE6003122E6 /* healthtrackrTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		ED0669F72F6F4CE6003122E6 /* MyFirstAppUITests */ = {
+		ED0669F72F6F4CE6003122E6 /* healthtrackrUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED066A082F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstAppUITests" */;
+			buildConfigurationList = ED066A082F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackrUITests" */;
 			buildPhases = (
 				ED0669F42F6F4CE6003122E6 /* Sources */,
 				ED0669F52F6F4CE6003122E6 /* Frameworks */,
@@ -154,13 +154,13 @@
 				ED0669FA2F6F4CE6003122E6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				ED0669FB2F6F4CE6003122E6 /* MyFirstAppUITests */,
+				ED0669FB2F6F4CE6003122E6 /* healthtrackrUITests */,
 			);
-			name = MyFirstAppUITests;
+			name = healthtrackrUITests;
 			packageProductDependencies = (
 			);
-			productName = MyFirstAppUITests;
-			productReference = ED0669F82F6F4CE6003122E6 /* MyFirstAppUITests.xctest */;
+			productName = healthtrackrUITests;
+			productReference = ED0669F82F6F4CE6003122E6 /* healthtrackrUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = ED0669DC2F6F4CE5003122E6 /* Build configuration list for PBXProject "MyFirstApp" */;
+			buildConfigurationList = ED0669DC2F6F4CE5003122E6 /* Build configuration list for PBXProject "healthtrackr" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				ED0669E02F6F4CE5003122E6 /* MyFirstApp */,
-				ED0669ED2F6F4CE6003122E6 /* MyFirstAppTests */,
-				ED0669F72F6F4CE6003122E6 /* MyFirstAppUITests */,
+				ED0669E02F6F4CE5003122E6 /* healthtrackr */,
+				ED0669ED2F6F4CE6003122E6 /* healthtrackrTests */,
+				ED0669F72F6F4CE6003122E6 /* healthtrackrUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		ED0669F02F6F4CE6003122E6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = ED0669E02F6F4CE5003122E6 /* MyFirstApp */;
+			target = ED0669E02F6F4CE5003122E6 /* healthtrackr */;
 			targetProxy = ED0669EF2F6F4CE6003122E6 /* PBXContainerItemProxy */;
 		};
 		ED0669FA2F6F4CE6003122E6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = ED0669E02F6F4CE5003122E6 /* MyFirstApp */;
+			target = ED0669E02F6F4CE5003122E6 /* healthtrackr */;
 			targetProxy = ED0669F92F6F4CE6003122E6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -410,7 +410,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstApp;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -442,7 +442,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstApp;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -464,7 +464,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstAppTests;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackrTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -472,7 +472,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyFirstApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyFirstApp";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/healthtrackr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/healthtrackr";
 			};
 			name = Debug;
 		};
@@ -486,7 +486,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstAppTests;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackrTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -494,7 +494,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyFirstApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyFirstApp";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/healthtrackr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/healthtrackr";
 			};
 			name = Release;
 		};
@@ -506,7 +506,7 @@
 				DEVELOPMENT_TEAM = GB7AG2E4X2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstAppUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackrUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -514,7 +514,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MyFirstApp;
+				TEST_TARGET_NAME = healthtrackr;
 			};
 			name = Debug;
 		};
@@ -526,7 +526,7 @@
 				DEVELOPMENT_TEAM = GB7AG2E4X2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = andreste.MyFirstAppUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = andreste.healthtrackrUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -534,14 +534,14 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MyFirstApp;
+				TEST_TARGET_NAME = healthtrackr;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		ED0669DC2F6F4CE5003122E6 /* Build configuration list for PBXProject "MyFirstApp" */ = {
+		ED0669DC2F6F4CE5003122E6 /* Build configuration list for PBXProject "healthtrackr" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED066A002F6F4CE6003122E6 /* Debug */,
@@ -550,7 +550,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED066A022F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstApp" */ = {
+		ED066A022F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackr" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED066A032F6F4CE6003122E6 /* Debug */,
@@ -559,7 +559,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED066A052F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstAppTests" */ = {
+		ED066A052F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackrTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED066A062F6F4CE6003122E6 /* Debug */,
@@ -568,7 +568,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED066A082F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "MyFirstAppUITests" */ = {
+		ED066A082F6F4CE6003122E6 /* Build configuration list for PBXNativeTarget "healthtrackrUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED066A092F6F4CE6003122E6 /* Debug */,
