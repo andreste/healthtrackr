@@ -516,8 +516,8 @@ Step 8 of the implementation plan: verify end-to-end on real HealthKit data.
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
 | Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAN | 6 issues, 0 critical gaps |
 | Design Review | `/plan-design-review` | UI/UX gaps | 1 | CLEAN (FULL) | score: 5/10 → 9/10, 3 decisions |
 
 **UNRESOLVED:** 0 across all reviews
-**VERDICT:** Design Review CLEAR — eng review required before implementation.
+**VERDICT:** ENG + DESIGN CLEARED — ready to implement.
