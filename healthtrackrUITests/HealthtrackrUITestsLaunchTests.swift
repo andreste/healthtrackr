@@ -1,13 +1,13 @@
 //
-//  MyFirstAppUITestsLaunchTests.swift
-//  MyFirstAppUITests
+//  HealthtrackrUITestsLaunchTests.swift
+//  healthtrackrUITests
 //
 //  Created by Andres Trevino on 3/21/26.
 //
 
 import XCTest
 
-final class MyFirstAppUITestsLaunchTests: XCTestCase {
+final class HealthtrackrUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

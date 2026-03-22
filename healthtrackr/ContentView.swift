@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  MyFirstApp
+//  healthtrackr
 //
 //  Created by Andres Trevino on 3/21/26.
 //

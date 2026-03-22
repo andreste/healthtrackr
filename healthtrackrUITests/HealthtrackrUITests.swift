@@ -1,13 +1,13 @@
 //
-//  MyFirstAppUITests.swift
-//  MyFirstAppUITests
+//  HealthtrackrUITests.swift
+//  HealthtrackrUITests
 //
 //  Created by Andres Trevino on 3/21/26.
 //
 
 import XCTest
 
-final class MyFirstAppUITests: XCTestCase {
+final class HealthtrackrUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

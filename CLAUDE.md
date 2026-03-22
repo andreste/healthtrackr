@@ -1,4 +1,4 @@
-# MyFirstApp
+# healthtrackr
 
 ## Branch naming
 
