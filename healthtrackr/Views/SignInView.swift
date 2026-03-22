@@ -2,7 +2,7 @@ import AuthenticationServices
 import SwiftUI
 
 struct SignInView: View {
-    var authManager: AuthManager
+    @Bindable var authManager: AuthManager
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {

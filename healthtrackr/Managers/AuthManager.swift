@@ -1,7 +1,7 @@
 import AuthenticationServices
 import SwiftUI
 
-@Observable
+@MainActor @Observable
 final class AuthManager {
     var isAuthenticated = false
     var isCheckingCredential = true
@@ -44,18 +44,32 @@ final class AuthManager {
                 return
             }
             let userID = credential.user
-            KeychainHelper.save(key: Self.userIDKey, data: Data(userID.utf8))
-            if let tokenData = credential.identityToken {
-                KeychainHelper.save(key: Self.tokenKey, data: tokenData)
+
+            let savedUserID = KeychainHelper.save(key: Self.userIDKey, data: Data(userID.utf8))
+            #if DEBUG
+            if !savedUserID {
+                print("[AuthManager] Failed to save user ID to Keychain")
             }
+            #endif
+
+            if let tokenData = credential.identityToken {
+                let savedToken = KeychainHelper.save(key: Self.tokenKey, data: tokenData)
+                #if DEBUG
+                if !savedToken {
+                    print("[AuthManager] Failed to save identity token to Keychain")
+                }
+                #endif
+            }
+
             isAuthenticated = true
 
         case .failure(let error):
-            guard let authError = error as? ASAuthorizationError,
-                  authError.code != .canceled else {
+            if let authError = error as? ASAuthorizationError, authError.code == .canceled {
                 return
             }
-            print("Sign in with Apple failed: \(authError.localizedDescription)")
+            #if DEBUG
+            print("[AuthManager] Sign in with Apple failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
