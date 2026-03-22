@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AA0000042F6F5000003122E6 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000022F6F5000003122E6 /* HealthKit.framework */; };
+		AA0000052F6F5000003122E6 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000032F6F5000003122E6 /* AuthenticationServices.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		ED0669EF2F6F4CE6003122E6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,14 +29,30 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AA0000012F6F5000003122E6 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		AA0000022F6F5000003122E6 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		AA0000032F6F5000003122E6 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		ED0669E12F6F4CE5003122E6 /* healthtrackr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = healthtrackr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED0669EE2F6F4CE6003122E6 /* healthtrackrTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = healthtrackrTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED0669F82F6F4CE6003122E6 /* healthtrackrUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = healthtrackrUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA0000072F6F5000003122E6 /* Exceptions for "healthtrackr" folder in "healthtrackr" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = ED0669E02F6F4CE5003122E6 /* healthtrackr */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		ED0669E32F6F4CE5003122E6 /* healthtrackr */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA0000072F6F5000003122E6 /* Exceptions for "healthtrackr" folder in "healthtrackr" target */,
+			);
 			path = healthtrackr;
 			sourceTree = "<group>";
 		};
@@ -52,6 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA0000042F6F5000003122E6 /* HealthKit.framework in Frameworks */,
+				AA0000052F6F5000003122E6 /* AuthenticationServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,13 +95,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA0000062F6F5000003122E6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000022F6F5000003122E6 /* HealthKit.framework */,
+				AA0000032F6F5000003122E6 /* AuthenticationServices.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		ED0669D82F6F4CE5003122E6 = {
 			isa = PBXGroup;
 			children = (
+				AA0000012F6F5000003122E6 /* Config.xcconfig */,
 				ED0669E32F6F4CE5003122E6 /* healthtrackr */,
 				ED0669F12F6F4CE6003122E6 /* healthtrackrTests */,
 				ED0669FB2F6F4CE6003122E6 /* healthtrackrUITests */,
 				ED0669E22F6F4CE5003122E6 /* Products */,
+				AA0000062F6F5000003122E6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -271,6 +305,7 @@
 /* Begin XCBuildConfiguration section */
 		ED066A002F6F4CE6003122E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA0000012F6F5000003122E6 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -335,6 +370,7 @@
 		};
 		ED066A012F6F4CE6003122E6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA0000012F6F5000003122E6 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -395,11 +431,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = healthtrackr/healthtrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GB7AG2E4X2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = healthtrackr/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -427,11 +465,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = healthtrackr/healthtrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GB7AG2E4X2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = healthtrackr/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

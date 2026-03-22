@@ -1,0 +1,5 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// Anthropic API Key — copy this file to Config.xcconfig and set your key
+ANTHROPIC_API_KEY = your-api-key-here
