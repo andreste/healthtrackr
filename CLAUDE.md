@@ -46,3 +46,16 @@ If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to re
 - `/setup-browser-cookies` — Import real browser cookies for authenticated testing
 - `/benchmark` — Performance benchmarking
 - `/gstack-upgrade` — Upgrade gstack to the latest version
+
+## Design System
+
+Always read `DESIGN.md` before making any visual or UI decisions.
+
+All font choices, colors, spacing, border radius, and motion are defined there — including **both light and dark mode token values** for every color, component, and view.
+
+- Never hardcode hex values in Swift — always reference named Color assets from the asset catalog
+- Every color token has an `Any` (light) and `Dark` variant — use both
+- Every new view must be tested in both light and dark mode before merging
+- Use `@Environment(\.colorScheme)` to read system preference — never override it
+- Do not deviate from DESIGN.md without explicit approval
+- In QA and design-review mode, flag any code that doesn't match DESIGN.md
