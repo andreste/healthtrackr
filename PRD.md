@@ -89,7 +89,13 @@ Three approaches were evaluated:
 
 #### HealthKitManager
 - Async data fetcher for 4 HKQuantityType metrics: HRV, sleep, step count, resting HR
+- **Query type: `HKStatisticsCollectionQuery`** — returns pre-aggregated daily values (sum for steps, average for HRV/HR, total for sleep duration). Returns ~90 data points per metric, not 25,000+ raw HKSample objects. This is the correct HealthKit API for daily-bucketed data.
+  - Sleep: `HKCategoryTypeIdentifierSleepAnalysis` → sum of `.asleep` intervals per day
+  - HRV: `HKQuantityTypeIdentifierHeartRateVariabilitySDNN` → average of samples in 5–9am window per day (use `HKSampleQuery` with time predicate for this one metric only, since `HKStatisticsCollectionQuery` doesn't support time-of-day filtering within a day bucket)
+  - Steps: `HKQuantityTypeIdentifierStepCount` → daily sum
+  - Resting HR: `HKQuantityTypeIdentifierRestingHeartRate` → daily average
 - Fetches up to 90-day windows; degrades gracefully to 30+ days if less data available
+- All queries run on background queue (never main thread)
 - Handles partial permissions — each metric independently authorized; missing metrics flagged in UI, not fatal
 - If authorization denied entirely: show "Connect Apple Health" re-prompt screen
 
@@ -106,8 +112,8 @@ Three approaches were evaluated:
   - High: p < 0.01
   - Medium: p < 0.05
   - Emerging: n < 30
-- **Caching:** Results stored in UserDefaults with timestamp. Re-run only if cache is >24h stale. Fresh run triggered as background Swift Task on app open; UI shows cached results immediately
-- **Implementation:** Use Accelerate framework for ranked correlation math (not a custom implementation)
+- **Caching:** CorrelationResult structs (Codable) written to `Caches/correlations/{pairId}.json` — one file per metric pair. OS can evict on low storage (appropriate for derived data). Cache timestamp + last-run date stored in UserDefaults (small, <100 bytes). Re-run only if cache is >24h stale. Fresh run triggered as background Swift Task on app open; UI shows cached results immediately.
+- **Implementation:** Use Accelerate framework (vDSP) for rank computation and Spearman r. P-value computed via t-distribution approximation: t = r√(n-2)/√(1-r²), CDF via Abramowitz & Stegun series approximation (~20 lines inline). No external dependency.
 - **Compute budget:** 2 pairs × 5 lags = 10 correlation runs (sub-second on iPhone 12+)
 
 #### PatternNarrator
@@ -115,8 +121,8 @@ Three approaches were evaluated:
 - **Input format:** Structured text summary only — never raw biometric data. Example input: `"Sleep duration and next-day HRV: r=0.71, n=14, lag=36h, avg delta=-18%"`
 - **Prompt rules:** Plain English, no medical claims, explain lag if non-zero, cite sample size
 - **Batch size:** Max 5 confirmed patterns per API call (~500 tokens input)
-- **API key:** Hardcoded constant for V1 (personal-use prototype). Keychain / server-side proxy deferred to V1.1 before any public distribution
-- Results cached alongside CorrelationResult in UserDefaults
+- **API key:** Stored in `Config.xcconfig` (gitignored), referenced via `$(ANTHROPIC_API_KEY)` in Info.plist, read at runtime via `Bundle.main.infoDictionary`. Never committed to source. Keychain/server-side proxy deferred to V1.1.
+- Narration strings cached alongside CorrelationResult in `Caches/correlations/{pairId}.json`. Refreshed only when CorrelationResult changes.
 
 #### DiscoveryFeed UI
 - **Navigation:** No tab bar in V1. Nav stack only. Gear icon (top-right of nav bar) opens inline Settings sheet (Anthropic disclosure).
@@ -136,6 +142,74 @@ Three approaches were evaluated:
 - Stat row (see `DESIGN.md §Stat Row`): 3 cells — effect size (−18%), lag (36h), correlation (r=0.71). Values in Geist Mono 22pt bold; labels in Instrument Sans 10pt `textSecondary`.
 - AI narration box (see `DESIGN.md §Narration Box`): `surfaceSecondary` background, Instrument Sans 14pt, `textPrimary`. "What this means" label in uppercase tracked `textSecondary` 11pt.
 - "How we found this" transparency box: deferred to V1.1. In V1, omit the section entirely — do not show a disabled/grayed-out placeholder.
+
+### 7.3 Core Data Models
+
+All components share these Codable Swift structs. Define in `Models/HealthModels.swift`.
+
+```swift
+struct MetricSample: Codable {
+    let date: Date
+    let value: Double
+}
+
+struct DayBucket: Codable {
+    let date: Date
+    var sleepHours: Double?
+    var hrvMs: Double?
+    var steps: Double?
+    var restingHR: Double?
+}
+
+struct CorrelationResult: Codable {
+    let pairId: String           // e.g. "sleep_hrv"
+    let lagHours: Int            // 0, 12, 24, 36, or 48
+    let r: Double
+    let pValue: Double           // t = r*sqrt(n-2)/sqrt(1-r^2), then t-dist CDF
+    let n: Int
+    let effectSize: Double       // avg delta % of metric B
+    let confidence: Confidence
+    let computedAt: Date
+
+    enum Confidence: String, Codable { case high, medium, emerging, hidden }
+}
+
+struct PatternNarration: Codable {
+    let pairId: String
+    let headline: String
+    let body: String
+    let cachedAt: Date
+}
+```
+
+**Data flow:**
+```
+HealthKitManager -> [MetricSample] -> CorrelationEngine (buckets internally)
+                                           |
+                                           v
+                                   [CorrelationResult] -> Caches/correlations/{pairId}.json
+                                           |
+                                           v
+                                   PatternNarrator -> PatternNarration -> same cache file
+                                           |
+                                           v
+                                   DiscoveryFeedViewModel (reads cache)
+```
+
+### 7.4 Concurrency Contract
+
+**CorrelationEngine re-entrancy:** Holds `private var currentTask: Task<Void, Never>?`. Every `run()` call cancels the previous task before starting. Prevents concurrent cache writes on rapid background/foreground.
+
+```swift
+func run() {
+    currentTask?.cancel()
+    currentTask = Task {
+        // correlation logic with Task.checkCancellation() at each lag step
+    }
+}
+```
+
+**Cache I/O:** All file reads/writes go through a `CacheActor` (Swift actor) to serialize disk access. No raw DispatchQueue.
 
 ---
 
@@ -346,6 +420,43 @@ First 5 seconds of Discovery Feed: user should immediately understand they're lo
 | 6 | Build DiscoveryFeed SwiftUI view with PatternCard, filter chips, loading, and empty states |
 | 7 | Build PatternDetail view with Apple Charts scatter plot, stat row, and chart callout |
 | 8 | Test on real device with own HealthKit data; verify no data leaves device; verify credential state handling |
+
+---
+
+## 13.4 Testing Strategy
+
+Use the existing `healthtrackrTests` XCTest target. No new test target needed.
+
+### Unit Tests (no device required)
+
+**CorrelationEngine** — highest priority. Pure math, fully deterministic.
+- Test Spearman r with a known dataset (e.g. n=10 pairs with known r=0.85)
+- Test p-value computation against tabulated values (r=0.5 n=30 → p≈0.005)
+- Test threshold classification: n=29 → `.emerging`, n=30 + r=0.5 + p<0.05 → `.medium`, n<20 → `.hidden`
+- Test lag alignment: Day 0 sleep vs Day 1 HRV correctly paired
+- Test task cancellation: start run(), immediately start again, verify only one result written
+
+**HealthKitManager** — use a `HKHealthStoreProtocol` mock protocol.
+- All 4 metrics authorized → 4 fetch calls made
+- HRV authorization denied → Sleep+HRV pair skipped, Steps+HR proceeds
+- 0 HRV samples returned → `MetricSample` array empty, pair marked unavailable
+- Data window of 25 days → estimated-days-until-ready arithmetic correct
+
+**PatternNarrator** — inject a mock `URLSession`.
+- Prompt string contains r, n, lag, effectSize — does NOT contain raw HK values
+- API 200 response → `PatternNarration` parsed and cached
+- API 500 error → function throws, UI falls back to stat-row-only mode
+- Second call with fresh cache → URLSession never called (cache hit)
+
+**CacheActor** — concurrent access test.
+- Two async writes to same pairId → second read returns second write's data (no interleaving)
+
+### Integration Test (real device)
+
+Step 8 of the implementation plan: verify end-to-end on real HealthKit data.
+- Open Charles Proxy, confirm no raw HK data in any outbound request
+- Confirm correlation runs complete within 5s on iPhone 12+
+- Confirm cached results appear in <1s on second app open
 
 ---
 
