@@ -42,6 +42,24 @@ actor CacheActor {
         return Date().timeIntervalSince1970 - timestamp > maxAge
     }
 
+    // MARK: - Narration Cache
+
+    func loadNarration(pairId: String, lagHours: Int) -> PatternNarration? {
+        let url = narrationURL(pairId: pairId, lagHours: lagHours)
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? decoder.decode(PatternNarration.self, from: data)
+    }
+
+    func saveNarration(_ narration: PatternNarration) {
+        let url = narrationURL(pairId: narration.pairId, lagHours: 0)
+        guard let data = try? encoder.encode(narration) else { return }
+        try? data.write(to: url, options: .atomic)
+    }
+
+    private func narrationURL(pairId: String, lagHours: Int) -> URL {
+        cacheDirectory.appendingPathComponent("\(pairId)_narration_\(lagHours).json")
+    }
+
     // MARK: - Helpers
 
     private func fileURL(for pairId: String) -> URL {
