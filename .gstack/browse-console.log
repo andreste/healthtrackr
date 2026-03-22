@@ -1,0 +1,6 @@
+[2026-03-22T17:15:38.392Z] [warning]   WARN  [Statsig] The user does not have the required id_type "userID" for Dynamic config "sitewide_discount"
+[2026-03-22T17:15:38.418Z] [warning]   WARN  [Statsig] The user does not have the required id_type "userID" for Dynamic config "multivariate_payment_animation_timing"
+[2026-03-22T17:15:39.028Z] [warning] Allow attribute will take precedence over 'allowfullscreen'.
+[2026-03-22T17:15:39.031Z] [error] Failed to load resource: the server responded with a status of 403 ()
+[2026-03-22T17:15:42.737Z] [warning] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
+[2026-03-22T17:15:42.742Z] [warning] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
