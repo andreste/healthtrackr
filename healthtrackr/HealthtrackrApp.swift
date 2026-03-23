@@ -18,8 +18,8 @@ struct HealthtrackrApp: App {
                         .transition(.opacity)
                 }
             }
-            .animation(.easeOut(duration: Duration.medium), value: authManager.isAuthenticated)
-            .animation(.easeOut(duration: Duration.medium), value: authManager.isCheckingCredential)
+            .animation(.easeOut(duration: AnimationDuration.medium), value: authManager.isAuthenticated)
+            .animation(.easeOut(duration: AnimationDuration.medium), value: authManager.isCheckingCredential)
             .task {
                 await authManager.checkExistingCredential()
             }

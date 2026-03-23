@@ -46,6 +46,54 @@ If gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to re
 - `/benchmark` — Performance benchmarking
 - `/gstack-upgrade` — Upgrade gstack to the latest version
 
+## Architecture
+
+### Swift Concurrency & Observation
+- Use `@Observable` macro (not `ObservableObject`/`@Published`)
+- Use `@State` to hold `@Observable` ViewModels in views (not `@StateObject`)
+- Project has `default-isolation=MainActor` enabled — all types are `@MainActor` by default
+- Use `async/await` exclusively — no Combine, no completion handlers
+- When a default parameter needs `@MainActor` isolation (e.g., `init(healthKit: any HealthKitProviding = HealthKitManager())`), use a separate `convenience init()` instead
+
+### Dependency Injection
+- Define protocols for all external dependencies (HealthKit, networking, APIs)
+- Protocol files live in `healthtrackr/Protocols/`
+- Inject via initializer, not environment objects
+- Conformance extensions (`extension HealthKitManager: HealthKitProviding {}`) go in the protocol file
+- ViewModels take `any ProtocolName` parameters
+
+### File Organization
+```
+healthtrackr/
+├── Models/          — Codable structs, value types (PatternItem, MetricSample, CorrelationResult)
+├── ViewModels/      — @Observable classes with business logic
+├── Views/           — SwiftUI views (presentation only)
+├── Engine/          — Computation (CorrelationEngine, StatisticalMath, MetricAlignment)
+├── Protocols/       — Dependency protocols (one per file)
+├── Services/        — External API integrations (PatternNarrator)
+├── Managers/        — System integrations (HealthKitManager, AuthManager)
+├── Theme/           — Design tokens (Typography, Spacing, Radius, AnimationDuration)
+└── Fonts/           — Custom font files
+```
+
+### Naming
+- Design token enums: `AnimationDuration` (not `Duration` — avoid shadowing stdlib)
+- Utility enums for namespacing: `StatisticalMath`, `MetricAlignment`, `PatternDetailFormatter`
+- Shared logic extracted into static methods on namespacing enums
+
+### Testing
+- Use Swift Testing framework (`import Testing`, `@Test`, `#expect`, `@Suite`)
+- Test doubles (fakes) go at the top of the test file
+- Statistical/mathematical functions must be in testable utility enums, not private on classes
+- Test all state transitions in ViewModels
+
+### Anti-patterns to Avoid
+- No fire-and-forget `Task {}` wrappers around async work — make the method `async` and `await` it
+- No `Task.sleep` hacks to wait for background work — `await` the actual work
+- No duplicated logic across files — extract to shared utility (e.g., `MetricAlignment`)
+- No nested model types in ViewModels — put models in `Models/`
+- No protocols defined inside ViewModels — put in `Protocols/`
+
 ## Design System
 
 Always read `DESIGN.md` before making any visual or UI decisions.

@@ -1,35 +1,5 @@
 import SwiftUI
 
-// MARK: - Dependency Protocols
-
-@MainActor
-protocol HealthKitProviding {
-    var needsAuthorization: Bool { get }
-    func requestAuthorization() async throws
-    func fetchSleep(days: Int) async -> [MetricSample]
-    func fetchHRV(days: Int) async -> [MetricSample]
-    func fetchSteps(days: Int) async -> [MetricSample]
-    func fetchRestingHR(days: Int) async -> [MetricSample]
-}
-
-extension HealthKitManager: HealthKitProviding {}
-
-@MainActor
-protocol CorrelationProviding {
-    func cachedResults(for pairId: String) async -> [CorrelationResult]
-    func run(pairs: [MetricPair])
-}
-
-extension CorrelationEngine: CorrelationProviding {}
-
-protocol NarrationProviding: Sendable {
-    func narrate(results: [CorrelationResult]) async -> [PatternNarration]
-}
-
-extension PatternNarrator: NarrationProviding {}
-
-// MARK: - ViewModel
-
 @MainActor @Observable
 final class DiscoveryFeedViewModel {
     // MARK: - Filter
@@ -46,31 +16,6 @@ final class DiscoveryFeedViewModel {
             case .stepsHR: return ["steps_rhr"]
             }
         }
-    }
-
-    // MARK: - Feed Item
-
-    struct ScatterPoint: Identifiable {
-        let id = UUID()
-        let date: Date
-        let metricA: Double
-        let metricB: Double
-    }
-
-    struct PatternItem: Identifiable {
-        let id: String
-        let pairId: String
-        let pairLabel: String
-        let headline: String
-        let body: String
-        let confidence: CorrelationResult.Confidence
-        let r: Double
-        let n: Int
-        let lagHours: Int
-        let effectSize: Double
-        let scatterData: [ScatterPoint]
-        let metricALabel: String
-        let metricBLabel: String
     }
 
     // MARK: - State
@@ -193,11 +138,8 @@ final class DiscoveryFeedViewModel {
             MetricPair(id: "steps_rhr", metricA: steps, metricB: rhr),
         ]
 
-        // Run correlation
-        engine.run(pairs: pairs)
-
-        // Wait briefly for engine to finish, then collect results
-        try? await Task.sleep(for: .milliseconds(500))
+        // Run correlation and await completion
+        await engine.run(pairs: pairs)
 
         var allItems: [PatternItem] = []
 
@@ -229,11 +171,14 @@ final class DiscoveryFeedViewModel {
         let best = confirmed.max(by: { abs($0.r) < abs($1.r) })!
         let narration = narrations.first { $0.pairId == best.pairId }
         let (metricAKey, metricBKey) = metricKeys(for: best.pairId)
-        let scatter = alignForScatter(
+        let aligned = MetricAlignment.align(
             a: metricSamples[metricAKey] ?? [],
             b: metricSamples[metricBKey] ?? [],
             lagHours: best.lagHours
         )
+        let scatter = aligned.map { pair in
+            ScatterPoint(date: pair.date, metricA: pair.a, metricB: pair.b)
+        }
 
         return [PatternItem(
             id: "\(best.pairId)_\(best.lagHours)",
@@ -278,41 +223,4 @@ final class DiscoveryFeedViewModel {
         }
     }
 
-    func alignForScatter(a: [MetricSample], b: [MetricSample], lagHours: Int) -> [ScatterPoint] {
-        let calendar = Calendar.current
-        let lagDays = lagHours / 24
-        let hasHalfDay = (lagHours % 24) == 12
-
-        var bByDay: [Date: (value: Double, date: Date)] = [:]
-        for sample in b {
-            let day = calendar.startOfDay(for: sample.date)
-            bByDay[day] = (sample.value, sample.date)
-        }
-
-        var points: [ScatterPoint] = []
-        for sample in a {
-            let dayA = calendar.startOfDay(for: sample.date)
-
-            if hasHalfDay {
-                guard let dayB1 = calendar.date(byAdding: .day, value: lagDays, to: dayA),
-                      let dayB2 = calendar.date(byAdding: .day, value: lagDays + 1, to: dayA),
-                      let val1 = bByDay[dayB1],
-                      let val2 = bByDay[dayB2] else { continue }
-                points.append(ScatterPoint(
-                    date: sample.date,
-                    metricA: sample.value,
-                    metricB: (val1.value + val2.value) / 2.0
-                ))
-            } else {
-                guard let dayB = calendar.date(byAdding: .day, value: lagDays, to: dayA),
-                      let valB = bByDay[dayB] else { continue }
-                points.append(ScatterPoint(
-                    date: sample.date,
-                    metricA: sample.value,
-                    metricB: valB.value
-                ))
-            }
-        }
-        return points
-    }
 }

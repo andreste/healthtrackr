@@ -8,7 +8,7 @@ enum Radius {
     static let full: CGFloat = 9999
 }
 
-enum Duration {
+enum AnimationDuration {
     static let micro: Double = 0.08
     static let short: Double = 0.18
     static let medium: Double = 0.28

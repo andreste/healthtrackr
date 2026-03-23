@@ -24,7 +24,7 @@ struct FilterChipView: View {
                 )
         }
         .buttonStyle(.plain)
-        .animation(.easeOut(duration: Duration.short), value: isActive)
+        .animation(.easeOut(duration: AnimationDuration.short), value: isActive)
     }
 }
 

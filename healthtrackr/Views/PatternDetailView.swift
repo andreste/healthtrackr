@@ -2,9 +2,9 @@ import Charts
 import SwiftUI
 
 struct PatternDetailView: View {
-    let item: DiscoveryFeedViewModel.PatternItem
+    let item: PatternItem
 
-    @State private var selectedPoint: DiscoveryFeedViewModel.ScatterPoint?
+    @State private var selectedPoint: ScatterPoint?
 
     var body: some View {
         ScrollView {
@@ -128,7 +128,7 @@ struct PatternDetailView: View {
         }
     }
 
-    private func calloutView(for point: DiscoveryFeedViewModel.ScatterPoint) -> some View {
+    private func calloutView(for point: ScatterPoint) -> some View {
         VStack(alignment: .leading, spacing: Spacing.space1) {
             Text(point.date, style: .date)
                 .font(Typography.dataSM)
