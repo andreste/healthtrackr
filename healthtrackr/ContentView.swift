@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    let authManager: AuthManager
+
     @State private var hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedDataReadiness")
 
     var body: some View {
         if hasCompletedOnboarding {
-            DiscoveryFeedView()
+            DiscoveryFeedView(authManager: authManager)
                 .transition(.opacity)
         } else {
             DataReadinessView {
@@ -20,5 +22,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(authManager: AuthManager())
 }

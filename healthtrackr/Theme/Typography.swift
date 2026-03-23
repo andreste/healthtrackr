@@ -3,8 +3,7 @@ import SwiftUI
 enum Typography {
     // MARK: - Font Names
     private static let fraunces = "Fraunces"
-    private static let frauncesItalic = "Fraunces-Italic"
-    private static let instrumentSans = "InstrumentSans"
+    private static let instrumentSans = "InstrumentSans-Regular"
     private static let geistMono = "GeistMono-Regular"
     private static let geistMonoMedium = "GeistMono-Medium"
 
@@ -14,7 +13,7 @@ enum Typography {
     static let displayLG = Font.custom(fraunces, size: 28, relativeTo: .title)
     static let displayMD = Font.custom(fraunces, size: 22, relativeTo: .title2)
     static let displaySM = Font.custom(fraunces, size: 18, relativeTo: .title3)
-    static let displayItalic = Font.custom(frauncesItalic, size: 16, relativeTo: .subheadline)
+    static let displayItalic = Font.custom(fraunces, size: 16, relativeTo: .subheadline).italic()
 
     // MARK: - Body (Instrument Sans)
 

@@ -11,7 +11,7 @@ struct HealthtrackrApp: App {
                     Color("bgPrimary")
                         .ignoresSafeArea()
                 } else if authManager.isAuthenticated {
-                    ContentView()
+                    ContentView(authManager: authManager)
                         .transition(.opacity)
                 } else {
                     SignInView(authManager: authManager)
