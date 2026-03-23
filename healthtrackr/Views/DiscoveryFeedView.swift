@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DiscoveryFeedView: View {
+    let authManager: AuthManager
     @State private var viewModel = DiscoveryFeedViewModel()
 
     var body: some View {
@@ -119,6 +120,30 @@ struct DiscoveryFeedView: View {
     private var settingsSheet: some View {
         NavigationStack {
             List {
+                Section("Data & Privacy") {
+                    VStack(alignment: .leading, spacing: Spacing.space2) {
+                        Text("Pattern summaries are sent to Claude API for narration.")
+                            .font(Typography.bodyMD)
+                            .foregroundStyle(Color("textSecondary"))
+                        Link("Anthropic Privacy Policy",
+                             destination: URL(string: "https://www.anthropic.com/privacy")!)
+                            .font(Typography.bodyMD)
+                            .foregroundStyle(Color("accentPrimary"))
+                    }
+                    Text("Your raw health data never leaves your device.")
+                        .font(Typography.bodyMD)
+                        .foregroundStyle(Color("textSecondary"))
+                }
+
+                Section("Account") {
+                    Button(role: .destructive) {
+                        authManager.signOut()
+                    } label: {
+                        Text("Sign Out")
+                            .font(Typography.labelMD)
+                    }
+                }
+
                 Section("About") {
                     HStack {
                         Text("Version")
@@ -141,7 +166,7 @@ struct DiscoveryFeedView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 
     private func displayLabel(for pairId: String) -> String {
@@ -154,10 +179,10 @@ struct DiscoveryFeedView: View {
 }
 
 #Preview("Discovery Feed") {
-    DiscoveryFeedView()
+    DiscoveryFeedView(authManager: AuthManager())
 }
 
 #Preview("Discovery Feed - Dark") {
-    DiscoveryFeedView()
+    DiscoveryFeedView(authManager: AuthManager())
         .preferredColorScheme(.dark)
 }
