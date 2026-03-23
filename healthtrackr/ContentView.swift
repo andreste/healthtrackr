@@ -1,15 +1,21 @@
-//
-//  ContentView.swift
-//  healthtrackr
-//
-//  Created by Andres Trevino on 3/21/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedDataReadiness")
+
     var body: some View {
-        DiscoveryFeedView()
+        if hasCompletedOnboarding {
+            DiscoveryFeedView()
+                .transition(.opacity)
+        } else {
+            DataReadinessView {
+                UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
+                withAnimation(.easeOut(duration: AnimationDuration.medium)) {
+                    hasCompletedOnboarding = true
+                }
+            }
+            .transition(.opacity)
+        }
     }
 }
 
