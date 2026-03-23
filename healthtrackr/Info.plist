@@ -10,12 +10,12 @@
 	<string>healthtrackr needs write access to store computed health insights.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fonts/Fraunces[SOFT,WONK,opsz,wght].ttf</string>
-		<string>Fonts/Fraunces-Italic[SOFT,WONK,opsz,wght].ttf</string>
-		<string>Fonts/InstrumentSans-Regular.ttf</string>
-		<string>Fonts/InstrumentSans-Italic.ttf</string>
-		<string>Fonts/GeistMono-Regular.ttf</string>
-		<string>Fonts/GeistMono-Medium.ttf</string>
+		<string>Fraunces[SOFT,WONK,opsz,wght].ttf</string>
+		<string>Fraunces-Italic[SOFT,WONK,opsz,wght].ttf</string>
+		<string>InstrumentSans-Regular.ttf</string>
+		<string>InstrumentSans-Italic.ttf</string>
+		<string>GeistMono-Regular.ttf</string>
+		<string>GeistMono-Medium.ttf</string>
 	</array>
 </dict>
 </plist>
