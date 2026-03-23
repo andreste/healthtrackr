@@ -7,7 +7,6 @@ final class AuthManager {
     var isCheckingCredential = true
 
     private static let userIDKey = "appleUserIdentifier"
-    private static let tokenKey = "appleIdentityToken"
 
     // MARK: - Lifecycle
 
@@ -52,15 +51,6 @@ final class AuthManager {
             }
             #endif
 
-            if let tokenData = credential.identityToken {
-                let savedToken = KeychainHelper.save(key: Self.tokenKey, data: tokenData)
-                #if DEBUG
-                if !savedToken {
-                    print("[AuthManager] Failed to save identity token to Keychain")
-                }
-                #endif
-            }
-
             isAuthenticated = true
 
         case .failure(let error):
@@ -81,7 +71,6 @@ final class AuthManager {
 
     private func clearCredentials() {
         KeychainHelper.delete(key: Self.userIDKey)
-        KeychainHelper.delete(key: Self.tokenKey)
         isAuthenticated = false
     }
 }
