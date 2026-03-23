@@ -404,3 +404,155 @@ struct LoadStateTests {
         #expect(vm.selectedFilter == .all)
     }
 }
+
+// MARK: - PatternDetailFormatter Tests
+
+@Suite("PatternDetailFormatter")
+struct PatternDetailFormatterTests {
+    @Test("effectSizeText formats positive percentage")
+    func positiveEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(0.18) == "+18%")
+    }
+
+    @Test("effectSizeText formats negative percentage")
+    func negativeEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(-0.12) == "-12%")
+    }
+
+    @Test("effectSizeText formats zero")
+    func zeroEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(0.0) == "+0%")
+    }
+
+    @Test("lagText formats hours")
+    func lagHours() {
+        #expect(PatternDetailFormatter.lagText(36) == "36h")
+        #expect(PatternDetailFormatter.lagText(0) == "0h")
+    }
+
+    @Test("correlationText formats r value")
+    func correlationR() {
+        #expect(PatternDetailFormatter.correlationText(0.71) == "r=0.71")
+        #expect(PatternDetailFormatter.correlationText(-0.45) == "r=-0.45")
+    }
+}
+
+// MARK: - Metric Keys & Labels Tests
+
+@Suite("Metric Keys and Labels")
+struct MetricKeysTests {
+    @Test("metricKeys returns correct keys for sleep_hrv")
+    @MainActor func sleepHRVKeys() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let (a, b) = vm.metricKeys(for: "sleep_hrv")
+        #expect(a == "sleep")
+        #expect(b == "hrv")
+    }
+
+    @Test("metricKeys returns correct keys for steps_rhr")
+    @MainActor func stepsRHRKeys() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let (a, b) = vm.metricKeys(for: "steps_rhr")
+        #expect(a == "steps")
+        #expect(b == "rhr")
+    }
+
+    @Test("metricLabel returns human-readable labels")
+    @MainActor func labels() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        #expect(vm.metricLabel("sleep") == "Sleep (hrs)")
+        #expect(vm.metricLabel("hrv") == "HRV (ms)")
+        #expect(vm.metricLabel("steps") == "Steps")
+        #expect(vm.metricLabel("rhr") == "Resting HR (bpm)")
+        #expect(vm.metricLabel("unknown") == "unknown")
+    }
+}
+
+// MARK: - Scatter Alignment Tests
+
+@Suite("Scatter Alignment")
+struct ScatterAlignmentTests {
+    @Test("alignForScatter produces correct points with 0 lag")
+    @MainActor func zeroLag() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+
+        let a = [
+            MetricSample(date: today, value: 7.5),
+            MetricSample(date: yesterday, value: 6.0),
+        ]
+        let b = [
+            MetricSample(date: today, value: 55.0),
+            MetricSample(date: yesterday, value: 40.0),
+        ]
+
+        let points = vm.alignForScatter(a: a, b: b, lagHours: 0)
+        #expect(points.count == 2)
+        #expect(points.first?.metricA == 7.5)
+        #expect(points.first?.metricB == 55.0)
+    }
+
+    @Test("alignForScatter handles 24h lag correctly")
+    @MainActor func dayLag() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+
+        let a = [MetricSample(date: yesterday, value: 8.0)]
+        let b = [MetricSample(date: today, value: 60.0)]
+
+        let points = vm.alignForScatter(a: a, b: b, lagHours: 24)
+        #expect(points.count == 1)
+        #expect(points.first?.metricA == 8.0)
+        #expect(points.first?.metricB == 60.0)
+    }
+
+    @Test("alignForScatter returns empty when no alignment possible")
+    @MainActor func noAlignment() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let points = vm.alignForScatter(a: [], b: [], lagHours: 0)
+        #expect(points.isEmpty)
+    }
+
+    @Test("buildItems includes effectSize and metric labels")
+    @MainActor func buildItemsIncludesNewFields() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let result = makeResult(pairId: "sleep_hrv")
+        let items = vm.buildItems(from: [result], narrations: [])
+
+        #expect(items.first?.effectSize == 0.18)
+        #expect(items.first?.metricALabel == "Sleep (hrs)")
+        #expect(items.first?.metricBLabel == "HRV (ms)")
+    }
+}

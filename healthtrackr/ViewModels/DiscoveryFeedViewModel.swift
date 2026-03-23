@@ -50,6 +50,13 @@ final class DiscoveryFeedViewModel {
 
     // MARK: - Feed Item
 
+    struct ScatterPoint: Identifiable {
+        let id = UUID()
+        let date: Date
+        let metricA: Double
+        let metricB: Double
+    }
+
     struct PatternItem: Identifiable {
         let id: String
         let pairId: String
@@ -60,6 +67,10 @@ final class DiscoveryFeedViewModel {
         let r: Double
         let n: Int
         let lagHours: Int
+        let effectSize: Double
+        let scatterData: [ScatterPoint]
+        let metricALabel: String
+        let metricBLabel: String
     }
 
     // MARK: - State
@@ -77,6 +88,8 @@ final class DiscoveryFeedViewModel {
     var loadingPairIds: Set<String> = []
     var lastUpdated: Date?
     var showSettings = false
+
+    private var metricSamples: [String: [MetricSample]] = [:]
 
     var filteredItems: [PatternItem] {
         guard let allowedPairs = selectedFilter.pairIds else { return items }
@@ -170,6 +183,11 @@ final class DiscoveryFeedViewModel {
         let steps = await stepsData
         let rhr = await rhrData
 
+        metricSamples = [
+            "sleep": sleep, "hrv": hrv,
+            "steps": steps, "rhr": rhr,
+        ]
+
         let pairs = [
             MetricPair(id: "sleep_hrv", metricA: sleep, metricB: hrv),
             MetricPair(id: "steps_rhr", metricA: steps, metricB: rhr),
@@ -210,6 +228,12 @@ final class DiscoveryFeedViewModel {
         // Pick the best result per pair (highest |r|)
         let best = confirmed.max(by: { abs($0.r) < abs($1.r) })!
         let narration = narrations.first { $0.pairId == best.pairId }
+        let (metricAKey, metricBKey) = metricKeys(for: best.pairId)
+        let scatter = alignForScatter(
+            a: metricSamples[metricAKey] ?? [],
+            b: metricSamples[metricBKey] ?? [],
+            lagHours: best.lagHours
+        )
 
         return [PatternItem(
             id: "\(best.pairId)_\(best.lagHours)",
@@ -220,7 +244,11 @@ final class DiscoveryFeedViewModel {
             confidence: best.confidence,
             r: best.r,
             n: best.n,
-            lagHours: best.lagHours
+            lagHours: best.lagHours,
+            effectSize: best.effectSize,
+            scatterData: scatter,
+            metricALabel: metricLabel(metricAKey),
+            metricBLabel: metricLabel(metricBKey)
         )]
     }
 
@@ -230,5 +258,61 @@ final class DiscoveryFeedViewModel {
         case "steps_rhr": return "STEPS + HR"
         default: return pairId.uppercased()
         }
+    }
+
+    func metricKeys(for pairId: String) -> (String, String) {
+        switch pairId {
+        case "sleep_hrv": return ("sleep", "hrv")
+        case "steps_rhr": return ("steps", "rhr")
+        default: return ("", "")
+        }
+    }
+
+    func metricLabel(_ key: String) -> String {
+        switch key {
+        case "sleep": return "Sleep (hrs)"
+        case "hrv": return "HRV (ms)"
+        case "steps": return "Steps"
+        case "rhr": return "Resting HR (bpm)"
+        default: return key
+        }
+    }
+
+    func alignForScatter(a: [MetricSample], b: [MetricSample], lagHours: Int) -> [ScatterPoint] {
+        let calendar = Calendar.current
+        let lagDays = lagHours / 24
+        let hasHalfDay = (lagHours % 24) == 12
+
+        var bByDay: [Date: (value: Double, date: Date)] = [:]
+        for sample in b {
+            let day = calendar.startOfDay(for: sample.date)
+            bByDay[day] = (sample.value, sample.date)
+        }
+
+        var points: [ScatterPoint] = []
+        for sample in a {
+            let dayA = calendar.startOfDay(for: sample.date)
+
+            if hasHalfDay {
+                guard let dayB1 = calendar.date(byAdding: .day, value: lagDays, to: dayA),
+                      let dayB2 = calendar.date(byAdding: .day, value: lagDays + 1, to: dayA),
+                      let val1 = bByDay[dayB1],
+                      let val2 = bByDay[dayB2] else { continue }
+                points.append(ScatterPoint(
+                    date: sample.date,
+                    metricA: sample.value,
+                    metricB: (val1.value + val2.value) / 2.0
+                ))
+            } else {
+                guard let dayB = calendar.date(byAdding: .day, value: lagDays, to: dayA),
+                      let valB = bByDay[dayB] else { continue }
+                points.append(ScatterPoint(
+                    date: sample.date,
+                    metricA: sample.value,
+                    metricB: valB.value
+                ))
+            }
+        }
+        return points
     }
 }

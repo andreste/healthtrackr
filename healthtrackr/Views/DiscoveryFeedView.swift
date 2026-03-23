@@ -86,8 +86,13 @@ struct DiscoveryFeedView: View {
     private var cardsSection: some View {
         LazyVStack(spacing: Spacing.space6) {
             ForEach(Array(viewModel.filteredItems.enumerated()), id: \.element.id) { index, item in
-                PatternCardView(item: item, index: index)
-                    .padding(.horizontal, Spacing.screenHorizontalMargin)
+                NavigationLink {
+                    PatternDetailView(item: item)
+                } label: {
+                    PatternCardView(item: item, index: index)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, Spacing.screenHorizontalMargin)
             }
 
             // Show loading for pairs still computing
