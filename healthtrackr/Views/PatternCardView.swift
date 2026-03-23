@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PatternCardView: View {
-    let item: DiscoveryFeedViewModel.PatternItem
+    let item: PatternItem
     let index: Int
 
     @State private var appeared = false
@@ -59,7 +59,7 @@ struct PatternCardView: View {
         .offset(y: appeared ? 0 : 12)
         .onAppear {
             withAnimation(
-                .easeOut(duration: Duration.short)
+                .easeOut(duration: AnimationDuration.short)
                     .delay(CardStagger.delay * Double(index))
             ) {
                 appeared = true

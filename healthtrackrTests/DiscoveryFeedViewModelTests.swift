@@ -36,7 +36,7 @@ final class FakeCorrelationEngine: CorrelationProviding {
         cachedResultsByPair[pairId] ?? []
     }
 
-    func run(pairs: [MetricPair]) {
+    func run(pairs: [MetricPair]) async {
         runCalledWith = pairs
     }
 }
@@ -480,17 +480,12 @@ struct MetricKeysTests {
     }
 }
 
-// MARK: - Scatter Alignment Tests
+// MARK: - MetricAlignment Tests
 
-@Suite("Scatter Alignment")
-struct ScatterAlignmentTests {
-    @Test("alignForScatter produces correct points with 0 lag")
-    @MainActor func zeroLag() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
+@Suite("Metric Alignment")
+struct MetricAlignmentTests {
+    @Test("align produces correct points with 0 lag")
+    func zeroLag() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
@@ -504,19 +499,14 @@ struct ScatterAlignmentTests {
             MetricSample(date: yesterday, value: 40.0),
         ]
 
-        let points = vm.alignForScatter(a: a, b: b, lagHours: 0)
+        let points = MetricAlignment.align(a: a, b: b, lagHours: 0)
         #expect(points.count == 2)
-        #expect(points.first?.metricA == 7.5)
-        #expect(points.first?.metricB == 55.0)
+        #expect(points.first?.a == 7.5)
+        #expect(points.first?.b == 55.0)
     }
 
-    @Test("alignForScatter handles 24h lag correctly")
-    @MainActor func dayLag() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
+    @Test("align handles 24h lag correctly")
+    func dayLag() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
@@ -524,21 +514,45 @@ struct ScatterAlignmentTests {
         let a = [MetricSample(date: yesterday, value: 8.0)]
         let b = [MetricSample(date: today, value: 60.0)]
 
-        let points = vm.alignForScatter(a: a, b: b, lagHours: 24)
+        let points = MetricAlignment.align(a: a, b: b, lagHours: 24)
         #expect(points.count == 1)
-        #expect(points.first?.metricA == 8.0)
-        #expect(points.first?.metricB == 60.0)
+        #expect(points.first?.a == 8.0)
+        #expect(points.first?.b == 60.0)
     }
 
-    @Test("alignForScatter returns empty when no alignment possible")
-    @MainActor func noAlignment() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
-        let points = vm.alignForScatter(a: [], b: [], lagHours: 0)
+    @Test("align returns empty when no alignment possible")
+    func noAlignment() {
+        let points = MetricAlignment.align(a: [], b: [], lagHours: 0)
         #expect(points.isEmpty)
+    }
+
+    @Test("align handles 12h half-day offset by averaging")
+    func halfDayLag() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+
+        let a = [MetricSample(date: yesterday, value: 7.0)]
+        let b = [
+            MetricSample(date: yesterday, value: 40.0),
+            MetricSample(date: today, value: 60.0),
+        ]
+
+        let points = MetricAlignment.align(a: a, b: b, lagHours: 12)
+        #expect(points.count == 1)
+        #expect(points.first?.b == 50.0) // (40 + 60) / 2
+    }
+
+    @Test("align preserves date from metric A")
+    func preservesDate() {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let a = [MetricSample(date: today, value: 7.0)]
+        let b = [MetricSample(date: today, value: 55.0)]
+
+        let points = MetricAlignment.align(a: a, b: b, lagHours: 0)
+        #expect(points.first?.date == today)
     }
 
     @Test("buildItems includes effectSize and metric labels")

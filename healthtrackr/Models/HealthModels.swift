@@ -28,6 +28,12 @@ struct CorrelationResult: Codable {
     }
 }
 
+struct MetricPair {
+    let id: String
+    let metricA: [MetricSample]
+    let metricB: [MetricSample]
+}
+
 struct PatternNarration: Codable {
     let pairId: String
     let headline: String
