@@ -155,6 +155,35 @@ struct DiscoveryFeedView: View {
                         .foregroundStyle(Color("textSecondary"))
                 }
 
+                Section {
+                    VStack(alignment: .leading, spacing: Spacing.space2) {
+                        PermissionRow(icon: "bed.double.fill", label: "Sleep Analysis")
+                        PermissionRow(icon: "waveform.path.ecg", label: "Heart Rate Variability")
+                        PermissionRow(icon: "figure.walk", label: "Steps")
+                        PermissionRow(icon: "heart.fill", label: "Resting Heart Rate")
+                    }
+                    .padding(.vertical, Spacing.space1)
+
+                    Button {
+                        if let url = URL(string: "x-apple-health://") {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        HStack {
+                            Text("Manage Permissions in Health App")
+                                .font(Typography.labelMD)
+                                .foregroundStyle(Color("accentPrimary"))
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundStyle(Color("accentPrimary"))
+                        }
+                    }
+                    .accessibilityIdentifier("ManageHealthPermissionsButton")
+                } header: {
+                    Text("Health Permissions")
+                }
+
                 Section("Account") {
                     Button(role: .destructive) {
                         authManager.signOut()
@@ -195,6 +224,24 @@ struct DiscoveryFeedView: View {
         case "sleep_hrv": return "Sleep + HRV"
         case "steps_rhr": return "Steps + HR"
         default: return pairId
+        }
+    }
+}
+
+// MARK: - Permission Row
+
+private struct PermissionRow: View {
+    let icon: String
+    let label: String
+
+    var body: some View {
+        HStack(spacing: Spacing.space2) {
+            Image(systemName: icon)
+                .foregroundStyle(Color("accentPrimary"))
+                .frame(width: 20)
+            Text(label)
+                .font(Typography.bodyMD)
+                .foregroundStyle(Color("textPrimary"))
         }
     }
 }
