@@ -36,7 +36,9 @@ struct SignInView: View {
                         request.requestedScopes = [.fullName, .email]
                     },
                     onCompletion: { result in
-                        authManager.handleSignInResult(result)
+                        MainActor.assumeIsolated {
+                            authManager.handleSignInResult(result)
+                        }
                     }
                 )
                 .signInWithAppleButtonStyle(
