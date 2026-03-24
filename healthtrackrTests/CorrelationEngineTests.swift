@@ -131,13 +131,23 @@ struct CorrelationEngineTests {
 
     @Test("v1Pairs has expected configuration")
     func v1PairsConfiguration() {
-        #expect(CorrelationEngine.v1Pairs.count == 2)
+        #expect(CorrelationEngine.v1Pairs.count == 10)
         #expect(CorrelationEngine.v1Pairs[0].id == "sleep_hrv")
         #expect(CorrelationEngine.v1Pairs[0].metricAKey == "sleep")
         #expect(CorrelationEngine.v1Pairs[0].metricBKey == "hrv")
         #expect(CorrelationEngine.v1Pairs[1].id == "steps_rhr")
         #expect(CorrelationEngine.v1Pairs[1].metricAKey == "steps")
         #expect(CorrelationEngine.v1Pairs[1].metricBKey == "rhr")
+
+        let pairIds = CorrelationEngine.v1Pairs.map(\.id)
+        #expect(pairIds.contains("sleep_rhr"))
+        #expect(pairIds.contains("activeEnergy_hrv"))
+        #expect(pairIds.contains("activeEnergy_rhr"))
+        #expect(pairIds.contains("exerciseTime_rhr"))
+        #expect(pairIds.contains("exerciseTime_hrv"))
+        #expect(pairIds.contains("steps_hrv"))
+        #expect(pairIds.contains("vo2Max_rhr"))
+        #expect(pairIds.contains("distance_rhr"))
     }
 
     @Test("lagOffsets includes expected values")

@@ -57,6 +57,30 @@ final class StubHealthKit: HealthKitProviding {
     func fetchRestingHR(days: Int) async -> [MetricSample] {
         samples.map { MetricSample(date: $0.date, value: Double.random(in: 55...75)) }
     }
+    func fetchActiveEnergy(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 200...800)) }
+    }
+    func fetchExerciseTime(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 10...90)) }
+    }
+    func fetchDistance(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 1...12)) }
+    }
+    func fetchVO2Max(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 30...55)) }
+    }
+    func fetchWalkingHR(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 90...130)) }
+    }
+    func fetchOxygenSaturation(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 0.95...0.99)) }
+    }
+    func fetchRespiratoryRate(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 12...20)) }
+    }
+    func fetchBodyMass(days: Int) async -> [MetricSample] {
+        samples.map { MetricSample(date: $0.date, value: Double.random(in: 60...90)) }
+    }
 
     enum StubError: Error { case denied }
 }

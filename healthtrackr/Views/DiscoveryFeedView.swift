@@ -161,6 +161,14 @@ struct DiscoveryFeedView: View {
                         PermissionRow(icon: "waveform.path.ecg", label: "Heart Rate Variability")
                         PermissionRow(icon: "figure.walk", label: "Steps")
                         PermissionRow(icon: "heart.fill", label: "Resting Heart Rate")
+                        PermissionRow(icon: "flame.fill", label: "Active Energy")
+                        PermissionRow(icon: "figure.run", label: "Exercise Time")
+                        PermissionRow(icon: "map.fill", label: "Walking + Running Distance")
+                        PermissionRow(icon: "lungs.fill", label: "VO2 Max")
+                        PermissionRow(icon: "figure.walk.motion", label: "Walking Heart Rate")
+                        PermissionRow(icon: "o2.circle.fill", label: "Blood Oxygen")
+                        PermissionRow(icon: "wind", label: "Respiratory Rate")
+                        PermissionRow(icon: "scalemass.fill", label: "Body Mass")
                     }
                     .padding(.vertical, Spacing.space1)
 
@@ -223,6 +231,14 @@ struct DiscoveryFeedView: View {
         switch pairId {
         case "sleep_hrv": return "Sleep + HRV"
         case "steps_rhr": return "Steps + HR"
+        case "sleep_rhr": return "Sleep + HR"
+        case "activeEnergy_hrv": return "Energy + HRV"
+        case "activeEnergy_rhr": return "Energy + HR"
+        case "exerciseTime_rhr": return "Exercise + HR"
+        case "exerciseTime_hrv": return "Exercise + HRV"
+        case "steps_hrv": return "Steps + HRV"
+        case "vo2Max_rhr": return "VO2 Max + HR"
+        case "distance_rhr": return "Distance + HR"
         default: return pairId
         }
     }
