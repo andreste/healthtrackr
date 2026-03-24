@@ -2,7 +2,7 @@ name: iOS starter workflow
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "hello" ]
 
 jobs:
   build:
