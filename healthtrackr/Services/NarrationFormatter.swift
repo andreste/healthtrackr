@@ -30,6 +30,14 @@ enum NarrationFormatter {
         switch pairId {
         case "sleep_hrv": return "Sleep duration and next-day HRV"
         case "steps_rhr": return "Steps and Resting Heart Rate"
+        case "sleep_rhr": return "Sleep and Resting Heart Rate"
+        case "activeEnergy_hrv": return "Active Energy and HRV"
+        case "activeEnergy_rhr": return "Active Energy and Resting Heart Rate"
+        case "exerciseTime_rhr": return "Exercise Time and Resting Heart Rate"
+        case "exerciseTime_hrv": return "Exercise Time and HRV"
+        case "steps_hrv": return "Steps and HRV"
+        case "vo2Max_rhr": return "VO2 Max and Resting Heart Rate"
+        case "distance_rhr": return "Walking Distance and Resting Heart Rate"
         default: return pairId.replacingOccurrences(of: "_", with: " and ")
         }
     }

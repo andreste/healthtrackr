@@ -9,6 +9,14 @@ final class CorrelationEngine {
     static let v1Pairs: [(id: String, metricAKey: String, metricBKey: String)] = [
         ("sleep_hrv", "sleep", "hrv"),
         ("steps_rhr", "steps", "rhr"),
+        ("sleep_rhr", "sleep", "rhr"),
+        ("activeEnergy_hrv", "activeEnergy", "hrv"),
+        ("activeEnergy_rhr", "activeEnergy", "rhr"),
+        ("exerciseTime_rhr", "exerciseTime", "rhr"),
+        ("exerciseTime_hrv", "exerciseTime", "hrv"),
+        ("steps_hrv", "steps", "hrv"),
+        ("vo2Max_rhr", "vo2Max", "rhr"),
+        ("distance_rhr", "distance", "rhr"),
     ]
 
     // MARK: - Public

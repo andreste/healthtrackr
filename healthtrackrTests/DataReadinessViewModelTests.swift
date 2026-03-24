@@ -60,7 +60,7 @@ struct DataReadinessStateTests {
         await vm.load()
 
         #expect(vm.state == .loaded)
-        #expect(vm.metricStatuses.count == 2)
+        #expect(vm.metricStatuses.count == 10)
     }
 }
 

@@ -8,12 +8,16 @@ final class DiscoveryFeedViewModel {
         case all = "All"
         case sleepHRV = "Sleep + HRV"
         case stepsHR = "Steps + HR"
+        case energy = "Energy"
+        case exercise = "Exercise"
 
         var pairIds: [String]? {
             switch self {
             case .all: return nil
-            case .sleepHRV: return ["sleep_hrv"]
-            case .stepsHR: return ["steps_rhr"]
+            case .sleepHRV: return ["sleep_hrv", "sleep_rhr"]
+            case .stepsHR: return ["steps_rhr", "steps_hrv"]
+            case .energy: return ["activeEnergy_hrv", "activeEnergy_rhr"]
+            case .exercise: return ["exerciseTime_rhr", "exerciseTime_hrv"]
             }
         }
     }
@@ -122,21 +126,34 @@ final class DiscoveryFeedViewModel {
         async let hrvData = healthKit.fetchHRV(days: 90)
         async let stepsData = healthKit.fetchSteps(days: 90)
         async let rhrData = healthKit.fetchRestingHR(days: 90)
+        async let activeEnergyData = healthKit.fetchActiveEnergy(days: 90)
+        async let exerciseTimeData = healthKit.fetchExerciseTime(days: 90)
+        async let distanceData = healthKit.fetchDistance(days: 90)
+        async let vo2MaxData = healthKit.fetchVO2Max(days: 90)
 
         let sleep = await sleepData
         let hrv = await hrvData
         let steps = await stepsData
         let rhr = await rhrData
+        let activeEnergy = await activeEnergyData
+        let exerciseTime = await exerciseTimeData
+        let distance = await distanceData
+        let vo2Max = await vo2MaxData
 
         metricSamples = [
             "sleep": sleep, "hrv": hrv,
             "steps": steps, "rhr": rhr,
+            "activeEnergy": activeEnergy, "exerciseTime": exerciseTime,
+            "distance": distance, "vo2Max": vo2Max,
         ]
 
-        let pairs = [
-            MetricPair(id: "sleep_hrv", metricA: sleep, metricB: hrv),
-            MetricPair(id: "steps_rhr", metricA: steps, metricB: rhr),
-        ]
+        let pairs = CorrelationEngine.v1Pairs.map { pairDef in
+            MetricPair(
+                id: pairDef.id,
+                metricA: metricSamples[pairDef.metricAKey] ?? [],
+                metricB: metricSamples[pairDef.metricBKey] ?? []
+            )
+        }
 
         // Run correlation and await completion
         await engine.run(pairs: pairs)
@@ -201,16 +218,23 @@ final class DiscoveryFeedViewModel {
         switch pairId {
         case "sleep_hrv": return "SLEEP + HRV"
         case "steps_rhr": return "STEPS + HR"
+        case "sleep_rhr": return "SLEEP + HR"
+        case "activeEnergy_hrv": return "ENERGY + HRV"
+        case "activeEnergy_rhr": return "ENERGY + HR"
+        case "exerciseTime_rhr": return "EXERCISE + HR"
+        case "exerciseTime_hrv": return "EXERCISE + HRV"
+        case "steps_hrv": return "STEPS + HRV"
+        case "vo2Max_rhr": return "VO2 MAX + HR"
+        case "distance_rhr": return "DISTANCE + HR"
         default: return pairId.uppercased()
         }
     }
 
     func metricKeys(for pairId: String) -> (String, String) {
-        switch pairId {
-        case "sleep_hrv": return ("sleep", "hrv")
-        case "steps_rhr": return ("steps", "rhr")
-        default: return ("", "")
+        guard let pair = CorrelationEngine.v1Pairs.first(where: { $0.id == pairId }) else {
+            return ("", "")
         }
+        return (pair.metricAKey, pair.metricBKey)
     }
 
     func metricLabel(_ key: String) -> String {
@@ -219,6 +243,14 @@ final class DiscoveryFeedViewModel {
         case "hrv": return "HRV (ms)"
         case "steps": return "Steps"
         case "rhr": return "Resting HR (bpm)"
+        case "activeEnergy": return "Active Energy (kcal)"
+        case "exerciseTime": return "Exercise (min)"
+        case "distance": return "Distance (km)"
+        case "vo2Max": return "VO2 Max (mL/kg/min)"
+        case "walkingHR": return "Walking HR (bpm)"
+        case "spo2": return "SpO2 (%)"
+        case "respiratoryRate": return "Resp. Rate (br/min)"
+        case "bodyMass": return "Body Mass (kg)"
         default: return key
         }
     }

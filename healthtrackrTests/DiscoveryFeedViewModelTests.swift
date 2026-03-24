@@ -12,6 +12,14 @@ final class FakeHealthKit: HealthKitProviding {
     var hrvSamples: [MetricSample] = []
     var stepsSamples: [MetricSample] = []
     var rhrSamples: [MetricSample] = []
+    var activeEnergySamples: [MetricSample] = []
+    var exerciseTimeSamples: [MetricSample] = []
+    var distanceSamples: [MetricSample] = []
+    var vo2MaxSamples: [MetricSample] = []
+    var walkingHRSamples: [MetricSample] = []
+    var oxygenSaturationSamples: [MetricSample] = []
+    var respiratoryRateSamples: [MetricSample] = []
+    var bodyMassSamples: [MetricSample] = []
 
     func requestAuthorization() async throws {
         if shouldThrowOnAuth {
@@ -23,6 +31,14 @@ final class FakeHealthKit: HealthKitProviding {
     func fetchHRV(days: Int) async -> [MetricSample] { hrvSamples }
     func fetchSteps(days: Int) async -> [MetricSample] { stepsSamples }
     func fetchRestingHR(days: Int) async -> [MetricSample] { rhrSamples }
+    func fetchActiveEnergy(days: Int) async -> [MetricSample] { activeEnergySamples }
+    func fetchExerciseTime(days: Int) async -> [MetricSample] { exerciseTimeSamples }
+    func fetchDistance(days: Int) async -> [MetricSample] { distanceSamples }
+    func fetchVO2Max(days: Int) async -> [MetricSample] { vo2MaxSamples }
+    func fetchWalkingHR(days: Int) async -> [MetricSample] { walkingHRSamples }
+    func fetchOxygenSaturation(days: Int) async -> [MetricSample] { oxygenSaturationSamples }
+    func fetchRespiratoryRate(days: Int) async -> [MetricSample] { respiratoryRateSamples }
+    func fetchBodyMass(days: Int) async -> [MetricSample] { bodyMassSamples }
 
     enum FakeError: Error { case denied }
 }
@@ -80,14 +96,24 @@ struct FilterTests {
         #expect(DiscoveryFeedViewModel.Filter.all.pairIds == nil)
     }
 
-    @Test("Sleep + HRV filter returns sleep_hrv")
-    func sleepHRVFilterReturnsSleepHRV() {
-        #expect(DiscoveryFeedViewModel.Filter.sleepHRV.pairIds == ["sleep_hrv"])
+    @Test("Sleep + HRV filter returns sleep pairs")
+    func sleepHRVFilterReturnsSleepPairs() {
+        #expect(DiscoveryFeedViewModel.Filter.sleepHRV.pairIds == ["sleep_hrv", "sleep_rhr"])
     }
 
-    @Test("Steps + HR filter returns steps_rhr")
-    func stepsHRFilterReturnsStepsRHR() {
-        #expect(DiscoveryFeedViewModel.Filter.stepsHR.pairIds == ["steps_rhr"])
+    @Test("Steps + HR filter returns steps pairs")
+    func stepsHRFilterReturnsStepsPairs() {
+        #expect(DiscoveryFeedViewModel.Filter.stepsHR.pairIds == ["steps_rhr", "steps_hrv"])
+    }
+
+    @Test("Energy filter returns activeEnergy pairs")
+    func energyFilterReturnsEnergyPairs() {
+        #expect(DiscoveryFeedViewModel.Filter.energy.pairIds == ["activeEnergy_hrv", "activeEnergy_rhr"])
+    }
+
+    @Test("Exercise filter returns exerciseTime pairs")
+    func exerciseFilterReturnsExercisePairs() {
+        #expect(DiscoveryFeedViewModel.Filter.exercise.pairIds == ["exerciseTime_rhr", "exerciseTime_hrv"])
     }
 }
 
@@ -270,6 +296,20 @@ struct HumanReadablePairTests {
         #expect(vm.humanReadablePair("steps_rhr") == "STEPS + HR")
     }
 
+    @Test("new pairs map to correct labels")
+    @MainActor func newPairLabels() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        #expect(vm.humanReadablePair("activeEnergy_hrv") == "ENERGY + HRV")
+        #expect(vm.humanReadablePair("exerciseTime_rhr") == "EXERCISE + HR")
+        #expect(vm.humanReadablePair("vo2Max_rhr") == "VO2 MAX + HR")
+        #expect(vm.humanReadablePair("distance_rhr") == "DISTANCE + HR")
+        #expect(vm.humanReadablePair("sleep_rhr") == "SLEEP + HR")
+    }
+
     @Test("unknown pair uppercases the id")
     @MainActor func unknownPair() {
         let vm = DiscoveryFeedViewModel(
@@ -387,7 +427,7 @@ struct LoadStateTests {
 
         await vm.load()
 
-        #expect(fakeEngine.runCalledWith.count == 2)
+        #expect(fakeEngine.runCalledWith.count == CorrelationEngine.v1Pairs.count)
         #expect(fakeEngine.runCalledWith[0].id == "sleep_hrv")
         #expect(fakeEngine.runCalledWith[1].id == "steps_rhr")
     }
@@ -465,6 +505,26 @@ struct MetricKeysTests {
         #expect(b == "rhr")
     }
 
+    @Test("metricKeys returns correct keys for new pairs")
+    @MainActor func newPairKeys() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        let (a1, b1) = vm.metricKeys(for: "activeEnergy_hrv")
+        #expect(a1 == "activeEnergy")
+        #expect(b1 == "hrv")
+
+        let (a2, b2) = vm.metricKeys(for: "exerciseTime_rhr")
+        #expect(a2 == "exerciseTime")
+        #expect(b2 == "rhr")
+
+        let (a3, b3) = vm.metricKeys(for: "vo2Max_rhr")
+        #expect(a3 == "vo2Max")
+        #expect(b3 == "rhr")
+    }
+
     @Test("metricLabel returns human-readable labels")
     @MainActor func labels() {
         let vm = DiscoveryFeedViewModel(
@@ -476,6 +536,10 @@ struct MetricKeysTests {
         #expect(vm.metricLabel("hrv") == "HRV (ms)")
         #expect(vm.metricLabel("steps") == "Steps")
         #expect(vm.metricLabel("rhr") == "Resting HR (bpm)")
+        #expect(vm.metricLabel("activeEnergy") == "Active Energy (kcal)")
+        #expect(vm.metricLabel("exerciseTime") == "Exercise (min)")
+        #expect(vm.metricLabel("distance") == "Distance (km)")
+        #expect(vm.metricLabel("vo2Max") == "VO2 Max (mL/kg/min)")
         #expect(vm.metricLabel("unknown") == "unknown")
     }
 }

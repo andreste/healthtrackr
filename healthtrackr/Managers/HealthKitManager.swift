@@ -11,14 +11,23 @@ final class HealthKitManager {
         if let sleep = HKCategoryType.categoryType(forIdentifier: .sleepAnalysis) {
             types.insert(sleep)
         }
-        if let hrv = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN) {
-            types.insert(hrv)
-        }
-        if let steps = HKQuantityType.quantityType(forIdentifier: .stepCount) {
-            types.insert(steps)
-        }
-        if let rhr = HKQuantityType.quantityType(forIdentifier: .restingHeartRate) {
-            types.insert(rhr)
+        let quantityIdentifiers: [HKQuantityTypeIdentifier] = [
+            .heartRateVariabilitySDNN,
+            .stepCount,
+            .restingHeartRate,
+            .activeEnergyBurned,
+            .appleExerciseTime,
+            .distanceWalkingRunning,
+            .vo2Max,
+            .walkingHeartRateAverage,
+            .oxygenSaturation,
+            .respiratoryRate,
+            .bodyMass,
+        ]
+        for identifier in quantityIdentifiers {
+            if let type = HKQuantityType.quantityType(forIdentifier: identifier) {
+                types.insert(type)
+            }
         }
         return types
     }()
@@ -153,6 +162,119 @@ final class HealthKitManager {
         return await fetchStatisticsCollection(
             quantityType: quantityType,
             unit: HKUnit(from: "count/min"),
+            options: .discreteAverage,
+            days: days
+        )
+    }
+
+    // MARK: - Active Energy Burned (daily sum, kcal)
+
+    func fetchActiveEnergy(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit.kilocalorie(),
+            options: .cumulativeSum,
+            days: days
+        )
+    }
+
+    // MARK: - Exercise Time (daily sum, minutes)
+
+    func fetchExerciseTime(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .appleExerciseTime) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit.minute(),
+            options: .cumulativeSum,
+            days: days
+        )
+    }
+
+    // MARK: - Walking + Running Distance (daily sum, km)
+
+    func fetchDistance(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit.meterUnit(with: .kilo),
+            options: .cumulativeSum,
+            days: days
+        )
+    }
+
+    // MARK: - VO2 Max (daily average, mL/kg/min)
+
+    func fetchVO2Max(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .vo2Max) else {
+            return []
+        }
+        let unit = HKUnit.literUnit(with: .milli).unitDivided(by: HKUnit.gramUnit(with: .kilo).unitMultiplied(by: HKUnit.minute()))
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: unit,
+            options: .discreteAverage,
+            days: days
+        )
+    }
+
+    // MARK: - Walking Heart Rate Average (daily average, bpm)
+
+    func fetchWalkingHR(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .walkingHeartRateAverage) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit(from: "count/min"),
+            options: .discreteAverage,
+            days: days
+        )
+    }
+
+    // MARK: - Oxygen Saturation (daily average, %)
+
+    func fetchOxygenSaturation(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .oxygenSaturation) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit.percent(),
+            options: .discreteAverage,
+            days: days
+        )
+    }
+
+    // MARK: - Respiratory Rate (daily average, breaths/min)
+
+    func fetchRespiratoryRate(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .respiratoryRate) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit(from: "count/min"),
+            options: .discreteAverage,
+            days: days
+        )
+    }
+
+    // MARK: - Body Mass (daily average, kg)
+
+    func fetchBodyMass(days: Int = 90) async -> [MetricSample] {
+        guard let quantityType = HKQuantityType.quantityType(forIdentifier: .bodyMass) else {
+            return []
+        }
+        return await fetchStatisticsCollection(
+            quantityType: quantityType,
+            unit: HKUnit.gramUnit(with: .kilo),
             options: .discreteAverage,
             days: days
         )
