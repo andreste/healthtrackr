@@ -160,6 +160,24 @@ final class HealthtrackrUITests: XCTestCase {
         XCTAssertTrue(signOutButton.exists, "Sign Out button should be visible in settings")
     }
 
+    @MainActor
+    func testSettingsShowsHealthPermissionsSection() {
+        let app = launchApp()
+
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 10))
+
+        element("SettingsButton", in: app).tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+
+        XCTAssertTrue(app.staticTexts["Sleep Analysis"].exists, "Sleep Analysis permission should be visible")
+        XCTAssertTrue(app.staticTexts["Heart Rate Variability"].exists, "HRV permission should be visible")
+        XCTAssertTrue(app.staticTexts["Steps"].exists, "Steps permission should be visible")
+        XCTAssertTrue(app.staticTexts["Resting Heart Rate"].exists, "Resting Heart Rate permission should be visible")
+
+        let manageButton = element("ManageHealthPermissionsButton", in: app)
+        XCTAssertTrue(manageButton.exists, "Manage Permissions button should be visible")
+    }
+
     // MARK: - Launch Performance
 
     @MainActor
