@@ -1,41 +1,174 @@
-//
-//  HealthtrackrUITests.swift
-//  HealthtrackrUITests
-//
-//  Created by Andres Trevino on 3/21/26.
-//
-
 import XCTest
 
 final class HealthtrackrUITests: XCTestCase {
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    // MARK: - Helpers
+
+    private func launchApp(
+        skipAuth: Bool = true,
+        stubEmptyFeed: Bool = false,
+        healthKitDenied: Bool = false
+    ) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments.append("--uitesting")
+        if skipAuth { app.launchArguments.append("--skip-auth") }
+        if stubEmptyFeed { app.launchArguments.append("--stub-empty-feed") }
+        if healthKitDenied { app.launchArguments.append("--healthkit-denied") }
+        app.launch()
+        return app
+    }
+
+    /// Find any element with the given accessibility identifier, regardless of type.
+    private func element(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    // MARK: - Sign In Screen
+
+    @MainActor
+    func testSignInScreenAppearsWhenNotAuthenticated() {
+        let app = launchApp(skipAuth: false)
+        let signInView = element("SignInView", in: app)
+        XCTAssertTrue(signInView.waitForExistence(timeout: 5), "Sign-in screen should appear when not authenticated")
+        XCTAssertTrue(app.staticTexts["healthtrackr"].exists, "App title should be visible")
+    }
+
+    // MARK: - Discovery Feed
+
+    @MainActor
+    func testDiscoveryFeedShowsNavigationTitle() {
+        let app = launchApp()
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 10), "Navigation title should say Discoveries")
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
+    func testDiscoveryFeedLoadsWithPatternCards() {
+        let app = launchApp()
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 10), "Feed should load")
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // Pattern cards are wrapped in NavigationLink, so they appear as buttons
+        let sleepCard = element("PatternCard_sleep_hrv", in: app)
+        XCTAssertTrue(sleepCard.waitForExistence(timeout: 10), "Sleep + HRV pattern card should appear")
+
+        let stepsCard = element("PatternCard_steps_rhr", in: app)
+        XCTAssertTrue(stepsCard.waitForExistence(timeout: 10), "Steps + HR pattern card should appear")
     }
+
+    // MARK: - Filter Chips
+
+    @MainActor
+    func testFilterChipsSwitchContent() {
+        let app = launchApp()
+
+        // Wait for cards to load
+        let sleepCard = element("PatternCard_sleep_hrv", in: app)
+        XCTAssertTrue(sleepCard.waitForExistence(timeout: 10))
+
+        // Tap "Sleep + HRV" filter
+        let sleepFilter = element("FilterChip_Sleep + HRV", in: app)
+        XCTAssertTrue(sleepFilter.waitForExistence(timeout: 5), "Sleep + HRV filter chip should exist")
+        sleepFilter.tap()
+
+        // Sleep card should still be visible
+        XCTAssertTrue(sleepCard.waitForExistence(timeout: 5), "Sleep card should remain after filtering")
+
+        // Steps card should be hidden
+        let stepsCard = element("PatternCard_steps_rhr", in: app)
+        // Give the UI a moment to update
+        sleep(1)
+        XCTAssertFalse(stepsCard.exists, "Steps card should be hidden after filtering to Sleep + HRV")
+
+        // Tap "All" filter to restore
+        let allFilter = element("FilterChip_All", in: app)
+        allFilter.tap()
+
+        XCTAssertTrue(element("PatternCard_steps_rhr", in: app).waitForExistence(timeout: 5), "Steps card should reappear after selecting All filter")
+    }
+
+    // MARK: - Pattern Detail Navigation
+
+    @MainActor
+    func testTapPatternCardNavigatesToDetail() {
+        let app = launchApp()
+
+        let sleepCard = element("PatternCard_sleep_hrv", in: app)
+        XCTAssertTrue(sleepCard.waitForExistence(timeout: 10))
+        sleepCard.tap()
+
+        let detailView = element("PatternDetailView", in: app)
+        XCTAssertTrue(detailView.waitForExistence(timeout: 5), "Pattern detail view should appear after tapping a card")
+
+        // Verify narration section
+        XCTAssertTrue(app.staticTexts["WHAT THIS MEANS"].waitForExistence(timeout: 3), "Narration section header should be visible")
+    }
+
+    @MainActor
+    func testPatternDetailBackNavigation() {
+        let app = launchApp()
+
+        let sleepCard = element("PatternCard_sleep_hrv", in: app)
+        XCTAssertTrue(sleepCard.waitForExistence(timeout: 10))
+        sleepCard.tap()
+
+        XCTAssertTrue(element("PatternDetailView", in: app).waitForExistence(timeout: 5))
+
+        // Tap back
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // Feed should be visible again
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 5), "Feed should reappear after navigating back")
+    }
+
+    // MARK: - Settings Sheet
+
+    @MainActor
+    func testSettingsSheetOpensAndCloses() {
+        let app = launchApp()
+
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 10))
+
+        // Tap settings button
+        let settingsButton = element("SettingsButton", in: app)
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5))
+        settingsButton.tap()
+
+        // Settings sheet should appear
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5), "Settings sheet should appear")
+        XCTAssertTrue(app.staticTexts["Version"].exists, "Version row should be visible in settings")
+
+        // Dismiss
+        app.buttons["Done"].tap()
+
+        // Feed should be visible again
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testSettingsShowsSignOutButton() {
+        let app = launchApp()
+
+        XCTAssertTrue(app.navigationBars["Discoveries"].waitForExistence(timeout: 10))
+
+        element("SettingsButton", in: app).tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+
+        let signOutButton = element("SignOutButton", in: app)
+        XCTAssertTrue(signOutButton.exists, "Sign Out button should be visible in settings")
+    }
+
+    // MARK: - Launch Performance
 
     @MainActor
     func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
+            let app = XCUIApplication()
+            app.launchArguments.append("--uitesting")
+            app.launchArguments.append("--skip-auth")
+            app.launch()
         }
     }
 }

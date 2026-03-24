@@ -1,8 +1,17 @@
 import SwiftUI
 
 struct DataReadinessView: View {
-    @State private var viewModel = DataReadinessViewModel()
+    @State private var viewModel: DataReadinessViewModel
     let onStart: () -> Void
+
+    init(healthKit: (any HealthKitProviding)? = nil, onStart: @escaping () -> Void) {
+        if let healthKit {
+            self._viewModel = State(initialValue: DataReadinessViewModel(healthKit: healthKit))
+        } else {
+            self._viewModel = State(initialValue: DataReadinessViewModel())
+        }
+        self.onStart = onStart
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -63,6 +72,7 @@ struct DataReadinessView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                 }
                 .disabled(!viewModel.canStart)
+                .accessibilityIdentifier("StartFindingPatternsButton")
                 .padding(.horizontal, Spacing.screenHorizontalMargin)
 
                 Text("Analysis runs on your device. Only pattern summaries are sent to AI.")
@@ -74,6 +84,7 @@ struct DataReadinessView: View {
             .padding(.bottom, Spacing.space7)
         }
         .background(Color("bgPrimary"))
+        .accessibilityIdentifier("DataReadinessView")
         .task {
             await viewModel.load()
         }
@@ -147,10 +158,10 @@ struct DataReadinessView: View {
 // MARK: - Previews
 
 #Preview("Data Readiness - Ready") {
-    DataReadinessView { }
+    DataReadinessView(onStart: { })
 }
 
 #Preview("Data Readiness - Dark") {
-    DataReadinessView { }
+    DataReadinessView(onStart: { })
         .preferredColorScheme(.dark)
 }

@@ -22,6 +22,7 @@ struct PatternDetailView: View {
         .scrollIndicators(.hidden)
         .navigationTitle(item.pairLabel)
         .navigationBarTitleDisplayMode(.inline)
+        .accessibilityIdentifier("PatternDetailView")
     }
 
     // MARK: - Header

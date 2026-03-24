@@ -7,22 +7,54 @@ struct HealthtrackrApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if authManager.isCheckingCredential {
-                    Color("bgPrimary")
-                        .ignoresSafeArea()
-                } else if authManager.isAuthenticated {
-                    ContentView(authManager: authManager)
-                        .transition(.opacity)
+                #if DEBUG
+                if UITestArgument.isUITesting {
+                    uiTestingRoot
                 } else {
-                    SignInView(authManager: authManager)
-                        .transition(.opacity)
+                    productionRoot
                 }
+                #else
+                productionRoot
+                #endif
             }
             .animation(.easeOut(duration: AnimationDuration.medium), value: authManager.isAuthenticated)
             .animation(.easeOut(duration: AnimationDuration.medium), value: authManager.isCheckingCredential)
-            .task {
-                await authManager.checkExistingCredential()
+        }
+    }
+
+    private var productionRoot: some View {
+        Group {
+            if authManager.isCheckingCredential {
+                Color("bgPrimary")
+                    .ignoresSafeArea()
+            } else if authManager.isAuthenticated {
+                ContentView(authManager: authManager)
+                    .transition(.opacity)
+            } else {
+                SignInView(authManager: authManager)
+                    .transition(.opacity)
+            }
+        }
+        .task {
+            await authManager.checkExistingCredential()
+        }
+    }
+
+    #if DEBUG
+    private var uiTestingRoot: some View {
+        Group {
+            if UITestArgument.skipAuth {
+                ContentView(
+                    authManager: authManager,
+                    skipOnboarding: true,
+                    healthKit: StubHealthKit(denied: UITestArgument.healthKitDenied),
+                    engine: StubCorrelationEngine(empty: UITestArgument.stubEmptyFeed),
+                    narrator: StubNarrator()
+                )
+            } else {
+                SignInView(authManager: authManager)
             }
         }
     }
+    #endif
 }

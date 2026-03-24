@@ -76,6 +76,7 @@ struct EmptyStateView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Spacing.space8)
+        .accessibilityIdentifier("EmptyStateView")
     }
 }
 
@@ -111,6 +112,7 @@ struct HealthKitDeniedView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("bgPrimary"))
+        .accessibilityIdentifier("HealthKitDeniedView")
     }
 }
 
