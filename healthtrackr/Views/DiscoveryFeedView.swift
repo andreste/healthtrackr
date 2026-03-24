@@ -2,7 +2,25 @@ import SwiftUI
 
 struct DiscoveryFeedView: View {
     let authManager: AuthManager
-    @State private var viewModel = DiscoveryFeedViewModel()
+    @State private var viewModel: DiscoveryFeedViewModel
+
+    init(
+        authManager: AuthManager,
+        healthKit: (any HealthKitProviding)? = nil,
+        engine: (any CorrelationProviding)? = nil,
+        narrator: (any NarrationProviding)? = nil
+    ) {
+        self.authManager = authManager
+        if let healthKit, let engine, let narrator {
+            self._viewModel = State(initialValue: DiscoveryFeedViewModel(
+                healthKit: healthKit,
+                engine: engine,
+                narrator: narrator
+            ))
+        } else {
+            self._viewModel = State(initialValue: DiscoveryFeedViewModel())
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -26,6 +44,7 @@ struct DiscoveryFeedView: View {
                 }
             }
             .background(Color("bgPrimary"))
+            .accessibilityIdentifier("DiscoveryFeedView")
             .navigationTitle("Discoveries")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -36,6 +55,7 @@ struct DiscoveryFeedView: View {
                         Image(systemName: "gearshape")
                             .foregroundStyle(Color("textSecondary"))
                     }
+                    .accessibilityIdentifier("SettingsButton")
                 }
 
                 if let updatedText = viewModel.lastUpdatedText {
@@ -142,6 +162,7 @@ struct DiscoveryFeedView: View {
                         Text("Sign Out")
                             .font(Typography.labelMD)
                     }
+                    .accessibilityIdentifier("SignOutButton")
                 }
 
                 Section("About") {

@@ -24,6 +24,7 @@ struct FilterChipView: View {
                 )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("FilterChip_\(label)")
         .animation(.easeOut(duration: AnimationDuration.short), value: isActive)
     }
 }

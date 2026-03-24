@@ -54,6 +54,7 @@ struct PatternCardView: View {
                 .stroke(Color("borderDefault"), lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("PatternCard_\(item.pairId)")
         .accessibilityLabel("\(item.pairLabel): \(item.headline). Confidence: \(item.confidence.rawValue).")
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 12)

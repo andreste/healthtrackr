@@ -54,6 +54,7 @@ struct SignInView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("bgPrimary"))
+        .accessibilityIdentifier("SignInView")
     }
 }
 
