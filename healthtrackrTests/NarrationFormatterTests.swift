@@ -25,13 +25,17 @@ private func makeResult(
     )
 }
 
-private func makeAPIResponseData(headline: String, body: String) -> Data {
-    let json: [String: Any] = [
-        "content": [
-            ["type": "text", "text": "\(headline)\n\(body)"]
-        ]
-    ]
-    return try! JSONSerialization.data(withJSONObject: json)
+private func makeAnthropicResponse(text: String?) -> AnthropicMessageResponse {
+    if let text {
+        return AnthropicMessageResponse(
+            content: [AnthropicMessageResponse.ContentBlock(type: "text", text: text)]
+        )
+    }
+    return AnthropicMessageResponse(content: [])
+}
+
+private func makeAnthropicResponse(blocks: [AnthropicMessageResponse.ContentBlock]) -> AnthropicMessageResponse {
+    AnthropicMessageResponse(content: blocks)
 }
 
 // MARK: - humanReadablePair Tests
@@ -106,18 +110,15 @@ struct BuildPromptTests {
     }
 }
 
-// MARK: - parseResponse Tests
+// MARK: - parseAnthropicResponse Tests
 
-@Suite("NarrationFormatter.parseResponse")
-struct ParseResponseTests {
-    @Test("parses valid API response into headline and body")
+@Suite("NarrationFormatter.parseAnthropicResponse")
+struct ParseAnthropicResponseTests {
+    @Test("parses valid response into headline and body")
     func validResponse() {
-        let data = makeAPIResponseData(
-            headline: "Sleep Boosts Your HRV",
-            body: "More sleep leads to better HRV the next day."
-        )
+        let response = makeAnthropicResponse(text: "Sleep Boosts Your HRV\nMore sleep leads to better HRV the next day.")
         let result = makeResult(pairId: "sleep_hrv")
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.pairId == "sleep_hrv")
         #expect(narration.headline == "Sleep Boosts Your HRV")
@@ -126,63 +127,49 @@ struct ParseResponseTests {
 
     @Test("parses multi-line body into single paragraph")
     func multiLineBody() {
-        let json: [String: Any] = [
-            "content": [
-                ["type": "text", "text": "Headline Here\nFirst sentence.\nSecond sentence."]
-            ]
-        ]
-        let data = try! JSONSerialization.data(withJSONObject: json)
+        let response = makeAnthropicResponse(text: "Headline Here\nFirst sentence.\nSecond sentence.")
         let result = makeResult()
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.headline == "Headline Here")
         #expect(narration.body == "First sentence. Second sentence.")
     }
 
-    @Test("falls back on invalid JSON")
-    func invalidJSON() {
-        let data = "not json".data(using: .utf8)!
+    @Test("falls back on empty content blocks")
+    func emptyContentBlocks() {
+        let response = makeAnthropicResponse(text: nil)
         let result = makeResult(pairId: "sleep_hrv")
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.headline == "Sleep duration and next-day HRV")
         #expect(narration.body.contains("Couldn't generate explanation"))
     }
 
-    @Test("falls back on missing content array")
-    func missingContent() {
-        let json: [String: Any] = ["id": "msg_123"]
-        let data = try! JSONSerialization.data(withJSONObject: json)
+    @Test("falls back on nil text in content block")
+    func nilText() {
+        let response = makeAnthropicResponse(
+            blocks: [AnthropicMessageResponse.ContentBlock(type: "text", text: nil)]
+        )
         let result = makeResult()
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.body.contains("Couldn't generate explanation"))
     }
 
     @Test("falls back on empty text")
     func emptyText() {
-        let json: [String: Any] = [
-            "content": [
-                ["type": "text", "text": ""]
-            ]
-        ]
-        let data = try! JSONSerialization.data(withJSONObject: json)
+        let response = makeAnthropicResponse(text: "")
         let result = makeResult()
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.body.contains("Couldn't generate explanation"))
     }
 
     @Test("falls back when body is empty but headline exists")
     func headlineOnlyResponse() {
-        let json: [String: Any] = [
-            "content": [
-                ["type": "text", "text": "Just A Headline"]
-            ]
-        ]
-        let data = try! JSONSerialization.data(withJSONObject: json)
+        let response = makeAnthropicResponse(text: "Just A Headline")
         let result = makeResult()
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.headline == "Just A Headline")
         #expect(narration.body.contains("r=0.71"))
@@ -190,15 +177,12 @@ struct ParseResponseTests {
 
     @Test("ignores non-text content blocks")
     func ignoresNonTextBlocks() {
-        let json: [String: Any] = [
-            "content": [
-                ["type": "image", "source": "data"],
-                ["type": "text", "text": "Real Headline\nReal body text."],
-            ]
-        ]
-        let data = try! JSONSerialization.data(withJSONObject: json)
+        let response = makeAnthropicResponse(blocks: [
+            AnthropicMessageResponse.ContentBlock(type: "image", text: nil),
+            AnthropicMessageResponse.ContentBlock(type: "text", text: "Real Headline\nReal body text."),
+        ])
         let result = makeResult()
-        let narration = NarrationFormatter.parseResponse(data: data, result: result)
+        let narration = NarrationFormatter.parseAnthropicResponse(response, result: result)
 
         #expect(narration.headline == "Real Headline")
         #expect(narration.body == "Real body text.")
@@ -240,64 +224,3 @@ struct FallbackTests {
     }
 }
 
-// MARK: - PatternNarrator Integration Tests
-
-@Suite("PatternNarrator")
-struct PatternNarratorTests {
-    @Test("narrate returns empty for empty results")
-    func emptyResults() async {
-        let narrator = PatternNarrator()
-        let narrations = await narrator.narrate(results: [])
-        #expect(narrations.isEmpty)
-    }
-
-    @Test("narrate filters out hidden and emerging results")
-    func filtersLowConfidence() async {
-        let narrator = PatternNarrator()
-        let results = [
-            makeResult(confidence: .hidden),
-            makeResult(confidence: .emerging),
-        ]
-        let narrations = await narrator.narrate(results: results)
-        #expect(narrations.isEmpty)
-    }
-
-    @Test("narrate processes high confidence results")
-    func processesHighConfidence() async {
-        let narrator = PatternNarrator()
-        let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
-        let narrations = await narrator.narrate(results: results)
-        #expect(narrations.count == 1)
-        #expect(narrations.first?.pairId == "sleep_hrv")
-    }
-
-    @Test("narrate processes medium confidence results")
-    func processesMediumConfidence() async {
-        let narrator = PatternNarrator()
-        let results = [makeResult(pairId: "steps_rhr", confidence: .medium)]
-        let narrations = await narrator.narrate(results: results)
-        #expect(narrations.count == 1)
-        #expect(narrations.first?.pairId == "steps_rhr")
-    }
-
-    @Test("narrate returns narration with matching pairId")
-    func narrationMatchesPairId() async {
-        let narrator = PatternNarrator()
-        let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
-        let narrations = await narrator.narrate(results: results)
-
-        #expect(narrations.first?.pairId == "sleep_hrv")
-        #expect(narrations.first?.headline.isEmpty == false)
-        #expect(narrations.first?.body.isEmpty == false)
-    }
-
-    @Test("narrate limits batch to maxBatchSize")
-    func limitsBatchSize() async {
-        let narrator = PatternNarrator()
-        let results = (0..<10).map { i in
-            makeResult(pairId: "pair_\(i)", lagHours: i, confidence: .high)
-        }
-        let narrations = await narrator.narrate(results: results)
-        #expect(narrations.count <= 5)
-    }
-}

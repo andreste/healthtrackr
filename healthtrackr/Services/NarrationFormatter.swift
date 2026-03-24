@@ -1,6 +1,6 @@
 import Foundation
 
-enum NarrationFormatter {
+nonisolated enum NarrationFormatter {
     static func buildSummary(for result: CorrelationResult) -> String {
         let pairLabel = humanReadablePair(result.pairId)
         let effectPct = String(format: "%.0f%%", result.effectSize * 100)
@@ -34,11 +34,11 @@ enum NarrationFormatter {
         }
     }
 
-    static func parseResponse(data: Data, result: CorrelationResult) -> PatternNarration {
-        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let content = json["content"] as? [[String: Any]],
-              let textBlock = content.first(where: { $0["type"] as? String == "text" }),
-              let text = textBlock["text"] as? String else {
+    static func parseAnthropicResponse(
+        _ response: AnthropicMessageResponse,
+        result: CorrelationResult
+    ) -> PatternNarration {
+        guard let text = response.text, !text.isEmpty else {
             return fallbackNarration(for: result)
         }
 
