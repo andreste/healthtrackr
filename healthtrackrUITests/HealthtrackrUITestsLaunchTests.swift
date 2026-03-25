@@ -7,7 +7,7 @@ final class HealthtrackrUITestsLaunchTests: XCTestCase {
     }
 
     override func setUpWithError() throws {
-        throw XCTSkip("UI tests are temporarily disabled")
+        continueAfterFailure = false
     }
 
     @MainActor
