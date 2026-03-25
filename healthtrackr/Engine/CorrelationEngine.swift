@@ -17,6 +17,16 @@ final class CorrelationEngine {
         ("steps_hrv", "steps", "hrv"),
         ("vo2Max_rhr", "vo2Max", "rhr"),
         ("distance_rhr", "distance", "rhr"),
+        ("sleep_walkingHR", "sleep", "walkingHR"),
+        ("sleep_respiratoryRate", "sleep", "respiratoryRate"),
+        ("sleep_spo2", "sleep", "spo2"),
+        ("exerciseTime_walkingHR", "exerciseTime", "walkingHR"),
+        ("steps_walkingHR", "steps", "walkingHR"),
+        ("bodyMass_rhr", "bodyMass", "rhr"),
+        ("bodyMass_vo2Max", "bodyMass", "vo2Max"),
+        ("vo2Max_hrv", "vo2Max", "hrv"),
+        ("vo2Max_walkingHR", "vo2Max", "walkingHR"),
+        ("distance_hrv", "distance", "hrv"),
     ]
 
     // MARK: - Public

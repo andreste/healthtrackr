@@ -239,6 +239,16 @@ struct DiscoveryFeedView: View {
         case "steps_hrv": return "Steps + HRV"
         case "vo2Max_rhr": return "VO2 Max + HR"
         case "distance_rhr": return "Distance + HR"
+        case "sleep_walkingHR": return "Sleep + Walking HR"
+        case "sleep_respiratoryRate": return "Sleep + Resp. Rate"
+        case "sleep_spo2": return "Sleep + Blood O₂"
+        case "exerciseTime_walkingHR": return "Exercise + Walking HR"
+        case "steps_walkingHR": return "Steps + Walking HR"
+        case "bodyMass_rhr": return "Body Mass + HR"
+        case "bodyMass_vo2Max": return "Body Mass + VO2 Max"
+        case "vo2Max_hrv": return "VO2 Max + HRV"
+        case "vo2Max_walkingHR": return "VO2 Max + Walking HR"
+        case "distance_hrv": return "Distance + HRV"
         default: return pairId
         }
     }

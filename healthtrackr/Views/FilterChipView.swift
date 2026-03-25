@@ -33,16 +33,17 @@ struct FilterChipRow: View {
     @Binding var selected: DiscoveryFeedViewModel.Filter
 
     var body: some View {
-        HStack(spacing: Spacing.space2) {
-            ForEach(DiscoveryFeedViewModel.Filter.allCases, id: \.self) { filter in
-                FilterChipView(
-                    label: filter.rawValue,
-                    isActive: selected == filter
-                ) {
-                    selected = filter
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: Spacing.space2) {
+                ForEach(DiscoveryFeedViewModel.Filter.allCases, id: \.self) { filter in
+                    FilterChipView(
+                        label: filter.rawValue,
+                        isActive: selected == filter
+                    ) {
+                        selected = filter
+                    }
                 }
             }
-            Spacer()
         }
     }
 }

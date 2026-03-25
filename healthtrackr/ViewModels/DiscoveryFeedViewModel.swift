@@ -6,18 +6,24 @@ final class DiscoveryFeedViewModel {
 
     enum Filter: String, CaseIterable {
         case all = "All"
-        case sleepHRV = "Sleep + HRV"
-        case stepsHR = "Steps + HR"
+        case sleep = "Sleep"
+        case steps = "Steps"
         case energy = "Energy"
         case exercise = "Exercise"
+        case vo2Max = "VO2 Max"
+        case distance = "Distance"
+        case body = "Body"
 
         var pairIds: [String]? {
             switch self {
             case .all: return nil
-            case .sleepHRV: return ["sleep_hrv", "sleep_rhr"]
-            case .stepsHR: return ["steps_rhr", "steps_hrv"]
+            case .sleep: return ["sleep_hrv", "sleep_rhr", "sleep_walkingHR", "sleep_respiratoryRate", "sleep_spo2"]
+            case .steps: return ["steps_rhr", "steps_hrv", "steps_walkingHR"]
             case .energy: return ["activeEnergy_hrv", "activeEnergy_rhr"]
-            case .exercise: return ["exerciseTime_rhr", "exerciseTime_hrv"]
+            case .exercise: return ["exerciseTime_rhr", "exerciseTime_hrv", "exerciseTime_walkingHR"]
+            case .vo2Max: return ["vo2Max_rhr", "vo2Max_hrv", "vo2Max_walkingHR"]
+            case .distance: return ["distance_rhr", "distance_hrv"]
+            case .body: return ["bodyMass_rhr", "bodyMass_vo2Max"]
             }
         }
     }
@@ -130,6 +136,10 @@ final class DiscoveryFeedViewModel {
         async let exerciseTimeData = healthKit.fetchExerciseTime(days: 90)
         async let distanceData = healthKit.fetchDistance(days: 90)
         async let vo2MaxData = healthKit.fetchVO2Max(days: 90)
+        async let walkingHRData = healthKit.fetchWalkingHR(days: 90)
+        async let spo2Data = healthKit.fetchOxygenSaturation(days: 90)
+        async let respiratoryRateData = healthKit.fetchRespiratoryRate(days: 90)
+        async let bodyMassData = healthKit.fetchBodyMass(days: 90)
 
         let sleep = await sleepData
         let hrv = await hrvData
@@ -139,12 +149,18 @@ final class DiscoveryFeedViewModel {
         let exerciseTime = await exerciseTimeData
         let distance = await distanceData
         let vo2Max = await vo2MaxData
+        let walkingHR = await walkingHRData
+        let spo2 = await spo2Data
+        let respiratoryRate = await respiratoryRateData
+        let bodyMass = await bodyMassData
 
         metricSamples = [
             "sleep": sleep, "hrv": hrv,
             "steps": steps, "rhr": rhr,
             "activeEnergy": activeEnergy, "exerciseTime": exerciseTime,
             "distance": distance, "vo2Max": vo2Max,
+            "walkingHR": walkingHR, "spo2": spo2,
+            "respiratoryRate": respiratoryRate, "bodyMass": bodyMass,
         ]
 
         let pairs = CorrelationEngine.v1Pairs.map { pairDef in
@@ -226,6 +242,16 @@ final class DiscoveryFeedViewModel {
         case "steps_hrv": return "STEPS + HRV"
         case "vo2Max_rhr": return "VO2 MAX + HR"
         case "distance_rhr": return "DISTANCE + HR"
+        case "sleep_walkingHR": return "SLEEP + WALKING HR"
+        case "sleep_respiratoryRate": return "SLEEP + RESP. RATE"
+        case "sleep_spo2": return "SLEEP + BLOOD O₂"
+        case "exerciseTime_walkingHR": return "EXERCISE + WALKING HR"
+        case "steps_walkingHR": return "STEPS + WALKING HR"
+        case "bodyMass_rhr": return "BODY MASS + HR"
+        case "bodyMass_vo2Max": return "BODY MASS + VO2 MAX"
+        case "vo2Max_hrv": return "VO2 MAX + HRV"
+        case "vo2Max_walkingHR": return "VO2 MAX + WALKING HR"
+        case "distance_hrv": return "DISTANCE + HRV"
         default: return pairId.uppercased()
         }
     }
