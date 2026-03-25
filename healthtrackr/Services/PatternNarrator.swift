@@ -1,11 +1,12 @@
 import Foundation
 
 actor PatternNarrator {
-    private let cache = CacheActor()
+    private let cache: CacheActor
     private let httpClient: any HTTPClientProviding
 
-    init(httpClient: any HTTPClientProviding = HTTPClient()) {
+    init(httpClient: any HTTPClientProviding = HTTPClient(), cache: CacheActor = CacheActor()) {
         self.httpClient = httpClient
+        self.cache = cache
     }
 
     private var apiKey: String? {
@@ -26,14 +27,15 @@ actor PatternNarrator {
         var narrations: [PatternNarration] = []
 
         for result in batch {
-            if let cached = await cache.loadNarration(pairId: result.pairId, lagHours: result.lagHours) {
+            if await cache.isNarrationFresh(pairId: result.pairId, lagHours: result.lagHours),
+               let cached = await cache.loadNarration(pairId: result.pairId, lagHours: result.lagHours) {
                 narrations.append(cached)
                 continue
             }
 
             let narration = await fetchNarration(for: result)
             narrations.append(narration)
-            await cache.saveNarration(narration)
+            await cache.saveNarration(narration, lagHours: result.lagHours)
         }
 
         return narrations

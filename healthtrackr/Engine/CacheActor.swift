@@ -13,6 +13,11 @@ actor CacheActor {
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
     }
 
+    init(directory: URL) {
+        cacheDirectory = directory
+        try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+    }
+
     // MARK: - Read / Write
 
     func load(pairId: String) -> CorrelationResult? {
@@ -50,10 +55,17 @@ actor CacheActor {
         return try? decoder.decode(PatternNarration.self, from: data)
     }
 
-    func saveNarration(_ narration: PatternNarration) {
-        let url = narrationURL(pairId: narration.pairId, lagHours: 0)
+    func saveNarration(_ narration: PatternNarration, lagHours: Int) {
+        let url = narrationURL(pairId: narration.pairId, lagHours: lagHours)
         guard let data = try? encoder.encode(narration) else { return }
         try? data.write(to: url, options: .atomic)
+    }
+
+    func isNarrationFresh(pairId: String, lagHours: Int, calendar: Calendar = .current) -> Bool {
+        guard let narration = loadNarration(pairId: pairId, lagHours: lagHours) else {
+            return false
+        }
+        return calendar.isDateInToday(narration.cachedAt)
     }
 
     private func narrationURL(pairId: String, lagHours: Int) -> URL {
