@@ -3,7 +3,7 @@ import XCTest
 final class HealthtrackrUITests: XCTestCase {
 
     override func setUpWithError() throws {
-        throw XCTSkip("UI tests are temporarily disabled")
+        continueAfterFailure = false
     }
 
     // MARK: - Helpers
