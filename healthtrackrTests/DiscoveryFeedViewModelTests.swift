@@ -355,34 +355,6 @@ struct HumanReadablePairTests {
     }
 }
 
-// MARK: - lastUpdatedText Tests
-
-@Suite("Last Updated Text")
-struct LastUpdatedTextTests {
-    @Test("returns nil when lastUpdated is nil")
-    @MainActor func nilWhenNoDate() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
-        #expect(vm.lastUpdatedText == nil)
-    }
-
-    @Test("returns non-nil when lastUpdated is set")
-    @MainActor func nonNilWhenDateSet() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
-        vm.lastUpdated = Date()
-        let text = vm.lastUpdatedText
-        #expect(text != nil)
-        #expect(text!.starts(with: "Updated"))
-    }
-}
-
 // MARK: - Load State Tests
 
 @Suite("Load State Transitions")
@@ -447,7 +419,6 @@ struct LoadStateTests {
 
         #expect(vm.feedState == .loaded)
         #expect(!vm.items.isEmpty)
-        #expect(vm.lastUpdated != nil)
     }
 
     @Test("load calls run on engine with metric pairs")

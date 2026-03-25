@@ -41,7 +41,6 @@ final class DiscoveryFeedViewModel {
     var selectedFilter: Filter = .all
     var items: [PatternItem] = []
     var loadingPairIds: Set<String> = []
-    var lastUpdated: Date?
     var showSettings = false
 
     private var metricSamples: [String: [MetricSample]] = [:]
@@ -49,13 +48,6 @@ final class DiscoveryFeedViewModel {
     var filteredItems: [PatternItem] {
         guard let allowedPairs = selectedFilter.pairIds else { return items }
         return items.filter { allowedPairs.contains($0.pairId) }
-    }
-
-    var lastUpdatedText: String? {
-        guard let date = lastUpdated else { return nil }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return "Updated \(formatter.localizedString(for: date, relativeTo: Date()))"
     }
 
     // MARK: - Dependencies
@@ -122,7 +114,6 @@ final class DiscoveryFeedViewModel {
         if !cachedItems.isEmpty {
             items = cachedItems
             feedState = .loaded
-            lastUpdated = Date()
         }
     }
 
@@ -185,7 +176,6 @@ final class DiscoveryFeedViewModel {
         }
 
         items = allItems
-        lastUpdated = Date()
         loadingPairIds = []
         feedState = allItems.isEmpty ? .empty : .loaded
     }

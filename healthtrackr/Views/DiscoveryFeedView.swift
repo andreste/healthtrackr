@@ -57,13 +57,6 @@ struct DiscoveryFeedView: View {
                     }
                 }
 
-                if let updatedText = viewModel.lastUpdatedText {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Text(updatedText)
-                            .font(Typography.dataSM)
-                            .foregroundStyle(Color("textTertiary"))
-                    }
-                }
             }
             .sheet(isPresented: $viewModel.showSettings) {
                 settingsSheet
