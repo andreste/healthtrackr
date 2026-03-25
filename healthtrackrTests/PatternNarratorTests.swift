@@ -44,20 +44,26 @@ private func makeResult(
     )
 }
 
+private func makeIsolatedCache() -> CacheActor {
+    let dir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("healthtrackr_tests_\(UUID().uuidString)", isDirectory: true)
+    return CacheActor(directory: dir)
+}
+
 // MARK: - Narrate Logic Tests
 
 @Suite("PatternNarrator")
 struct PatternNarratorTests {
     @Test("narrate returns empty for empty results")
     func emptyResults() async {
-        let narrator = PatternNarrator(httpClient: FakeHTTPClient())
+        let narrator = PatternNarrator(httpClient: FakeHTTPClient(), cache: makeIsolatedCache())
         let narrations = await narrator.narrate(results: [])
         #expect(narrations.isEmpty)
     }
 
     @Test("narrate filters out hidden and emerging results")
     func filtersLowConfidence() async {
-        let narrator = PatternNarrator(httpClient: FakeHTTPClient())
+        let narrator = PatternNarrator(httpClient: FakeHTTPClient(), cache: makeIsolatedCache())
         let results = [
             makeResult(confidence: .hidden),
             makeResult(confidence: .emerging),
@@ -72,7 +78,7 @@ struct PatternNarratorTests {
         fakeClient.result = AnthropicMessageResponse(
             content: [.init(type: "text", text: "Test Headline\nTest body.")]
         )
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)
 
@@ -86,7 +92,7 @@ struct PatternNarratorTests {
         fakeClient.result = AnthropicMessageResponse(
             content: [.init(type: "text", text: "Headline\nBody text.")]
         )
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "steps_rhr", confidence: .medium)]
         let narrations = await narrator.narrate(results: results)
 
@@ -100,7 +106,7 @@ struct PatternNarratorTests {
         fakeClient.result = AnthropicMessageResponse(
             content: [.init(type: "text", text: "H\nB")]
         )
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = (0..<10).map { i in
             makeResult(pairId: "pair_\(i)", lagHours: i, confidence: .high)
         }
@@ -116,7 +122,7 @@ struct PatternNarratorFetchTests {
     @Test("returns fallback when no API key")
     func fallbackWithoutAPIKey() async {
         let fakeClient = FakeHTTPClient()
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)
 
@@ -129,7 +135,7 @@ struct PatternNarratorFetchTests {
     func fallbackOnNetworkError() async {
         let fakeClient = FakeHTTPClient()
         fakeClient.errorToThrow = NetworkError.httpError(statusCode: 500, body: "Internal Server Error")
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)
 
@@ -142,7 +148,7 @@ struct PatternNarratorFetchTests {
         fakeClient.result = AnthropicMessageResponse(
             content: [.init(type: "text", text: "Sleep Boosts HRV\nMore sleep means better recovery.")]
         )
-        let narrator = PatternNarrator(httpClient: fakeClient)
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)
 
