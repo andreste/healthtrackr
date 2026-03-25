@@ -49,13 +49,12 @@ struct DiscoveryFeedView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
+                    ProfileButtonView(
+                        firstName: authManager.firstName,
+                        photoURL: authManager.photoURL
+                    ) {
                         viewModel.showSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .foregroundStyle(Color("textSecondary"))
                     }
-                    .accessibilityIdentifier("SettingsButton")
                 }
 
                 if let updatedText = viewModel.lastUpdatedText {
