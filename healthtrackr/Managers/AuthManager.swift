@@ -7,6 +7,19 @@ final class AuthManager {
     var isCheckingCredential = true
 
     private static let userIDKey = "appleUserIdentifier"
+    private static let userFirstNameKey = "appleUserFirstName"
+    private static let userPhotoURLKey = "appleUserPhotoURL"
+
+    var firstName: String? {
+        UserDefaults.standard.string(forKey: Self.userFirstNameKey)
+    }
+
+    var photoURL: URL? {
+        guard let urlString = UserDefaults.standard.string(forKey: Self.userPhotoURLKey) else {
+            return nil
+        }
+        return URL(string: urlString)
+    }
 
     // MARK: - Lifecycle
 
@@ -51,6 +64,11 @@ final class AuthManager {
             }
             #endif
 
+            // Apple only provides the name on the first sign-in — persist it
+            if let givenName = credential.fullName?.givenName, !givenName.isEmpty {
+                UserDefaults.standard.set(givenName, forKey: Self.userFirstNameKey)
+            }
+
             isAuthenticated = true
 
         case .failure(let error):
@@ -71,6 +89,8 @@ final class AuthManager {
 
     private func clearCredentials() {
         KeychainHelper.delete(key: Self.userIDKey)
+        UserDefaults.standard.removeObject(forKey: Self.userFirstNameKey)
+        UserDefaults.standard.removeObject(forKey: Self.userPhotoURLKey)
         isAuthenticated = false
     }
 }
