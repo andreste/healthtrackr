@@ -101,7 +101,8 @@ struct PatternDetailView: View {
     }
 
     private func handleChartTap(location: CGPoint, proxy: ChartProxy, geo: GeometryProxy) {
-        let plotFrame = geo[proxy.plotFrame!]
+        guard let plotFrameAnchor = proxy.plotFrame else { return }
+        let plotFrame = geo[plotFrameAnchor]
         let relativeX = location.x - plotFrame.origin.x
         let relativeY = location.y - plotFrame.origin.y
 
