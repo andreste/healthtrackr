@@ -160,6 +160,25 @@ struct CorrelationEngineTests {
         #expect(pairIds.contains("distance_hrv"))
     }
 
+    @Test("v1Pairs shortLabel is the single source of truth for human-readable labels")
+    func v1PairsShortLabels() {
+        // Every pair must have a non-empty shortLabel
+        for pair in CorrelationEngine.v1Pairs {
+            #expect(!pair.shortLabel.isEmpty, "pair \(pair.id) has empty shortLabel")
+        }
+
+        // Spot-check recently-added pairs to guard against switch-statement regressions
+        let labelFor: (String) -> String? = { id in
+            CorrelationEngine.v1Pairs.first(where: { $0.id == id })?.shortLabel
+        }
+        #expect(labelFor("sleep_walkingHR") == "SLEEP + WALKING HR")
+        #expect(labelFor("bodyMass_vo2Max") == "BODY MASS + VO2 MAX")
+        #expect(labelFor("vo2Max_walkingHR") == "VO2 MAX + WALKING HR")
+        #expect(labelFor("distance_hrv") == "DISTANCE + HRV")
+        #expect(labelFor("sleep_hrv") == "SLEEP + HRV")
+        #expect(labelFor("steps_rhr") == "STEPS + HR")
+    }
+
     @Test("lagOffsets includes expected values")
     func lagOffsetsValues() {
         #expect(CorrelationEngine.lagOffsets == [0, 12, 24, 36, 48])

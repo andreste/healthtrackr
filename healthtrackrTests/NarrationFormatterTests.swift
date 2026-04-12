@@ -56,6 +56,16 @@ struct HumanReadablePairFormatterTests {
     func unknownPair() {
         #expect(NarrationFormatter.humanReadablePair("foo_bar") == "foo and bar")
     }
+
+    @Test("all v1Pairs have explicit AI-prompt labels (no fallback to underscore replacement)")
+    func allV1PairsHaveExplicitLabels() {
+        for pair in CorrelationEngine.v1Pairs {
+            let label = NarrationFormatter.humanReadablePair(pair.id)
+            // The fallback replaces "_" with " and " — if it fires the label contains the raw id segment
+            let fallback = pair.id.replacingOccurrences(of: "_", with: " and ")
+            #expect(label != fallback, "pair \(pair.id) is using the generic fallback label in NarrationFormatter")
+        }
+    }
 }
 
 // MARK: - buildSummary Tests

@@ -38,6 +38,16 @@ nonisolated enum NarrationFormatter {
         case "steps_hrv": return "Steps and HRV"
         case "vo2Max_rhr": return "VO2 Max and Resting Heart Rate"
         case "distance_rhr": return "Walking Distance and Resting Heart Rate"
+        case "sleep_walkingHR": return "Sleep and Walking Heart Rate"
+        case "sleep_respiratoryRate": return "Sleep and Respiratory Rate"
+        case "sleep_spo2": return "Sleep and Blood Oxygen Saturation"
+        case "exerciseTime_walkingHR": return "Exercise Time and Walking Heart Rate"
+        case "steps_walkingHR": return "Steps and Walking Heart Rate"
+        case "bodyMass_rhr": return "Body Mass and Resting Heart Rate"
+        case "bodyMass_vo2Max": return "Body Mass and VO2 Max"
+        case "vo2Max_hrv": return "VO2 Max and HRV"
+        case "vo2Max_walkingHR": return "VO2 Max and Walking Heart Rate"
+        case "distance_hrv": return "Walking Distance and HRV"
         default: return pairId.replacingOccurrences(of: "_", with: " and ")
         }
     }
