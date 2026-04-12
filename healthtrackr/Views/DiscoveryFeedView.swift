@@ -148,6 +148,19 @@ struct DiscoveryFeedView: View {
                 }
 
                 Section {
+                    NavigationLink {
+                        HealthMetricsView()
+                    } label: {
+                        Text("View Current Health Data")
+                            .font(Typography.labelMD)
+                            .foregroundStyle(Color("textPrimary"))
+                    }
+                    .accessibilityIdentifier("ViewCurrentHealthDataButton")
+                } header: {
+                    Text("Health Data")
+                }
+
+                Section {
                     VStack(alignment: .leading, spacing: Spacing.space2) {
                         ForEach(HealthPermissionItem.all) { item in
                             PermissionRow(icon: item.icon, label: item.label)
