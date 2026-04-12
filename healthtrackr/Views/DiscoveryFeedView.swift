@@ -3,6 +3,7 @@ import SwiftUI
 struct DiscoveryFeedView: View {
     let authManager: AuthManager
     @State private var viewModel: DiscoveryFeedViewModel
+    @State private var hasStoredKey: Bool = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
 
     init(
         authManager: AuthManager,
@@ -132,6 +133,45 @@ struct DiscoveryFeedView: View {
     private var settingsSheet: some View {
         NavigationStack {
             List {
+                Section {
+                    if hasStoredKey {
+                        HStack {
+                            Text("sk-ant-••••••••")
+                                .font(Typography.dataSM)
+                                .foregroundStyle(Color("textTertiary"))
+                            Spacer()
+                            Button("Remove") {
+                                KeychainHelper.delete(key: PatternNarrator.keychainKey)
+                                hasStoredKey = false
+                            }
+                            .font(Typography.labelMD)
+                            .foregroundStyle(Color("semanticError"))
+                        }
+                    } else {
+                        Button {
+                            let trimmed = (UIPasteboard.general.string ?? "")
+                                .trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !trimmed.isEmpty else { return }
+                            KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(trimmed.utf8))
+                            hasStoredKey = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "clipboard")
+                                Text("Paste from Clipboard")
+                            }
+                            .font(Typography.labelMD)
+                            .foregroundStyle(Color("accentPrimary"))
+                        }
+                        .accessibilityIdentifier("PasteAPIKeyButton")
+                    }
+                } header: {
+                    Text("API Key")
+                } footer: {
+                    Text("Required for AI narration. Get yours at console.anthropic.com.")
+                        .font(Typography.bodySM)
+                        .foregroundStyle(Color("textTertiary"))
+                }
+
                 Section("Data & Privacy") {
                     VStack(alignment: .leading, spacing: Spacing.space2) {
                         Text("Pattern summaries are sent to Claude API for narration.")

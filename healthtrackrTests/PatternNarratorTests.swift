@@ -119,8 +119,10 @@ struct PatternNarratorTests {
 
 @Suite("PatternNarrator.fetchNarration")
 struct PatternNarratorFetchTests {
-    @Test("returns fallback when no API key")
+    @Test("returns fallback when no API key in Keychain")
     func fallbackWithoutAPIKey() async {
+        // Ensure no key is present
+        KeychainHelper.delete(key: PatternNarrator.keychainKey)
         let fakeClient = FakeHTTPClient()
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
@@ -129,6 +131,23 @@ struct PatternNarratorFetchTests {
         #expect(narrations.first?.headline == "Sleep duration and next-day HRV")
         #expect(narrations.first?.body.contains("Couldn't generate explanation") == true)
         #expect(fakeClient.lastRequest == nil)
+    }
+
+    @Test("reads API key from Keychain and sends it in request header")
+    func usesKeychainAPIKey() async {
+        let testKey = "sk-ant-test-key-\(UUID().uuidString)"
+        KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(testKey.utf8))
+        defer { KeychainHelper.delete(key: PatternNarrator.keychainKey) }
+
+        let fakeClient = FakeHTTPClient()
+        fakeClient.result = AnthropicMessageResponse(
+            content: [.init(type: "text", text: "Headline\nBody text.")]
+        )
+        let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
+        let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
+        _ = await narrator.narrate(results: results)
+
+        #expect(fakeClient.lastRequest?.value(forHTTPHeaderField: "x-api-key") == testKey)
     }
 
     @Test("returns fallback when HTTP client throws")
