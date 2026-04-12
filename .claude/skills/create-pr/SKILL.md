@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Create a PR for the current branch using the Linear ticket title as the PR title. Fetches the ticket details, builds a summary, takes screenshots from the iOS simulator to document the feature, and writes a test plan.
+description: Create a PR for the current branch using the Linear ticket title as the PR title. Fetches the ticket details, builds a summary and writes a test plan.
 allowed-tools:
   - Bash
   - Read
@@ -51,58 +51,14 @@ Read the changed files to understand what was built. Write a concise bullet-poin
 - Why (link back to the ticket goal)
 - Any notable technical decisions
 
-### 4. Take screenshots from the iOS Simulator
-
-Build and run the app on the simulator:
-
-```bash
-xcodebuild -scheme healthtrackr -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build 2>&1 | tail -5
-```
-
-Boot the simulator if needed:
-
-```bash
-xcrun simctl boot "iPhone 16 Pro" 2>/dev/null || true
-open -a Simulator
-```
-
-Launch the app:
-
-```bash
-APP_ID=$(xcrun simctl listapps booted 2>/dev/null | grep -i healthtrackr | grep -o '"[^"]*healthtrackr[^"]*"' | head -1 | tr -d '"')
-xcrun simctl launch booted "$APP_ID" 2>/dev/null || true
-sleep 3
-```
-
-Take screenshots that show the feature or UI change introduced by this PR. Save them to a temp directory:
-
-```bash
-mkdir -p /tmp/pr-screenshots
-xcrun simctl io booted screenshot /tmp/pr-screenshots/screen1.png
-sleep 1
-xcrun simctl io booted screenshot /tmp/pr-screenshots/screen2.png
-```
-
-Navigate the app to capture the relevant screens (use `xcrun simctl io booted screenshot` after each interaction). Take 2–4 screenshots that best illustrate the change. If the change is not visual (e.g. security or caching), take a screenshot of the most relevant screen and note that the change is non-visual in the caption.
-
-GitHub does not expose a public API for uploading inline images to PR descriptions — there is no CLI command that can do this automatically.
-
-Include the local file paths in the PR body and instruct the user to attach them manually by dragging the files onto the PR description textarea in the browser:
-
-```
-> **Screenshots saved locally — drag these files onto the PR description in GitHub to attach them:**
-> - /tmp/pr-screenshots/screen1.png
-> - /tmp/pr-screenshots/screen2.png
-```
-
-### 5. Write the test plan
+### 4. Write the test plan
 
 Based on the ticket description and diff, write a markdown checklist for manual QA covering:
 - Happy-path scenarios
 - Edge cases or error states
 - Regression checks (existing flows that should still work)
 
-### 6. Create the PR
+### 5. Create the PR
 
 ```bash
 gh pr create \
@@ -132,6 +88,6 @@ BODY
 )"
 ```
 
-Substitute the actual ticket ID, title, summary bullets, screenshots, and test plan steps.
+Substitute the actual ticket ID, title, summary bullets, and test plan steps.
 
 After the PR is created, print the PR URL.
