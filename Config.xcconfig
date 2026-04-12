@@ -1,8 +1,2 @@
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
-
-// Default (overridden by Config.local.xcconfig)
-ANTHROPIC_API_KEY =
-
-// Import local overrides (gitignored — contains API keys)
-#include? "Config.local.xcconfig"
