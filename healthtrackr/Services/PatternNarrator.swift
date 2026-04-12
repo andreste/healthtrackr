@@ -9,8 +9,11 @@ actor PatternNarrator {
         self.cache = cache
     }
 
+    static let keychainKey = "anthropic_api_key"
+
     private var apiKey: String? {
-        Bundle.main.infoDictionary?["ANTHROPIC_API_KEY"] as? String
+        guard let data = KeychainHelper.read(key: Self.keychainKey) else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 
     private static let apiURL = URL(string: "https://api.anthropic.com/v1/messages")!

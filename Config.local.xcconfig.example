@@ -1,0 +1,8 @@
+// Local overrides — copy this file to Config.local.xcconfig and fill in your values.
+// Config.local.xcconfig is gitignored and will never be committed.
+//
+// NOTE: As of HEA-46, the Anthropic API key is entered directly in the app's
+// Settings sheet and stored in Keychain. You no longer need to set it here.
+// This file is kept for reference only.
+
+ANTHROPIC_API_KEY = your-api-key-here
