@@ -85,15 +85,15 @@ xcrun simctl io booted screenshot /tmp/pr-screenshots/screen2.png
 
 Navigate the app to capture the relevant screens (use `xcrun simctl io booted screenshot` after each interaction). Take 2–4 screenshots that best illustrate the change. If the change is not visual (e.g. security or caching), take a screenshot of the most relevant screen and note that the change is non-visual in the caption.
 
-Attach each screenshot to the PR body using the GitHub CLI image upload:
+GitHub does not expose a public API for uploading inline images to PR descriptions — there is no CLI command that can do this automatically.
 
-```bash
-for f in /tmp/pr-screenshots/*.png; do
-  gh issue upload-image "$f" 2>/dev/null || echo "Manual upload needed: $f"
-done
+Include the local file paths in the PR body and instruct the user to attach them manually by dragging the files onto the PR description textarea in the browser:
+
 ```
-
-If image upload is unavailable, include the local file paths and instruct the user to attach them manually.
+> **Screenshots saved locally — drag these files onto the PR description in GitHub to attach them:**
+> - /tmp/pr-screenshots/screen1.png
+> - /tmp/pr-screenshots/screen2.png
+```
 
 ### 5. Write the test plan
 
