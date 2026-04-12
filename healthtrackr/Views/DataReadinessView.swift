@@ -85,9 +85,7 @@ struct DataReadinessView: View {
         }
         .background(Color("bgPrimary"))
         .accessibilityIdentifier("DataReadinessView")
-        .task {
-            await viewModel.load()
-        }
+        .task { await viewModel.load() }
     }
 
     // MARK: - Metric Row

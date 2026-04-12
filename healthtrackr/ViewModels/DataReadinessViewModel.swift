@@ -49,13 +49,6 @@ final class DataReadinessViewModel {
     func load() async {
         state = .loading
 
-        do {
-            try await healthKit.requestAuthorization()
-        } catch {
-            state = .healthKitDenied
-            return
-        }
-
         if healthKit.needsAuthorization {
             state = .healthKitDenied
             return
