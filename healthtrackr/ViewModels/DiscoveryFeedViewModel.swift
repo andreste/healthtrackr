@@ -222,29 +222,7 @@ final class DiscoveryFeedViewModel {
     }
 
     func humanReadablePair(_ pairId: String) -> String {
-        switch pairId {
-        case "sleep_hrv": return "SLEEP + HRV"
-        case "steps_rhr": return "STEPS + HR"
-        case "sleep_rhr": return "SLEEP + HR"
-        case "activeEnergy_hrv": return "ENERGY + HRV"
-        case "activeEnergy_rhr": return "ENERGY + HR"
-        case "exerciseTime_rhr": return "EXERCISE + HR"
-        case "exerciseTime_hrv": return "EXERCISE + HRV"
-        case "steps_hrv": return "STEPS + HRV"
-        case "vo2Max_rhr": return "VO2 MAX + HR"
-        case "distance_rhr": return "DISTANCE + HR"
-        case "sleep_walkingHR": return "SLEEP + WALKING HR"
-        case "sleep_respiratoryRate": return "SLEEP + RESP. RATE"
-        case "sleep_spo2": return "SLEEP + BLOOD O₂"
-        case "exerciseTime_walkingHR": return "EXERCISE + WALKING HR"
-        case "steps_walkingHR": return "STEPS + WALKING HR"
-        case "bodyMass_rhr": return "BODY MASS + HR"
-        case "bodyMass_vo2Max": return "BODY MASS + VO2 MAX"
-        case "vo2Max_hrv": return "VO2 MAX + HRV"
-        case "vo2Max_walkingHR": return "VO2 MAX + WALKING HR"
-        case "distance_hrv": return "DISTANCE + HRV"
-        default: return pairId.uppercased()
-        }
+        CorrelationEngine.v1Pairs.first(where: { $0.id == pairId })?.shortLabel ?? pairId.uppercased()
     }
 
     func metricKeys(for pairId: String) -> (String, String) {

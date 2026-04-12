@@ -353,6 +353,22 @@ struct HumanReadablePairTests {
         )
         #expect(vm.humanReadablePair("foo_bar") == "FOO_BAR")
     }
+
+    @Test("humanReadablePair resolves labels from v1Pairs shortLabel (no switch statement)")
+    @MainActor func resolvesFromV1PairsShortLabel() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        // Verify all 20 v1Pairs return a non-empty label
+        for pair in CorrelationEngine.v1Pairs {
+            let label = vm.humanReadablePair(pair.id)
+            #expect(!label.isEmpty, "pair \(pair.id) returned empty label")
+            // Label must equal the shortLabel stored in v1Pairs
+            #expect(label == pair.shortLabel, "pair \(pair.id): expected \(pair.shortLabel), got \(label)")
+        }
+    }
 }
 
 // MARK: - Load State Tests

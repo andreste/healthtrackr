@@ -10,27 +10,27 @@ final class CorrelationEngine {
 
     static let lagOffsets = [0, 12, 24, 36, 48]
 
-    static let v1Pairs: [(id: String, metricAKey: String, metricBKey: String)] = [
-        ("sleep_hrv", "sleep", "hrv"),
-        ("steps_rhr", "steps", "rhr"),
-        ("sleep_rhr", "sleep", "rhr"),
-        ("activeEnergy_hrv", "activeEnergy", "hrv"),
-        ("activeEnergy_rhr", "activeEnergy", "rhr"),
-        ("exerciseTime_rhr", "exerciseTime", "rhr"),
-        ("exerciseTime_hrv", "exerciseTime", "hrv"),
-        ("steps_hrv", "steps", "hrv"),
-        ("vo2Max_rhr", "vo2Max", "rhr"),
-        ("distance_rhr", "distance", "rhr"),
-        ("sleep_walkingHR", "sleep", "walkingHR"),
-        ("sleep_respiratoryRate", "sleep", "respiratoryRate"),
-        ("sleep_spo2", "sleep", "spo2"),
-        ("exerciseTime_walkingHR", "exerciseTime", "walkingHR"),
-        ("steps_walkingHR", "steps", "walkingHR"),
-        ("bodyMass_rhr", "bodyMass", "rhr"),
-        ("bodyMass_vo2Max", "bodyMass", "vo2Max"),
-        ("vo2Max_hrv", "vo2Max", "hrv"),
-        ("vo2Max_walkingHR", "vo2Max", "walkingHR"),
-        ("distance_hrv", "distance", "hrv"),
+    static let v1Pairs: [(id: String, metricAKey: String, metricBKey: String, shortLabel: String)] = [
+        ("sleep_hrv", "sleep", "hrv", "SLEEP + HRV"),
+        ("steps_rhr", "steps", "rhr", "STEPS + HR"),
+        ("sleep_rhr", "sleep", "rhr", "SLEEP + HR"),
+        ("activeEnergy_hrv", "activeEnergy", "hrv", "ENERGY + HRV"),
+        ("activeEnergy_rhr", "activeEnergy", "rhr", "ENERGY + HR"),
+        ("exerciseTime_rhr", "exerciseTime", "rhr", "EXERCISE + HR"),
+        ("exerciseTime_hrv", "exerciseTime", "hrv", "EXERCISE + HRV"),
+        ("steps_hrv", "steps", "hrv", "STEPS + HRV"),
+        ("vo2Max_rhr", "vo2Max", "rhr", "VO2 MAX + HR"),
+        ("distance_rhr", "distance", "rhr", "DISTANCE + HR"),
+        ("sleep_walkingHR", "sleep", "walkingHR", "SLEEP + WALKING HR"),
+        ("sleep_respiratoryRate", "sleep", "respiratoryRate", "SLEEP + RESP. RATE"),
+        ("sleep_spo2", "sleep", "spo2", "SLEEP + BLOOD O₂"),
+        ("exerciseTime_walkingHR", "exerciseTime", "walkingHR", "EXERCISE + WALKING HR"),
+        ("steps_walkingHR", "steps", "walkingHR", "STEPS + WALKING HR"),
+        ("bodyMass_rhr", "bodyMass", "rhr", "BODY MASS + HR"),
+        ("bodyMass_vo2Max", "bodyMass", "vo2Max", "BODY MASS + VO2 MAX"),
+        ("vo2Max_hrv", "vo2Max", "hrv", "VO2 MAX + HRV"),
+        ("vo2Max_walkingHR", "vo2Max", "walkingHR", "VO2 MAX + WALKING HR"),
+        ("distance_hrv", "distance", "hrv", "DISTANCE + HRV"),
     ]
 
     // MARK: - Public
