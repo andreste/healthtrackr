@@ -61,111 +61,70 @@ final class DataReadinessViewModel {
             return
         }
 
-        async let sleepData = healthKit.fetchSleep(days: 90)
-        async let hrvData = healthKit.fetchHRV(days: 90)
-        async let stepsData = healthKit.fetchSteps(days: 90)
-        async let rhrData = healthKit.fetchRestingHR(days: 90)
-        async let activeEnergyData = healthKit.fetchActiveEnergy(days: 90)
-        async let exerciseTimeData = healthKit.fetchExerciseTime(days: 90)
-        async let distanceData = healthKit.fetchDistance(days: 90)
-        async let vo2MaxData = healthKit.fetchVO2Max(days: 90)
-
-        let sleep = await sleepData
-        let hrv = await hrvData
-        let steps = await stepsData
-        let rhr = await rhrData
-        let activeEnergy = await activeEnergyData
-        let exerciseTime = await exerciseTimeData
-        let distance = await distanceData
-        let vo2Max = await vo2MaxData
-
-        let sleepDays = countUniqueDays(sleep)
-        let hrvDays = countUniqueDays(hrv)
-        let stepsDays = countUniqueDays(steps)
-        let rhrDays = countUniqueDays(rhr)
-        let activeEnergyDays = countUniqueDays(activeEnergy)
-        let exerciseTimeDays = countUniqueDays(exerciseTime)
-        let distanceDays = countUniqueDays(distance)
-        let vo2MaxDays = countUniqueDays(vo2Max)
-
-        let sleepHrvDays = min(sleepDays, hrvDays)
-        let stepsRhrDays = min(stepsDays, rhrDays)
-        let sleepRhrDays = min(sleepDays, rhrDays)
-        let activeEnergyHrvDays = min(activeEnergyDays, hrvDays)
-        let activeEnergyRhrDays = min(activeEnergyDays, rhrDays)
-        let exerciseTimeRhrDays = min(exerciseTimeDays, rhrDays)
-        let exerciseTimeHrvDays = min(exerciseTimeDays, hrvDays)
-        let stepsHrvDays = min(stepsDays, hrvDays)
-        let vo2MaxRhrDays = min(vo2MaxDays, rhrDays)
-        let distanceRhrDays = min(distanceDays, rhrDays)
-
-        metricStatuses = [
-            MetricStatus(
-                id: "sleep_hrv",
-                label: "Sleep + HRV",
-                daysAvailable: sleepHrvDays,
-                isReady: sleepHrvDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "steps_rhr",
-                label: "Steps + HR",
-                daysAvailable: stepsRhrDays,
-                isReady: stepsRhrDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "sleep_rhr",
-                label: "Sleep + HR",
-                daysAvailable: sleepRhrDays,
-                isReady: sleepRhrDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "activeEnergy_hrv",
-                label: "Energy + HRV",
-                daysAvailable: activeEnergyHrvDays,
-                isReady: activeEnergyHrvDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "activeEnergy_rhr",
-                label: "Energy + HR",
-                daysAvailable: activeEnergyRhrDays,
-                isReady: activeEnergyRhrDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "exerciseTime_rhr",
-                label: "Exercise + HR",
-                daysAvailable: exerciseTimeRhrDays,
-                isReady: exerciseTimeRhrDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "exerciseTime_hrv",
-                label: "Exercise + HRV",
-                daysAvailable: exerciseTimeHrvDays,
-                isReady: exerciseTimeHrvDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "steps_hrv",
-                label: "Steps + HRV",
-                daysAvailable: stepsHrvDays,
-                isReady: stepsHrvDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "vo2Max_rhr",
-                label: "VO2 Max + HR",
-                daysAvailable: vo2MaxRhrDays,
-                isReady: vo2MaxRhrDays >= Self.requiredDays
-            ),
-            MetricStatus(
-                id: "distance_rhr",
-                label: "Distance + HR",
-                daysAvailable: distanceRhrDays,
-                isReady: distanceRhrDays >= Self.requiredDays
-            ),
+        let fetchMap: [String: () async -> [MetricSample]] = [
+            "sleep": { [hk = self.healthKit] in await hk.fetchSleep(days: 90) },
+            "hrv": { [hk = self.healthKit] in await hk.fetchHRV(days: 90) },
+            "steps": { [hk = self.healthKit] in await hk.fetchSteps(days: 90) },
+            "rhr": { [hk = self.healthKit] in await hk.fetchRestingHR(days: 90) },
+            "activeEnergy": { [hk = self.healthKit] in await hk.fetchActiveEnergy(days: 90) },
+            "exerciseTime": { [hk = self.healthKit] in await hk.fetchExerciseTime(days: 90) },
+            "distance": { [hk = self.healthKit] in await hk.fetchDistance(days: 90) },
+            "vo2Max": { [hk = self.healthKit] in await hk.fetchVO2Max(days: 90) },
+            "walkingHR": { [hk = self.healthKit] in await hk.fetchWalkingHR(days: 90) },
+            "spo2": { [hk = self.healthKit] in await hk.fetchOxygenSaturation(days: 90) },
+            "respiratoryRate": { [hk = self.healthKit] in await hk.fetchRespiratoryRate(days: 90) },
+            "bodyMass": { [hk = self.healthKit] in await hk.fetchBodyMass(days: 90) },
         ]
+
+        let metricDisplayNames: [String: String] = [
+            "sleep": "Sleep",
+            "hrv": "HRV",
+            "steps": "Steps",
+            "rhr": "HR",
+            "activeEnergy": "Energy",
+            "exerciseTime": "Exercise",
+            "distance": "Distance",
+            "vo2Max": "VO2 Max",
+            "walkingHR": "Walking HR",
+            "spo2": "SpO2",
+            "respiratoryRate": "Resp. Rate",
+            "bodyMass": "Body Mass",
+        ]
+
+        let uniqueKeys = Set(CorrelationEngine.v1Pairs.flatMap { [$0.metricAKey, $0.metricBKey] })
+
+        var dayCounts: [String: Int] = [:]
+        await withTaskGroup(of: (String, Int).self) { group in
+            for key in uniqueKeys {
+                guard let fetcher = fetchMap[key] else { continue }
+                group.addTask {
+                    let samples = await fetcher()
+                    return (key, self.countUniqueDays(samples))
+                }
+            }
+            for await (key, count) in group {
+                dayCounts[key] = count
+            }
+        }
+
+        metricStatuses = CorrelationEngine.v1Pairs.map { pair in
+            let aDays = dayCounts[pair.metricAKey] ?? 0
+            let bDays = dayCounts[pair.metricBKey] ?? 0
+            let days = min(aDays, bDays)
+            let labelA = metricDisplayNames[pair.metricAKey] ?? pair.metricAKey
+            let labelB = metricDisplayNames[pair.metricBKey] ?? pair.metricBKey
+            return MetricStatus(
+                id: pair.id,
+                label: "\(labelA) + \(labelB)",
+                daysAvailable: days,
+                isReady: days >= Self.requiredDays
+            )
+        }
 
         state = .loaded
     }
 
-    func countUniqueDays(_ samples: [MetricSample]) -> Int {
+    nonisolated func countUniqueDays(_ samples: [MetricSample]) -> Int {
         let calendar = Calendar.current
         let uniqueDays = Set(samples.map { calendar.startOfDay(for: $0.date) })
         return uniqueDays.count

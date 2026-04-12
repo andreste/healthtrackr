@@ -60,7 +60,30 @@ struct DataReadinessStateTests {
         await vm.load()
 
         #expect(vm.state == .loaded)
-        #expect(vm.metricStatuses.count == 10)
+        #expect(vm.metricStatuses.count == 20)
+    }
+
+    @Test("load produces statuses for all 20 v1Pairs")
+    @MainActor func allTwentyPairs() async {
+        let fakeHK = FakeHealthKit()
+        let vm = DataReadinessViewModel(healthKit: fakeHK)
+
+        await vm.load()
+
+        let expectedIds = Set(CorrelationEngine.v1Pairs.map(\.id))
+        let actualIds = Set(vm.metricStatuses.map(\.id))
+        #expect(actualIds == expectedIds)
+    }
+
+    @Test("load produces one status per v1Pair id with no duplicates")
+    @MainActor func noDuplicatePairIds() async {
+        let fakeHK = FakeHealthKit()
+        let vm = DataReadinessViewModel(healthKit: fakeHK)
+
+        await vm.load()
+
+        let ids = vm.metricStatuses.map(\.id)
+        #expect(ids.count == Set(ids).count)
     }
 }
 
@@ -154,6 +177,48 @@ struct DataReadinessLogicTests {
         #expect(vm.metricStatuses[0].daysAvailable == 0)
         #expect(vm.metricStatuses[1].daysAvailable == 0)
         #expect(!vm.canStart)
+    }
+
+    @Test("walkingHR, spo2, respiratoryRate, bodyMass pairs reflect correct days")
+    @MainActor func newMetricPairsUseCorrectData() async {
+        let fakeHK = FakeHealthKit()
+        fakeHK.sleepSamples = makeSamples(days: 40)
+        fakeHK.walkingHRSamples = makeSamples(days: 35)
+        fakeHK.oxygenSaturationSamples = makeSamples(days: 32)
+        fakeHK.respiratoryRateSamples = makeSamples(days: 28)
+        fakeHK.bodyMassSamples = makeSamples(days: 31)
+        fakeHK.rhrSamples = makeSamples(days: 45)
+        fakeHK.vo2MaxSamples = makeSamples(days: 38)
+        let vm = DataReadinessViewModel(healthKit: fakeHK)
+
+        await vm.load()
+
+        let statusById = Dictionary(uniqueKeysWithValues: vm.metricStatuses.map { ($0.id, $0) })
+
+        // sleep_walkingHR: min(40, 35) = 35, ready
+        let sleepWalkingHR = try #require(statusById["sleep_walkingHR"])
+        #expect(sleepWalkingHR.daysAvailable == 35)
+        #expect(sleepWalkingHR.isReady)
+
+        // sleep_spo2: min(40, 32) = 32, ready
+        let sleepSpo2 = try #require(statusById["sleep_spo2"])
+        #expect(sleepSpo2.daysAvailable == 32)
+        #expect(sleepSpo2.isReady)
+
+        // sleep_respiratoryRate: min(40, 28) = 28, not ready
+        let sleepRespRate = try #require(statusById["sleep_respiratoryRate"])
+        #expect(sleepRespRate.daysAvailable == 28)
+        #expect(!sleepRespRate.isReady)
+
+        // bodyMass_rhr: min(31, 45) = 31, ready
+        let bodyMassRhr = try #require(statusById["bodyMass_rhr"])
+        #expect(bodyMassRhr.daysAvailable == 31)
+        #expect(bodyMassRhr.isReady)
+
+        // bodyMass_vo2Max: min(31, 38) = 31, ready
+        let bodyMassVo2 = try #require(statusById["bodyMass_vo2Max"])
+        #expect(bodyMassVo2.daysAvailable == 31)
+        #expect(bodyMassVo2.isReady)
     }
 }
 
