@@ -167,6 +167,8 @@ struct DiscoveryFeedView: View {
                                     KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(trimmed.utf8))
                                     hasStoredKey = true
                                     apiKeyInput = ""
+                                    viewModel.showSettings = false
+                                    Task { await viewModel.renarrate() }
                                 }
                                 .font(Typography.labelMD)
                                 .foregroundStyle(Color("accentPrimary"))
