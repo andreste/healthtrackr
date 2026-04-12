@@ -7,6 +7,7 @@ struct ContentView: View {
     let narrator: (any NarrationProviding)?
 
     @State private var hasCompletedOnboarding: Bool
+    @State private var hasGrantedHealthKit: Bool
 
     init(
         authManager: AuthManager,
@@ -19,8 +20,10 @@ struct ContentView: View {
         self.healthKit = healthKit
         self.engine = engine
         self.narrator = narrator
-        self._hasCompletedOnboarding = State(
-            initialValue: skipOnboarding || UserDefaults.standard.bool(forKey: "hasCompletedDataReadiness")
+        let onboarded = skipOnboarding || UserDefaults.standard.bool(forKey: "hasCompletedDataReadiness")
+        self._hasCompletedOnboarding = State(initialValue: onboarded)
+        self._hasGrantedHealthKit = State(
+            initialValue: onboarded || UserDefaults.standard.bool(forKey: "hasGrantedHealthKitPermission")
         )
     }
 
@@ -33,13 +36,23 @@ struct ContentView: View {
                 narrator: narrator
             )
             .transition(.opacity)
-        } else {
+        } else if hasGrantedHealthKit {
             DataReadinessView(healthKit: healthKit) {
                 UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
                 withAnimation(.easeOut(duration: AnimationDuration.medium)) {
                     hasCompletedOnboarding = true
                 }
             }
+            .transition(.opacity)
+        } else {
+            HealthKitPermissionsView(
+                healthKit: healthKit ?? HealthKitManager(),
+                onGranted: {
+                    withAnimation(.easeOut(duration: AnimationDuration.medium)) {
+                        hasGrantedHealthKit = true
+                    }
+                }
+            )
             .transition(.opacity)
         }
     }
