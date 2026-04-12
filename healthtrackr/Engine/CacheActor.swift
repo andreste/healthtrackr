@@ -79,7 +79,7 @@ actor CacheActor {
             at: cacheDirectory,
             includingPropertiesForKeys: nil
         )) ?? []
-        for url in contents {
+        for url in contents where url.pathExtension == "json" {
             try? FileManager.default.removeItem(at: url)
         }
         let prefix = "\(lastRunKey)_"

@@ -4,27 +4,10 @@ import Testing
 
 // MARK: - Fakes
 
-final class FakeCacheClearing: CacheClearing {
-    var clearAllCachesCalled = false
+final class FakeCacheClearing: CacheInvalidating {
+    nonisolated(unsafe) var clearAllCachesCalled = false
     func clearAllCaches() async {
         clearAllCachesCalled = true
-    }
-}
-
-@MainActor
-final class FakeUserDefaults {
-    private var store: [String: Any] = [:]
-
-    func set(_ value: Any?, forKey key: String) {
-        store[key] = value
-    }
-
-    func string(forKey key: String) -> String? {
-        store[key] as? String
-    }
-
-    func removeObject(forKey key: String) {
-        store.removeValue(forKey: key)
     }
 }
 

@@ -1,7 +1,7 @@
 import Foundation
 
-protocol CacheClearing {
+protocol CacheInvalidating {
     func clearAllCaches() async
 }
 
-extension CacheActor: CacheClearing {}
+extension CacheActor: CacheInvalidating {}
