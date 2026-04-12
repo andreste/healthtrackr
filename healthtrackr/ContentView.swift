@@ -28,6 +28,21 @@ struct ContentView: View {
     }
 
     var body: some View {
+        Group {
+            content
+        }
+        .task {
+            guard !hasGrantedHealthKit else { return }
+            let hk: any HealthKitProviding = healthKit ?? HealthKitManager()
+            if await hk.isAlreadyAuthorized {
+                UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
+                hasGrantedHealthKit = true
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if hasCompletedOnboarding {
             DiscoveryFeedView(
                 authManager: authManager,

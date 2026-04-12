@@ -3,6 +3,7 @@ import Foundation
 @MainActor
 protocol HealthKitProviding {
     var needsAuthorization: Bool { get }
+    var isAlreadyAuthorized: Bool { get async }
     func requestAuthorization() async throws
     func fetchSleep(days: Int) async -> [MetricSample]
     func fetchHRV(days: Int) async -> [MetricSample]
