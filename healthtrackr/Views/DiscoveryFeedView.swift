@@ -149,18 +149,9 @@ struct DiscoveryFeedView: View {
 
                 Section {
                     VStack(alignment: .leading, spacing: Spacing.space2) {
-                        PermissionRow(icon: "bed.double.fill", label: "Sleep Analysis")
-                        PermissionRow(icon: "waveform.path.ecg", label: "Heart Rate Variability")
-                        PermissionRow(icon: "figure.walk", label: "Steps")
-                        PermissionRow(icon: "heart.fill", label: "Resting Heart Rate")
-                        PermissionRow(icon: "flame.fill", label: "Active Energy")
-                        PermissionRow(icon: "figure.run", label: "Exercise Time")
-                        PermissionRow(icon: "map.fill", label: "Walking + Running Distance")
-                        PermissionRow(icon: "lungs.fill", label: "VO2 Max")
-                        PermissionRow(icon: "figure.walk.motion", label: "Walking Heart Rate")
-                        PermissionRow(icon: "o2.circle.fill", label: "Blood Oxygen")
-                        PermissionRow(icon: "wind", label: "Respiratory Rate")
-                        PermissionRow(icon: "scalemass.fill", label: "Body Mass")
+                        ForEach(HealthPermissionItem.all) { item in
+                            PermissionRow(icon: item.icon, label: item.label)
+                        }
                     }
                     .padding(.vertical, Spacing.space1)
 
