@@ -186,7 +186,7 @@ struct DiscoveryFeedView: View {
 
                 Section("Account") {
                     Button(role: .destructive) {
-                        authManager.signOut()
+                        Task { await authManager.signOut() }
                     } label: {
                         Text("Sign Out")
                             .font(Typography.labelMD)

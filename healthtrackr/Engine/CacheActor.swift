@@ -72,6 +72,22 @@ actor CacheActor {
         cacheDirectory.appendingPathComponent("\(pairId)_narration_\(lagHours).json")
     }
 
+    // MARK: - Clear
+
+    func clearAllCaches() {
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: cacheDirectory,
+            includingPropertiesForKeys: nil
+        )) ?? []
+        for url in contents where url.pathExtension == "json" {
+            try? FileManager.default.removeItem(at: url)
+        }
+        let prefix = "\(lastRunKey)_"
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix(prefix) {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
     // MARK: - Helpers
 
     private func fileURL(for pairId: String) -> URL {

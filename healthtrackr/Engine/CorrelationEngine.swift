@@ -2,7 +2,11 @@ import Foundation
 
 @MainActor
 final class CorrelationEngine {
-    private let cache = CacheActor()
+    private let cache: CacheActor
+
+    init(cache: CacheActor = CacheActor()) {
+        self.cache = cache
+    }
 
     static let lagOffsets = [0, 12, 24, 36, 48]
 

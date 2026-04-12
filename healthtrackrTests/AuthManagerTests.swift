@@ -4,20 +4,10 @@ import Testing
 
 // MARK: - Fakes
 
-@MainActor
-final class FakeUserDefaults {
-    private var store: [String: Any] = [:]
-
-    func set(_ value: Any?, forKey key: String) {
-        store[key] = value
-    }
-
-    func string(forKey key: String) -> String? {
-        store[key] as? String
-    }
-
-    func removeObject(forKey key: String) {
-        store.removeValue(forKey: key)
+final class FakeCacheClearing: CacheInvalidating {
+    nonisolated(unsafe) var clearAllCachesCalled = false
+    func clearAllCaches() async {
+        clearAllCachesCalled = true
     }
 }
 
@@ -64,16 +54,27 @@ struct AuthManagerUserProfileTests {
     }
 
     @Test("signOut clears firstName and photoURL")
-    @MainActor func signOutClearsUserInfo() {
+    @MainActor func signOutClearsUserInfo() async {
         UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
         UserDefaults.standard.set("https://example.com/photo.jpg", forKey: Self.photoURLKey)
         let manager = AuthManager()
         #expect(manager.firstName == "Andres")
 
-        manager.signOut()
+        await manager.signOut()
 
         #expect(manager.firstName == nil)
         #expect(manager.photoURL == nil)
+    }
+
+    @Test("signOut calls clearAllCaches on the cache")
+    @MainActor func signOutClearsCaches() async {
+        UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
+        let fakeCache = FakeCacheClearing()
+        let manager = AuthManager(cache: fakeCache)
+
+        await manager.signOut()
+
+        #expect(fakeCache.clearAllCachesCalled)
     }
 }
 
