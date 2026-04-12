@@ -33,25 +33,36 @@ struct ProfileButtonView: View {
                         .resizable()
                         .scaledToFill()
                 case .failure, .empty:
-                    fallbackImage
+                    initialsOrIcon
                 @unknown default:
-                    fallbackImage
+                    initialsOrIcon
                 }
             }
         } else {
-            fallbackImage
+            initialsOrIcon
         }
     }
 
-    private var fallbackImage: some View {
-        Image(systemName: "person.circle.fill")
-            .resizable()
-            .scaledToFit()
-            .foregroundStyle(Color("textSecondary"))
+    @ViewBuilder
+    private var initialsOrIcon: some View {
+        if let initial = firstName?.first.map(String.init) {
+            Circle()
+                .fill(Color("accentPrimary"))
+                .overlay(
+                    Text(initial.uppercased())
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                )
+        } else {
+            Image(systemName: "person.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(Color("textSecondary"))
+        }
     }
 }
 
-#Preview("With name") {
+#Preview("With name — initials avatar") {
     ProfileButtonView(
         firstName: "Andres",
         photoURL: nil,
@@ -61,7 +72,7 @@ struct ProfileButtonView: View {
     .background(Color("bgPrimary"))
 }
 
-#Preview("No name, no photo") {
+#Preview("No name, no photo — icon fallback") {
     ProfileButtonView(
         firstName: nil,
         photoURL: nil,
