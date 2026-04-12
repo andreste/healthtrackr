@@ -11,11 +11,19 @@ actor CacheActor {
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
         cacheDirectory = caches.appendingPathComponent("correlations", isDirectory: true)
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.complete],
+            ofItemAtPath: cacheDirectory.path
+        )
     }
 
     init(directory: URL) {
         cacheDirectory = directory
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.complete],
+            ofItemAtPath: cacheDirectory.path
+        )
     }
 
     // MARK: - Read / Write
@@ -35,7 +43,7 @@ actor CacheActor {
     func save(results: [CorrelationResult], pairId: String) {
         let url = allResultsURL(for: pairId)
         guard let data = try? encoder.encode(results) else { return }
-        try? data.write(to: url, options: .atomic)
+        try? data.write(to: url, options: [.atomic, .completeFileProtection])
         defaults.set(Date().timeIntervalSince1970, forKey: "\(lastRunKey)_\(pairId)")
     }
 
@@ -58,7 +66,7 @@ actor CacheActor {
     func saveNarration(_ narration: PatternNarration, lagHours: Int) {
         let url = narrationURL(pairId: narration.pairId, lagHours: lagHours)
         guard let data = try? encoder.encode(narration) else { return }
-        try? data.write(to: url, options: .atomic)
+        try? data.write(to: url, options: [.atomic, .completeFileProtection])
     }
 
     func isNarrationFresh(pairId: String, lagHours: Int, calendar: Calendar = .current) -> Bool {
