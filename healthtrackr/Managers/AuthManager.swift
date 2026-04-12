@@ -18,17 +18,32 @@ final class AuthManager {
 
     init(cache: any CacheInvalidating) {
         self.cache = cache
+        Self.migrateUserDefaultsToKeychain()
     }
 
     var firstName: String? {
-        UserDefaults.standard.string(forKey: Self.userFirstNameKey)
+        guard let data = KeychainHelper.read(key: Self.userFirstNameKey) else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 
     var photoURL: URL? {
-        guard let urlString = UserDefaults.standard.string(forKey: Self.userPhotoURLKey) else {
-            return nil
-        }
+        guard let data = KeychainHelper.read(key: Self.userPhotoURLKey),
+              let urlString = String(data: data, encoding: .utf8) else { return nil }
         return URL(string: urlString)
+    }
+
+    // MARK: - UserDefaults → Keychain Migration
+
+    private static func migrateUserDefaultsToKeychain() {
+        let defaults = UserDefaults.standard
+        if let name = defaults.string(forKey: userFirstNameKey) {
+            KeychainHelper.save(key: userFirstNameKey, data: Data(name.utf8))
+            defaults.removeObject(forKey: userFirstNameKey)
+        }
+        if let urlString = defaults.string(forKey: userPhotoURLKey) {
+            KeychainHelper.save(key: userPhotoURLKey, data: Data(urlString.utf8))
+            defaults.removeObject(forKey: userPhotoURLKey)
+        }
     }
 
     // MARK: - Lifecycle
@@ -76,7 +91,7 @@ final class AuthManager {
 
             // Apple only provides the name on the first sign-in — persist it
             if let givenName = credential.fullName?.givenName, !givenName.isEmpty {
-                UserDefaults.standard.set(givenName, forKey: Self.userFirstNameKey)
+                KeychainHelper.save(key: Self.userFirstNameKey, data: Data(givenName.utf8))
             }
 
             isAuthenticated = true
@@ -99,8 +114,8 @@ final class AuthManager {
 
     private func clearCredentials() async {
         KeychainHelper.delete(key: Self.userIDKey)
-        UserDefaults.standard.removeObject(forKey: Self.userFirstNameKey)
-        UserDefaults.standard.removeObject(forKey: Self.userPhotoURLKey)
+        KeychainHelper.delete(key: Self.userFirstNameKey)
+        KeychainHelper.delete(key: Self.userPhotoURLKey)
         isAuthenticated = false
         await cache.clearAllCaches()
     }
