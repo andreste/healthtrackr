@@ -237,6 +237,6 @@ struct HealthMetricsFormatterTests {
     @Test("override value uses the override instead of latestValue")
     func overrideValue() {
         let s = makeSnapshot(id: "sleep", latestValue: 7.0, weeklyAverage: 6.5)
-        #expect(HealthMetricsFormatter.formatValue(s, override: 6.5) == "6.5")
+        #expect(HealthMetricsFormatter.formatValue(s, using: 6.5) == "6.5")
     }
 }
