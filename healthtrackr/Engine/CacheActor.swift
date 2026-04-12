@@ -96,6 +96,16 @@ actor CacheActor {
         }
     }
 
+    func clearNarrationCache() {
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: cacheDirectory,
+            includingPropertiesForKeys: nil
+        )) ?? []
+        for url in contents where url.lastPathComponent.contains("_narration_") {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+
     // MARK: - Helpers
 
     private func fileURL(for pairId: String) -> URL {

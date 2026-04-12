@@ -55,15 +55,18 @@ final class DiscoveryFeedViewModel {
     private let healthKit: any HealthKitProviding
     private let engine: any CorrelationProviding
     private let narrator: any NarrationProviding
+    private let cache: CacheActor?
 
     init(
         healthKit: any HealthKitProviding,
         engine: any CorrelationProviding,
-        narrator: any NarrationProviding
+        narrator: any NarrationProviding,
+        cache: CacheActor? = nil
     ) {
         self.healthKit = healthKit
         self.engine = engine
         self.narrator = narrator
+        self.cache = cache
     }
 
     convenience init() {
@@ -71,7 +74,8 @@ final class DiscoveryFeedViewModel {
         self.init(
             healthKit: HealthKitManager(),
             engine: CorrelationEngine(cache: cache),
-            narrator: PatternNarrator(cache: cache)
+            narrator: PatternNarrator(cache: cache),
+            cache: cache
         )
     }
 
@@ -101,6 +105,19 @@ final class DiscoveryFeedViewModel {
 
         // Fetch fresh data in background
         await fetchAndCorrelate()
+    }
+
+    func renarrate() async {
+        await cache?.clearNarrationCache()
+        var allItems: [PatternItem] = []
+        for pair in CorrelationEngine.v1Pairs {
+            let results = await engine.cachedResults(for: pair.id)
+            let narrations = await narrateResults(results)
+            allItems.append(contentsOf: buildItems(from: results, narrations: narrations))
+        }
+        if !allItems.isEmpty {
+            items = allItems
+        }
     }
 
     private func loadCachedResults() async {
