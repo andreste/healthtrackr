@@ -34,6 +34,14 @@ final class HealthKitManager {
 
     // MARK: - Authorization
 
+    var isAlreadyAuthorized: Bool {
+        get async {
+            guard HKHealthStore.isHealthDataAvailable() else { return false }
+            let status = try? await store.statusForAuthorizationRequest(toShare: [], read: readTypes)
+            return status == .unnecessary
+        }
+    }
+
     func requestAuthorization() async throws {
         guard HKHealthStore.isHealthDataAvailable() else {
             needsAuthorization = true

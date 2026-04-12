@@ -41,6 +41,8 @@ final class StubHealthKit: HealthKitProviding {
         }
     }
 
+    var isAlreadyAuthorized: Bool { !needsAuthorization }
+
     func requestAuthorization() async throws {
         if needsAuthorization {
             throw StubError.denied
