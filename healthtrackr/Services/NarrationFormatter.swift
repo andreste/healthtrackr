@@ -3,11 +3,11 @@ import Foundation
 nonisolated enum NarrationFormatter {
     static func buildSummary(for result: CorrelationResult) -> String {
         let pairLabel = humanReadablePair(result.pairId)
-        let effectPct = String(format: "%.0f%%", result.effectSize * 100)
+        let cohensDStr = result.effectSize.map { String(format: "d=%.2f", $0) } ?? "d=n/a"
         return "\(pairLabel): r=\(String(format: "%.2f", result.r)), " +
                "p=\(String(format: "%.4f", result.pValue)), " +
                "n=\(result.n), lag=\(result.lagHours)h, " +
-               "avg delta=\(effectPct)"
+               "cohen's \(cohensDStr)"
     }
 
     static func buildPrompt(summary: String) -> String {

@@ -229,10 +229,13 @@ struct PatternDetailView: View {
 // MARK: - Formatter
 
 enum PatternDetailFormatter {
-    static func effectSizeText(_ effectSize: Double) -> String {
-        let pct = effectSize * 100
-        let sign = pct >= 0 ? "+" : ""
-        return "\(sign)\(String(format: "%.0f", pct))%"
+    static func effectSizeText(_ effectSize: Double?) -> String {
+        guard let d = effectSize else { return "n/a" }
+        let absD = abs(d)
+        if absD >= 0.8 { return "large" }
+        if absD >= 0.5 { return "medium" }
+        if absD >= 0.2 { return "small" }
+        return "negligible"
     }
 
     static func lagText(_ lagHours: Int) -> String {

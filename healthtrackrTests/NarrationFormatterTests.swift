@@ -82,7 +82,7 @@ struct BuildSummaryTests {
         #expect(summary.contains("p=0.0030"))
         #expect(summary.contains("n=52"))
         #expect(summary.contains("lag=36h"))
-        #expect(summary.contains("avg delta=18%"))
+        #expect(summary.contains("cohen's d=0.18"))
     }
 
     @Test("summary formats negative r correctly")
