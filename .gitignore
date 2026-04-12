@@ -17,3 +17,6 @@ Packages/
 
 # CocoaPods (if used later)
 Pods/
+
+# Claude Code worktrees
+.claude/worktrees/
