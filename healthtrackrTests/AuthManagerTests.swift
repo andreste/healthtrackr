@@ -11,52 +11,59 @@ final class FakeCacheClearing: CacheInvalidating {
     }
 }
 
+// MARK: - Helpers
+
+private let firstNameKey = "appleUserFirstName"
+private let photoURLKey = "appleUserPhotoURL"
+
+private func cleanKeychain() {
+    KeychainHelper.delete(key: firstNameKey)
+    KeychainHelper.delete(key: photoURLKey)
+}
+
 // MARK: - AuthManager User Profile Tests
 
 @Suite("AuthManager User Profile")
 struct AuthManagerUserProfileTests {
 
-    private static let firstNameKey = "appleUserFirstName"
-    private static let photoURLKey = "appleUserPhotoURL"
-
     @Test("firstName returns nil when not set")
     @MainActor func firstNameNilByDefault() {
-        // Clean up any leftover state
-        UserDefaults.standard.removeObject(forKey: Self.firstNameKey)
+        cleanKeychain()
         let manager = AuthManager()
         #expect(manager.firstName == nil)
     }
 
     @Test("firstName returns stored value")
     @MainActor func firstNameReturnsStoredValue() {
-        UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
+        cleanKeychain()
+        KeychainHelper.save(key: firstNameKey, data: Data("Andres".utf8))
         let manager = AuthManager()
         #expect(manager.firstName == "Andres")
-        // Clean up
-        UserDefaults.standard.removeObject(forKey: Self.firstNameKey)
+        cleanKeychain()
     }
 
     @Test("photoURL returns nil when not set")
     @MainActor func photoURLNilByDefault() {
-        UserDefaults.standard.removeObject(forKey: Self.photoURLKey)
+        cleanKeychain()
         let manager = AuthManager()
         #expect(manager.photoURL == nil)
     }
 
     @Test("photoURL returns stored URL")
     @MainActor func photoURLReturnsStoredURL() {
+        cleanKeychain()
         let urlString = "https://example.com/photo.jpg"
-        UserDefaults.standard.set(urlString, forKey: Self.photoURLKey)
+        KeychainHelper.save(key: photoURLKey, data: Data(urlString.utf8))
         let manager = AuthManager()
         #expect(manager.photoURL == URL(string: urlString))
-        // Clean up
-        UserDefaults.standard.removeObject(forKey: Self.photoURLKey)
+        cleanKeychain()
     }
 
-    @Test("signOut clears firstName and photoURL")
+    @Test("signOut clears firstName and photoURL from Keychain")
     @MainActor func signOutClearsUserInfo() async {
-        UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
-        UserDefaults.standard.set("https://example.com/photo.jpg", forKey: Self.photoURLKey)
+        cleanKeychain()
+        KeychainHelper.save(key: firstNameKey, data: Data("Andres".utf8))
+        KeychainHelper.save(key: photoURLKey, data: Data("https://example.com/photo.jpg".utf8))
         let manager = AuthManager()
         #expect(manager.firstName == "Andres")
 
@@ -68,7 +75,8 @@ struct AuthManagerUserProfileTests {
 
     @Test("signOut calls clearAllCaches on the cache")
     @MainActor func signOutClearsCaches() async {
-        UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
+        cleanKeychain()
+        KeychainHelper.save(key: firstNameKey, data: Data("Andres".utf8))
         let fakeCache = FakeCacheClearing()
         let manager = AuthManager(cache: fakeCache)
 
@@ -78,25 +86,68 @@ struct AuthManagerUserProfileTests {
     }
 }
 
+// MARK: - UserDefaults → Keychain Migration Tests
+
+@Suite("AuthManager Migration")
+struct AuthManagerMigrationTests {
+
+    @Test("firstName migrates from UserDefaults to Keychain on init")
+    @MainActor func migratesFirstNameFromUserDefaults() {
+        cleanKeychain()
+        UserDefaults.standard.set("MigratedName", forKey: firstNameKey)
+
+        let manager = AuthManager()
+
+        // After init, value should be in Keychain and removed from UserDefaults
+        #expect(manager.firstName == "MigratedName")
+        #expect(UserDefaults.standard.string(forKey: firstNameKey) == nil)
+        cleanKeychain()
+    }
+
+    @Test("photoURL migrates from UserDefaults to Keychain on init")
+    @MainActor func migratesPhotoURLFromUserDefaults() {
+        cleanKeychain()
+        let urlString = "https://example.com/migrated.jpg"
+        UserDefaults.standard.set(urlString, forKey: photoURLKey)
+
+        let manager = AuthManager()
+
+        #expect(manager.photoURL == URL(string: urlString))
+        #expect(UserDefaults.standard.string(forKey: photoURLKey) == nil)
+        cleanKeychain()
+    }
+
+    @Test("migration does not overwrite existing Keychain value when UserDefaults is empty")
+    @MainActor func doesNotOverwriteExistingKeychain() {
+        cleanKeychain()
+        KeychainHelper.save(key: firstNameKey, data: Data("ExistingName".utf8))
+        UserDefaults.standard.removeObject(forKey: firstNameKey)
+
+        let manager = AuthManager()
+
+        // Keychain value should be preserved
+        #expect(manager.firstName == "ExistingName")
+        cleanKeychain()
+    }
+}
+
 // MARK: - ProfileButtonView Display Logic Tests
 
 @Suite("Profile Display Logic")
 struct ProfileDisplayLogicTests {
 
-    @Test("firstName extracts first name correctly from full name")
+    @Test("firstName reads from Keychain correctly")
     @MainActor func firstNameExtraction() {
-        let key = "appleUserFirstName"
-        UserDefaults.standard.set("John", forKey: key)
+        cleanKeychain()
+        KeychainHelper.save(key: firstNameKey, data: Data("John".utf8))
         let manager = AuthManager()
         #expect(manager.firstName == "John")
-        UserDefaults.standard.removeObject(forKey: key)
+        cleanKeychain()
     }
 
-    @Test("photoURL handles invalid URL string gracefully")
-    @MainActor func invalidPhotoURL() {
-        let key = "appleUserPhotoURL"
-        // Empty string produces a valid URL in Foundation, so test with truly invalid
-        UserDefaults.standard.removeObject(forKey: key)
+    @Test("photoURL returns nil when Keychain has no entry")
+    @MainActor func photoURLNilWhenMissing() {
+        cleanKeychain()
         let manager = AuthManager()
         #expect(manager.photoURL == nil)
     }
