@@ -4,6 +4,13 @@ import Testing
 
 // MARK: - Fakes
 
+final class FakeCacheClearing: CacheClearing {
+    var clearAllCachesCalled = false
+    func clearAllCaches() async {
+        clearAllCachesCalled = true
+    }
+}
+
 @MainActor
 final class FakeUserDefaults {
     private var store: [String: Any] = [:]
@@ -64,16 +71,27 @@ struct AuthManagerUserProfileTests {
     }
 
     @Test("signOut clears firstName and photoURL")
-    @MainActor func signOutClearsUserInfo() {
+    @MainActor func signOutClearsUserInfo() async {
         UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
         UserDefaults.standard.set("https://example.com/photo.jpg", forKey: Self.photoURLKey)
         let manager = AuthManager()
         #expect(manager.firstName == "Andres")
 
-        manager.signOut()
+        await manager.signOut()
 
         #expect(manager.firstName == nil)
         #expect(manager.photoURL == nil)
+    }
+
+    @Test("signOut calls clearAllCaches on the cache")
+    @MainActor func signOutClearsCaches() async {
+        UserDefaults.standard.set("Andres", forKey: Self.firstNameKey)
+        let fakeCache = FakeCacheClearing()
+        let manager = AuthManager(cache: fakeCache)
+
+        await manager.signOut()
+
+        #expect(fakeCache.clearAllCachesCalled)
     }
 }
 

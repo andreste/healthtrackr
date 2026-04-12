@@ -88,6 +88,52 @@ struct CacheActorNarrationTests {
     }
 }
 
+// MARK: - CacheActor Clear Tests
+
+@Suite("CacheActor.clearAllCaches")
+struct CacheActorClearTests {
+    @Test("clearAllCaches removes cached narration files")
+    func clearAllCachesRemovesNarrationFiles() async {
+        let cache = makeIsolatedCache()
+        let narration = makeNarration(pairId: "sleep_hrv")
+        await cache.saveNarration(narration, lagHours: 12)
+
+        await cache.clearAllCaches()
+
+        let loaded = await cache.loadNarration(pairId: "sleep_hrv", lagHours: 12)
+        #expect(loaded == nil)
+    }
+
+    @Test("clearAllCaches removes UserDefaults timestamp keys")
+    func clearAllCachesRemovesTimestamps() async {
+        let pairId = "test_clear_\(UUID().uuidString)"
+        let cache = makeIsolatedCache()
+        let result = makeResult(pairId: pairId)
+        await cache.save(results: [result], pairId: pairId)
+
+        let staleBeforeClear = await cache.isStale(pairId: pairId)
+        #expect(!staleBeforeClear)
+
+        await cache.clearAllCaches()
+
+        let staleAfterClear = await cache.isStale(pairId: pairId)
+        #expect(staleAfterClear)
+    }
+
+    @Test("clearAllCaches removes all results files")
+    func clearAllCachesRemovesResultFiles() async {
+        let pairId = "steps_rhr"
+        let cache = makeIsolatedCache()
+        let result = makeResult(pairId: pairId)
+        await cache.save(results: [result], pairId: pairId)
+
+        await cache.clearAllCaches()
+
+        let loaded = await cache.loadAll(pairId: pairId)
+        #expect(loaded.isEmpty)
+    }
+}
+
 // MARK: - PatternNarrator Caching Integration Tests
 
 @Suite("PatternNarrator Daily Caching")

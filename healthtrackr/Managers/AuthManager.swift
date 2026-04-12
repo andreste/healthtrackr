@@ -10,6 +10,16 @@ final class AuthManager {
     private static let userFirstNameKey = "appleUserFirstName"
     private static let userPhotoURLKey = "appleUserPhotoURL"
 
+    private let cache: any CacheClearing
+
+    convenience init() {
+        self.init(cache: CacheActor())
+    }
+
+    init(cache: any CacheClearing) {
+        self.cache = cache
+    }
+
     var firstName: String? {
         UserDefaults.standard.string(forKey: Self.userFirstNameKey)
     }
@@ -37,12 +47,12 @@ final class AuthManager {
             case .authorized:
                 isAuthenticated = true
             case .revoked, .notFound:
-                clearCredentials()
+                await clearCredentials()
             default:
-                clearCredentials()
+                await clearCredentials()
             }
         } catch {
-            clearCredentials()
+            await clearCredentials()
         }
         isCheckingCredential = false
     }
@@ -83,11 +93,12 @@ final class AuthManager {
 
     // MARK: - Sign Out
 
-    func signOut() {
-        clearCredentials()
+    func signOut() async {
+        await clearCredentials()
     }
 
-    private func clearCredentials() {
+    private func clearCredentials() async {
+        await cache.clearAllCaches()
         KeychainHelper.delete(key: Self.userIDKey)
         UserDefaults.standard.removeObject(forKey: Self.userFirstNameKey)
         UserDefaults.standard.removeObject(forKey: Self.userPhotoURLKey)
