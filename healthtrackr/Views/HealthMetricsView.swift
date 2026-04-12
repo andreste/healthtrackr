@@ -121,7 +121,7 @@ struct HealthMetricsView: View {
                 }
 
                 if let avg = snapshot.weeklyAverage {
-                    Text("avg \(HealthMetricsFormatter.formatValue(snapshot, override: avg))")
+                    Text("avg \(HealthMetricsFormatter.formatValue(snapshot, using: avg))")
                         .font(Typography.dataXS)
                         .foregroundStyle(Color("textTertiary"))
                 }
@@ -171,8 +171,8 @@ struct HealthMetricsView: View {
 
 enum HealthMetricsFormatter {
 
-    static func formatValue(_ snapshot: MetricSnapshot, override value: Double? = nil) -> String {
-        guard let v = override ?? snapshot.latestValue else { return "—" }
+    static func formatValue(_ snapshot: MetricSnapshot, using value: Double? = nil) -> String {
+        guard let v = value ?? snapshot.latestValue else { return "—" }
         switch snapshot.id {
         case "sleep", "distance", "vo2Max", "bodyMass":
             return String(format: "%.1f", v)
