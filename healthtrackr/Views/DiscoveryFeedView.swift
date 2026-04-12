@@ -4,6 +4,7 @@ struct DiscoveryFeedView: View {
     let authManager: AuthManager
     @State private var viewModel: DiscoveryFeedViewModel
     @State private var hasStoredKey: Bool = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
+    @State private var apiKeyInput: String = ""
 
     init(
         authManager: AuthManager,
@@ -61,6 +62,10 @@ struct DiscoveryFeedView: View {
             }
             .sheet(isPresented: $viewModel.showSettings) {
                 settingsSheet
+                    .onAppear {
+                        hasStoredKey = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
+                        apiKeyInput = ""
+                    }
             }
         }
         .task {
@@ -143,26 +148,30 @@ struct DiscoveryFeedView: View {
                             Button("Remove") {
                                 KeychainHelper.delete(key: PatternNarrator.keychainKey)
                                 hasStoredKey = false
+                                apiKeyInput = ""
                             }
                             .font(Typography.labelMD)
                             .foregroundStyle(Color("semanticError"))
                         }
                     } else {
-                        Button {
-                            let trimmed = (UIPasteboard.general.string ?? "")
-                                .trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard !trimmed.isEmpty else { return }
-                            KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(trimmed.utf8))
-                            hasStoredKey = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "clipboard")
-                                Text("Paste from Clipboard")
+                        HStack {
+                            TextField("sk-ant-...", text: $apiKeyInput)
+                                .font(Typography.dataSM)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
+                                .accessibilityIdentifier("APIKeyTextField")
+                            if !apiKeyInput.isEmpty {
+                                Button("Save") {
+                                    let trimmed = apiKeyInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    guard !trimmed.isEmpty else { return }
+                                    KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(trimmed.utf8))
+                                    hasStoredKey = true
+                                    apiKeyInput = ""
+                                }
+                                .font(Typography.labelMD)
+                                .foregroundStyle(Color("accentPrimary"))
                             }
-                            .font(Typography.labelMD)
-                            .foregroundStyle(Color("accentPrimary"))
                         }
-                        .accessibilityIdentifier("PasteAPIKeyButton")
                     }
                 } header: {
                     Text("API Key")
