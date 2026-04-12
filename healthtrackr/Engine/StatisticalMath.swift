@@ -116,12 +116,26 @@ enum StatisticalMath {
 
     // MARK: - Effect Size
 
-    static func effectSize(a: [Double], b: [Double]) -> Double {
-        guard !a.isEmpty, !b.isEmpty else { return 0 }
-        let meanA = a.reduce(0, +) / Double(a.count)
-        let meanB = b.reduce(0, +) / Double(b.count)
-        guard meanB != 0 else { return 0 }
-        return abs(meanA - meanB) / abs(meanB)
+    /// Cohen's d: standardized mean difference between two samples.
+    /// Returns nil when either array has fewer than 2 elements or the pooled
+    /// standard deviation is zero (e.g. both distributions are constant).
+    static func effectSize(a: [Double], b: [Double]) -> Double? {
+        let nA = a.count
+        let nB = b.count
+        guard nA >= 2, nB >= 2 else { return nil }
+
+        let meanA = a.reduce(0, +) / Double(nA)
+        let meanB = b.reduce(0, +) / Double(nB)
+
+        let varA = a.reduce(0) { $0 + ($1 - meanA) * ($1 - meanA) } / Double(nA - 1)
+        let varB = b.reduce(0) { $0 + ($1 - meanB) * ($1 - meanB) } / Double(nB - 1)
+
+        let pooledVariance = (Double(nA - 1) * varA + Double(nB - 1) * varB) / Double(nA + nB - 2)
+        let pooledStdDev = sqrt(pooledVariance)
+
+        guard pooledStdDev > 0 else { return nil }
+
+        return (meanA - meanB) / pooledStdDev
     }
 
     // MARK: - Confidence Classification

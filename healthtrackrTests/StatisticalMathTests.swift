@@ -113,26 +113,53 @@ struct PValueTests {
 
 @Suite("Effect Size")
 struct EffectSizeTests {
-    @Test("identical means returns 0")
-    func identicalMeans() {
-        let e = StatisticalMath.effectSize(a: [5.0, 5.0], b: [5.0, 5.0])
-        #expect(e == 0)
+    @Test("identical distributions return nil (zero pooled std dev)")
+    func identicalDistributions() {
+        let result = StatisticalMath.effectSize(a: [5.0, 5.0, 5.0], b: [5.0, 5.0, 5.0])
+        #expect(result == nil)
     }
 
-    @Test("different means returns positive ratio")
-    func differentMeans() {
-        let e = StatisticalMath.effectSize(a: [10.0], b: [5.0])
-        #expect(e == 1.0) // |10 - 5| / |5| = 1.0
+    @Test("clearly separated distributions return large Cohen's d")
+    func separatedDistributions() {
+        // group A: mean≈10, group B: mean≈0, std dev≈1
+        let a = [9.0, 10.0, 11.0, 10.0, 10.0]
+        let b = [0.0, 1.0, -1.0, 0.5, -0.5]
+        let d = StatisticalMath.effectSize(a: a, b: b)
+        #expect(d != nil)
+        #expect(d! > 5.0)
     }
 
-    @Test("empty arrays return 0")
+    @Test("d≈0 when means are equal")
+    func equalMeans() {
+        let a = [1.0, 2.0, 3.0, 4.0, 5.0] // mean=3
+        let b = [2.0, 3.0, 4.0, 5.0, 1.0] // mean=3
+        let d = StatisticalMath.effectSize(a: a, b: b)
+        #expect(d != nil)
+        #expect(abs(d!) < 0.001)
+    }
+
+    @Test("empty arrays return nil")
     func emptyArrays() {
-        #expect(StatisticalMath.effectSize(a: [], b: []) == 0)
+        #expect(StatisticalMath.effectSize(a: [], b: []) == nil)
     }
 
-    @Test("zero mean B returns 0")
-    func zeroMeanB() {
-        #expect(StatisticalMath.effectSize(a: [5.0], b: [0.0]) == 0)
+    @Test("single-element arrays return nil")
+    func singleElementArrays() {
+        #expect(StatisticalMath.effectSize(a: [5.0], b: [10.0]) == nil)
+    }
+
+    @Test("one array too small returns nil")
+    func oneArrayTooSmall() {
+        #expect(StatisticalMath.effectSize(a: [1.0, 2.0, 3.0], b: [5.0]) == nil)
+    }
+
+    @Test("negative d when mean of a is less than mean of b")
+    func negativeCohensD() {
+        let a = [1.0, 2.0, 1.0, 2.0]  // mean=1.5
+        let b = [9.0, 10.0, 9.0, 10.0] // mean=9.5
+        let d = StatisticalMath.effectSize(a: a, b: b)
+        #expect(d != nil)
+        #expect(d! < -5.0)
     }
 }
 

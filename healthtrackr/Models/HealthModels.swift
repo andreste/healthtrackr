@@ -27,7 +27,7 @@ struct CorrelationResult: Codable {
     let r: Double
     let pValue: Double
     let n: Int
-    let effectSize: Double
+    let effectSize: Double?
     let confidence: Confidence
     let computedAt: Date
 

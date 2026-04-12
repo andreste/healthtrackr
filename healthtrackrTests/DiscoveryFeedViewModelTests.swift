@@ -470,19 +470,29 @@ struct LoadStateTests {
 
 @Suite("PatternDetailFormatter")
 struct PatternDetailFormatterTests {
-    @Test("effectSizeText formats positive percentage")
+    @Test("effectSizeText returns 'small' for d=0.18")
     func positiveEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(0.18) == "+18%")
+        #expect(PatternDetailFormatter.effectSizeText(0.18) == "small")
     }
 
-    @Test("effectSizeText formats negative percentage")
-    func negativeEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(-0.12) == "-12%")
+    @Test("effectSizeText returns 'negligible' for small d")
+    func negativeSmallEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(-0.12) == "negligible")
     }
 
-    @Test("effectSizeText formats zero")
-    func zeroEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(0.0) == "+0%")
+    @Test("effectSizeText returns 'n/a' for nil")
+    func nilEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(nil) == "n/a")
+    }
+
+    @Test("effectSizeText returns 'large' for d >= 0.8")
+    func largeEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(1.2) == "large")
+    }
+
+    @Test("effectSizeText returns 'medium' for 0.5 <= d < 0.8")
+    func mediumEffect() {
+        #expect(PatternDetailFormatter.effectSizeText(0.6) == "medium")
     }
 
     @Test("lagText formats hours")

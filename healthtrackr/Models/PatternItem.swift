@@ -17,7 +17,7 @@ struct PatternItem: Identifiable {
     let r: Double
     let n: Int
     let lagHours: Int
-    let effectSize: Double
+    let effectSize: Double?
     let scatterData: [ScatterPoint]
     let metricALabel: String
     let metricBLabel: String

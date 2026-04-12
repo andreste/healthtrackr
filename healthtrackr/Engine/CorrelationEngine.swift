@@ -56,7 +56,7 @@ final class CorrelationEngine {
                         r: 0,
                         pValue: 1,
                         n: aligned.count,
-                        effectSize: 0,
+                        effectSize: nil,
                         confidence: .hidden,
                         computedAt: Date()
                     ))
