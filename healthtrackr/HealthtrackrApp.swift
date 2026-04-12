@@ -2,7 +2,16 @@ import SwiftUI
 
 @main
 struct HealthtrackrApp: App {
-    @State private var authManager = AuthManager()
+    @State private var authManager: AuthManager
+    @State private var engine: CorrelationEngine
+    @State private var narrator: PatternNarrator
+
+    init() {
+        let cache = CacheActor()
+        _authManager = State(initialValue: AuthManager(cache: cache))
+        _engine = State(initialValue: CorrelationEngine(cache: cache))
+        _narrator = State(initialValue: PatternNarrator(cache: cache))
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -28,7 +37,7 @@ struct HealthtrackrApp: App {
                 Color("bgPrimary")
                     .ignoresSafeArea()
             } else if authManager.isAuthenticated {
-                ContentView(authManager: authManager)
+                ContentView(authManager: authManager, engine: engine, narrator: narrator)
                     .transition(.opacity)
             } else {
                 SignInView(authManager: authManager)

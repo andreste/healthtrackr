@@ -67,10 +67,11 @@ final class DiscoveryFeedViewModel {
     }
 
     convenience init() {
+        let cache = CacheActor()
         self.init(
             healthKit: HealthKitManager(),
-            engine: CorrelationEngine(),
-            narrator: PatternNarrator()
+            engine: CorrelationEngine(cache: cache),
+            narrator: PatternNarrator(cache: cache)
         )
     }
 
