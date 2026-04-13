@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		AA0000042F6F5000003122E6 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000022F6F5000003122E6 /* HealthKit.framework */; };
 		AA0000052F6F5000003122E6 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000032F6F5000003122E6 /* AuthenticationServices.framework */; };
+		ED9CF5EF2F8D9A9100A49406 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = ED9CF5EE2F8D9A9100A49406 /* Mixpanel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED9CF5EF2F8D9A9100A49406 /* Mixpanel in Frameworks */,
 				AA0000042F6F5000003122E6 /* HealthKit.framework in Frameworks */,
 				AA0000052F6F5000003122E6 /* AuthenticationServices.framework in Frameworks */,
 			);
@@ -146,6 +148,7 @@
 			);
 			name = healthtrackr;
 			packageProductDependencies = (
+				ED9CF5EE2F8D9A9100A49406 /* Mixpanel */,
 			);
 			productName = healthtrackr;
 			productReference = ED0669E12F6F4CE5003122E6 /* healthtrackr.app */;
@@ -229,6 +232,9 @@
 			);
 			mainGroup = ED0669D82F6F4CE5003122E6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				ED9CF5ED2F8D9A9100A49406 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = ED0669E22F6F4CE5003122E6 /* Products */;
 			projectDirPath = "";
@@ -618,6 +624,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		ED9CF5ED2F8D9A9100A49406 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		ED9CF5EE2F8D9A9100A49406 /* Mixpanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ED9CF5ED2F8D9A9100A49406 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
+			productName = Mixpanel;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = ED0669D92F6F4CE5003122E6 /* Project object */;
 }
