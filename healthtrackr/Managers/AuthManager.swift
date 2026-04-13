@@ -1,4 +1,5 @@
 import AuthenticationServices
+import os
 import SwiftUI
 
 @MainActor @Observable
@@ -12,6 +13,7 @@ final class AuthManager {
     private static let hasLaunchedBeforeKey = "hasLaunchedBefore"
 
     private let cache: any CacheInvalidating
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.healthtrackr", category: "AuthManager")
 
     convenience init() {
         self.init(cache: CacheActor())
@@ -97,11 +99,9 @@ final class AuthManager {
             let userID = credential.user
 
             let savedUserID = KeychainHelper.save(key: Self.userIDKey, data: Data(userID.utf8))
-            #if DEBUG
             if !savedUserID {
-                print("[AuthManager] Failed to save user ID to Keychain")
+                logger.debug("[AuthManager] Failed to save user ID to Keychain")
             }
-            #endif
 
             // Apple only provides the name on the first sign-in — persist it
             if let givenName = credential.fullName?.givenName, !givenName.isEmpty {
@@ -114,9 +114,7 @@ final class AuthManager {
             if let authError = error as? ASAuthorizationError, authError.code == .canceled {
                 return
             }
-            #if DEBUG
-            print("[AuthManager] Sign in with Apple failed: \(error.localizedDescription)")
-            #endif
+            logger.debug("[AuthManager] Sign in with Apple failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
