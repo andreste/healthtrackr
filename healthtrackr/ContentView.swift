@@ -51,20 +51,15 @@ struct ContentView: View {
                 narrator: narrator
             )
             .transition(.opacity)
-        } else if hasGrantedHealthKit {
-            DataReadinessView(healthKit: healthKit) {
-                UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
-                withAnimation(.easeOut(duration: AnimationDuration.medium)) {
-                    hasCompletedOnboarding = true
-                }
-            }
-            .transition(.opacity)
         } else {
             HealthKitPermissionsView(
                 healthKit: healthKit ?? HealthKitManager(),
                 onGranted: {
+                    UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
+                    UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
                     withAnimation(.easeOut(duration: AnimationDuration.medium)) {
                         hasGrantedHealthKit = true
+                        hasCompletedOnboarding = true
                     }
                 }
             )
