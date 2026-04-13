@@ -12,12 +12,14 @@ actor PatternNarrator {
     static let keychainKey = "anthropic_api_key"
 
     private var apiKey: String? {
+        // Info.plist (xcconfig) takes precedence; Keychain is the fallback for user-supplied keys
+        if let key = AppConfig.anthropicAPIKey { return key }
         guard let data = KeychainHelper.read(key: Self.keychainKey) else { return nil }
         return String(data: data, encoding: .utf8)
     }
 
     private static let apiURL = URL(string: "https://api.anthropic.com/v1/messages")!
-    private static let model = "claude-haiku-4-5-20251001"
+    private var model: String { AppConfig.anthropicModel }
     private static let maxBatchSize = 5
 
     // MARK: - Public
@@ -55,7 +57,7 @@ actor PatternNarrator {
         let prompt = NarrationFormatter.buildPrompt(summary: summary)
 
         let body = AnthropicMessageRequest(
-            model: Self.model,
+            model: model,
             maxTokens: 300,
             messages: [.init(role: "user", content: prompt)]
         )

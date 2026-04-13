@@ -1,2 +1,11 @@
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
+//
+// Copy Config.local.xcconfig.template → Config.local.xcconfig and fill in real values.
+// Config.local.xcconfig is gitignored and never committed.
+
+#include? "Config.local.xcconfig"
+
+ANTHROPIC_API_KEY =
+ANTHROPIC_MODEL = claude-haiku-4-5-20251001
+MIXPANEL_TOKEN =
