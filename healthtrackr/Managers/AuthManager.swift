@@ -9,6 +9,7 @@ final class AuthManager {
     private static let userIDKey = "appleUserIdentifier"
     private static let userFirstNameKey = "appleUserFirstName"
     private static let userPhotoURLKey = "appleUserPhotoURL"
+    private static let hasLaunchedBeforeKey = "hasLaunchedBefore"
 
     private let cache: any CacheInvalidating
 
@@ -19,6 +20,19 @@ final class AuthManager {
     init(cache: any CacheInvalidating) {
         self.cache = cache
         Self.migrateUserDefaultsToKeychain()
+        Self.clearKeychainIfReinstalled()
+    }
+
+    /// Clears stale Keychain credentials left over from a previous install.
+    /// UserDefaults is wiped on reinstall but Keychain is not — so if the
+    /// "hasLaunchedBefore" flag is absent, this is a fresh install.
+    private static func clearKeychainIfReinstalled() {
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: hasLaunchedBeforeKey) else { return }
+        KeychainHelper.delete(key: userIDKey)
+        KeychainHelper.delete(key: userFirstNameKey)
+        KeychainHelper.delete(key: userPhotoURLKey)
+        defaults.set(true, forKey: hasLaunchedBeforeKey)
     }
 
     var firstName: String? {
