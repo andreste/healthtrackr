@@ -48,6 +48,14 @@ struct HealthtrackrApp: App {
                     .transition(.opacity)
                     .onAppear {
                         analytics.track(event: .signedIn)
+                        if let userId = authManager.userId {
+                            var props: [String: String] = ["Platform": "iOS"]
+                            if let name = authManager.firstName { props["$name"] = name }
+                            if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                                props["App Version"] = version
+                            }
+                            analytics.identify(userId: userId, properties: props)
+                        }
                     }
             } else {
                 SignInView(authManager: authManager, analytics: analytics)

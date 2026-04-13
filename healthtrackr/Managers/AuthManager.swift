@@ -37,6 +37,11 @@ final class AuthManager {
         defaults.set(true, forKey: hasLaunchedBeforeKey)
     }
 
+    var userId: String? {
+        guard let data = KeychainHelper.read(key: Self.userIDKey) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
     var firstName: String? {
         guard let data = KeychainHelper.read(key: Self.userFirstNameKey) else { return nil }
         return String(data: data, encoding: .utf8)

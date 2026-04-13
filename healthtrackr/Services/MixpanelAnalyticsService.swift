@@ -19,8 +19,11 @@ final class MixpanelAnalyticsService {
 
     func identify(userId: String, properties: [String: String]) {
         #if canImport(Mixpanel)
-        Mixpanel.mainInstance().identify(distinctId: userId)
-        Mixpanel.mainInstance().people.set(properties: properties)
+        let instance = Mixpanel.mainInstance()
+        instance.identify(distinctId: userId)
+        var peopleProps: Properties = properties.reduce(into: [:]) { $0[$1.key] = $1.value }
+        peopleProps["$first_seen"] = Date()
+        instance.people.set(properties: peopleProps)
         #else
         logger.debug("[Identify] userId=\(userId, privacy: .private) properties=\(properties)")
         #endif
