@@ -28,12 +28,6 @@ actor CacheActor {
 
     // MARK: - Read / Write
 
-    func load(pairId: String) -> CorrelationResult? {
-        let url = fileURL(for: pairId)
-        guard let data = try? Data(contentsOf: url) else { return nil }
-        return try? decoder.decode(CorrelationResult.self, from: data)
-    }
-
     func loadAll(pairId: String) -> [CorrelationResult] {
         let url = allResultsURL(for: pairId)
         guard let data = try? Data(contentsOf: url) else { return [] }
@@ -107,10 +101,6 @@ actor CacheActor {
     }
 
     // MARK: - Helpers
-
-    private func fileURL(for pairId: String) -> URL {
-        cacheDirectory.appendingPathComponent("\(pairId).json")
-    }
 
     private func allResultsURL(for pairId: String) -> URL {
         cacheDirectory.appendingPathComponent("\(pairId)_all.json")
