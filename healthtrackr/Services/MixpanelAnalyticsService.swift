@@ -1,4 +1,5 @@
 import os
+import Foundation
 
 #if canImport(Mixpanel)
 import Mixpanel

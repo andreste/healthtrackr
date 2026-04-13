@@ -2,9 +2,20 @@ import SwiftUI
 
 struct HealthKitPermissionsView: View {
     let healthKit: any HealthKitProviding
+    let analytics: any AnalyticsProviding
     let onGranted: () -> Void
 
     @State private var isRequesting = false
+
+    init(
+        healthKit: any HealthKitProviding,
+        analytics: (any AnalyticsProviding)? = nil,
+        onGranted: @escaping () -> Void
+    ) {
+        self.healthKit = healthKit
+        self.analytics = analytics ?? MixpanelAnalyticsService()
+        self.onGranted = onGranted
+    }
 
     private static let categories: [(title: String, icon: String, metrics: [String])] = [
         ("Recovery", "bed.double.fill", ["Sleep duration", "HRV", "Blood oxygen", "Respiratory rate"]),
@@ -47,6 +58,7 @@ struct HealthKitPermissionsView: View {
             VStack(spacing: Spacing.space3) {
                 Button {
                     isRequesting = true
+                    analytics.track(event: .healthKitPermissionRequested)
                     Task {
                         try? await healthKit.requestAuthorization()
                         UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
@@ -82,6 +94,9 @@ struct HealthKitPermissionsView: View {
         }
         .background(Color("bgPrimary"))
         .accessibilityIdentifier("HealthKitPermissionsView")
+        .onAppear {
+            analytics.track(event: .healthKitPermissionsViewed)
+        }
     }
 
     private func categoryRow(_ category: (title: String, icon: String, metrics: [String])) -> some View {

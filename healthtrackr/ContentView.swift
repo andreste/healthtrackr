@@ -51,12 +51,14 @@ struct ContentView: View {
                 authManager: authManager,
                 healthKit: healthKit,
                 engine: engine,
-                narrator: narrator
+                narrator: narrator,
+                analytics: analytics
             )
             .transition(.opacity)
         } else {
             HealthKitPermissionsView(
                 healthKit: healthKit ?? HealthKitManager(),
+                analytics: analytics,
                 onGranted: {
                     UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
                     UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
