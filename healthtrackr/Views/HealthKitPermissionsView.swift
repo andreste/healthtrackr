@@ -6,6 +6,7 @@ struct HealthKitPermissionsView: View {
     let onGranted: () -> Void
 
     @State private var isRequesting = false
+    @State private var authorizationError: Error?
 
     init(
         healthKit: any HealthKitProviding,
@@ -58,12 +59,8 @@ struct HealthKitPermissionsView: View {
             VStack(spacing: Spacing.space3) {
                 Button {
                     isRequesting = true
+                    authorizationError = nil
                     analytics.track(event: .healthKitPermissionRequested)
-                    Task {
-                        try? await healthKit.requestAuthorization()
-                        UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
-                        onGranted()
-                    }
                 } label: {
                     Group {
                         if isRequesting {
@@ -94,6 +91,17 @@ struct HealthKitPermissionsView: View {
         }
         .background(Color("bgPrimary"))
         .accessibilityIdentifier("HealthKitPermissionsView")
+        .task(id: isRequesting) {
+            guard isRequesting else { return }
+            do {
+                try await healthKit.requestAuthorization()
+                UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
+                onGranted()
+            } catch {
+                authorizationError = error
+                isRequesting = false
+            }
+        }
         .onAppear {
             analytics.track(event: .healthKitPermissionsViewed)
         }

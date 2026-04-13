@@ -24,6 +24,10 @@ actor PatternNarrator {
 
     // MARK: - Public
 
+    func clearNarrationCache() async {
+        await cache.clearNarrationCache()
+    }
+
     func narrate(results: [CorrelationResult]) async -> [PatternNarration] {
         let confirmed = results.filter { $0.confidence == .high || $0.confidence == .medium }
         guard !confirmed.isEmpty else { return [] }

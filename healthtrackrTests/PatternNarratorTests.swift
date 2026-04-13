@@ -4,8 +4,9 @@ import Testing
 
 // MARK: - Fake
 
-final class FakeHTTPClient: HTTPClientProviding, @unchecked Sendable {
-    var result: (any Sendable)?
+@MainActor
+final class FakeHTTPClient: HTTPClientProviding {
+    var respondWith: ((URLRequest) throws -> Data)?
     var errorToThrow: Error?
     var lastRequest: URLRequest?
 
@@ -17,37 +18,25 @@ final class FakeHTTPClient: HTTPClientProviding, @unchecked Sendable {
         if let error = errorToThrow {
             throw error
         }
-        return result as! Response
+        guard let responder = respondWith else {
+            throw FakeHTTPClientError.noResponder
+        }
+        let data = try responder(request)
+        return try JSONDecoder().decode(Response.self, from: data)
     }
+
+    enum FakeHTTPClientError: Error { case noResponder }
 }
 
 // MARK: - Helper
 
-private func makeResult(
-    pairId: String = "sleep_hrv",
-    lagHours: Int = 36,
-    r: Double = 0.71,
-    pValue: Double = 0.003,
-    n: Int = 52,
-    effectSize: Double = 0.18,
-    confidence: CorrelationResult.Confidence = .high
-) -> CorrelationResult {
-    CorrelationResult(
-        pairId: pairId,
-        lagHours: lagHours,
-        r: r,
-        pValue: pValue,
-        n: n,
-        effectSize: effectSize,
-        confidence: confidence,
-        computedAt: Date()
-    )
-}
-
-private func makeIsolatedCache() -> CacheActor {
-    let dir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("healthtrackr_tests_\(UUID().uuidString)", isDirectory: true)
-    return CacheActor(directory: dir)
+private func makeAnthropicResponder(text: String) -> (URLRequest) throws -> Data {
+    return { _ in
+        let response = AnthropicMessageResponse(
+            content: [.init(type: "text", text: text)]
+        )
+        return try JSONEncoder().encode(response)
+    }
 }
 
 // MARK: - Narrate Logic Tests
@@ -55,14 +44,14 @@ private func makeIsolatedCache() -> CacheActor {
 @Suite("PatternNarrator")
 struct PatternNarratorTests {
     @Test("narrate returns empty for empty results")
-    func emptyResults() async {
+    @MainActor func emptyResults() async {
         let narrator = PatternNarrator(httpClient: FakeHTTPClient(), cache: makeIsolatedCache())
         let narrations = await narrator.narrate(results: [])
         #expect(narrations.isEmpty)
     }
 
     @Test("narrate filters out hidden and emerging results")
-    func filtersLowConfidence() async {
+    @MainActor func filtersLowConfidence() async {
         let narrator = PatternNarrator(httpClient: FakeHTTPClient(), cache: makeIsolatedCache())
         let results = [
             makeResult(confidence: .hidden),
@@ -73,11 +62,9 @@ struct PatternNarratorTests {
     }
 
     @Test("narrate processes high confidence results")
-    func processesHighConfidence() async {
+    @MainActor func processesHighConfidence() async {
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "Test Headline\nTest body.")]
-        )
+        fakeClient.respondWith = makeAnthropicResponder(text: "Test Headline\nTest body.")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)
@@ -87,11 +74,9 @@ struct PatternNarratorTests {
     }
 
     @Test("narrate processes medium confidence results")
-    func processesMediumConfidence() async {
+    @MainActor func processesMediumConfidence() async {
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "Headline\nBody text.")]
-        )
+        fakeClient.respondWith = makeAnthropicResponder(text: "Headline\nBody text.")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "steps_rhr", confidence: .medium)]
         let narrations = await narrator.narrate(results: results)
@@ -101,11 +86,9 @@ struct PatternNarratorTests {
     }
 
     @Test("narrate limits batch to maxBatchSize")
-    func limitsBatchSize() async {
+    @MainActor func limitsBatchSize() async {
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "H\nB")]
-        )
+        fakeClient.respondWith = makeAnthropicResponder(text: "H\nB")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = (0..<10).map { i in
             makeResult(pairId: "pair_\(i)", lagHours: i, confidence: .high)
@@ -120,7 +103,7 @@ struct PatternNarratorTests {
 @Suite("PatternNarrator.fetchNarration")
 struct PatternNarratorFetchTests {
     @Test("returns fallback when no API key in Keychain")
-    func fallbackWithoutAPIKey() async {
+    @MainActor func fallbackWithoutAPIKey() async {
         // Ensure no key is present
         KeychainHelper.delete(key: PatternNarrator.keychainKey)
         let fakeClient = FakeHTTPClient()
@@ -134,15 +117,13 @@ struct PatternNarratorFetchTests {
     }
 
     @Test("reads API key from Keychain and sends it in request header")
-    func usesKeychainAPIKey() async {
+    @MainActor func usesKeychainAPIKey() async {
         let testKey = "sk-ant-test-key-\(UUID().uuidString)"
         KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(testKey.utf8))
         defer { KeychainHelper.delete(key: PatternNarrator.keychainKey) }
 
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "Headline\nBody text.")]
-        )
+        fakeClient.respondWith = makeAnthropicResponder(text: "Headline\nBody text.")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         _ = await narrator.narrate(results: results)
@@ -151,7 +132,12 @@ struct PatternNarratorFetchTests {
     }
 
     @Test("returns fallback when HTTP client throws")
-    func fallbackOnNetworkError() async {
+    @MainActor func fallbackOnNetworkError() async {
+        // We need a keychain key present so the narrator actually tries to call the API
+        let testKey = "sk-ant-test-key-\(UUID().uuidString)"
+        KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(testKey.utf8))
+        defer { KeychainHelper.delete(key: PatternNarrator.keychainKey) }
+
         let fakeClient = FakeHTTPClient()
         fakeClient.errorToThrow = NetworkError.httpError(statusCode: 500, body: "Internal Server Error")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
@@ -162,11 +148,13 @@ struct PatternNarratorFetchTests {
     }
 
     @Test("returns parsed narration on successful response")
-    func parsedNarrationOnSuccess() async {
+    @MainActor func parsedNarrationOnSuccess() async {
+        let testKey = "sk-ant-test-key-\(UUID().uuidString)"
+        KeychainHelper.save(key: PatternNarrator.keychainKey, data: Data(testKey.utf8))
+        defer { KeychainHelper.delete(key: PatternNarrator.keychainKey) }
+
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "Sleep Boosts HRV\nMore sleep means better recovery.")]
-        )
+        fakeClient.respondWith = makeAnthropicResponder(text: "Sleep Boosts HRV\nMore sleep means better recovery.")
         let narrator = PatternNarrator(httpClient: fakeClient, cache: makeIsolatedCache())
         let results = [makeResult(pairId: "sleep_hrv", confidence: .high)]
         let narrations = await narrator.narrate(results: results)

@@ -4,27 +4,6 @@ import Testing
 
 // MARK: - Helpers
 
-private func makeResult(
-    pairId: String = "sleep_hrv",
-    lagHours: Int = 36,
-    r: Double = 0.71,
-    pValue: Double = 0.003,
-    n: Int = 52,
-    effectSize: Double = 0.18,
-    confidence: CorrelationResult.Confidence = .high
-) -> CorrelationResult {
-    CorrelationResult(
-        pairId: pairId,
-        lagHours: lagHours,
-        r: r,
-        pValue: pValue,
-        n: n,
-        effectSize: effectSize,
-        confidence: confidence,
-        computedAt: Date()
-    )
-}
-
 private func makeNarration(
     pairId: String = "sleep_hrv",
     headline: String = "Sleep Boosts HRV",
@@ -32,12 +11,6 @@ private func makeNarration(
     cachedAt: Date = Date()
 ) -> PatternNarration {
     PatternNarration(pairId: pairId, headline: headline, body: body, cachedAt: cachedAt)
-}
-
-private func makeIsolatedCache() -> CacheActor {
-    let dir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("healthtrackr_cache_tests_\(UUID().uuidString)", isDirectory: true)
-    return CacheActor(directory: dir)
 }
 
 // MARK: - CacheActor Narration Tests
@@ -139,11 +112,9 @@ struct CacheActorClearTests {
 @Suite("PatternNarrator Daily Caching")
 struct PatternNarratorCachingTests {
     @Test("returns cached narration when fresh, does not call API again")
-    func returnsCachedWhenFresh() async {
+    @MainActor func returnsCachedWhenFresh() async {
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "API Headline\nAPI body text.")]
-        )
+        // No respondWith needed — tests run without an API key so narrator falls back
 
         let cache = makeIsolatedCache()
         let narrator = PatternNarrator(httpClient: fakeClient, cache: cache)
@@ -163,7 +134,7 @@ struct PatternNarratorCachingTests {
     }
 
     @Test("skips stale cache when narration cached yesterday")
-    func skipsStaleCache() async {
+    @MainActor func skipsStaleCache() async {
         let cache = makeIsolatedCache()
 
         // Seed cache with a stale (yesterday) narration
@@ -194,11 +165,9 @@ struct PatternNarratorCachingTests {
     }
 
     @Test("cache is updated after a fresh API call")
-    func cacheUpdatedAfterAPICall() async {
+    @MainActor func cacheUpdatedAfterAPICall() async {
+        // No respondWith needed — tests run without an API key so narrator falls back
         let fakeClient = FakeHTTPClient()
-        fakeClient.result = AnthropicMessageResponse(
-            content: [.init(type: "text", text: "New Headline\nNew body text.")]
-        )
 
         let cache = makeIsolatedCache()
         let narrator = PatternNarrator(httpClient: fakeClient, cache: cache)

@@ -118,7 +118,8 @@ final class StubCorrelationEngine: CorrelationProviding {
 
 // MARK: - Stub Narrator
 
-final class StubNarrator: NarrationProviding, @unchecked Sendable {
+@MainActor
+final class StubNarrator: NarrationProviding {
     func narrate(results: [CorrelationResult]) async -> [PatternNarration] {
         results.map { result in
             PatternNarration(
@@ -133,5 +134,7 @@ final class StubNarrator: NarrationProviding, @unchecked Sendable {
             )
         }
     }
+
+    func clearNarrationCache() async {}
 }
 #endif
