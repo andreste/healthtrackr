@@ -4,6 +4,10 @@
 <dict>
 	<key>ANTHROPIC_API_KEY</key>
 	<string>$(ANTHROPIC_API_KEY)</string>
+	<key>ANTHROPIC_MODEL</key>
+	<string>$(ANTHROPIC_MODEL)</string>
+	<key>MIXPANEL_TOKEN</key>
+	<string>$(MIXPANEL_TOKEN)</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>healthtrackr reads your health data to discover cross-metric patterns and insights.</string>
 	<key>NSHealthUpdateUsageDescription</key>
