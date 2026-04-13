@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiscoveryFeedView: View {
     let authManager: AuthManager
+    let analytics: any AnalyticsProviding
     @State private var viewModel: DiscoveryFeedViewModel
     @State private var hasStoredKey: Bool = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
     @State private var apiKeyInput: String = ""
@@ -10,9 +11,11 @@ struct DiscoveryFeedView: View {
         authManager: AuthManager,
         healthKit: (any HealthKitProviding)? = nil,
         engine: (any CorrelationProviding)? = nil,
-        narrator: (any NarrationProviding)? = nil
+        narrator: (any NarrationProviding)? = nil,
+        analytics: (any AnalyticsProviding)? = nil
     ) {
         self.authManager = authManager
+        self.analytics = analytics ?? MixpanelAnalyticsService()
         if let healthKit, let engine, let narrator {
             self._viewModel = State(initialValue: DiscoveryFeedViewModel(
                 healthKit: healthKit,
@@ -56,6 +59,7 @@ struct DiscoveryFeedView: View {
                         photoURL: authManager.photoURL
                     ) {
                         viewModel.showSettings = true
+                        analytics.track(event: .settingsOpened)
                     }
                 }
 
@@ -70,6 +74,17 @@ struct DiscoveryFeedView: View {
         }
         .task {
             await viewModel.load()
+        }
+        .onAppear {
+            analytics.track(event: .feedViewed)
+        }
+        .onChange(of: viewModel.selectedFilter) { _, newFilter in
+            analytics.track(event: .feedFilterChanged(filter: newFilter.rawValue))
+        }
+        .onChange(of: viewModel.feedState) { _, newState in
+            if newState == .healthKitDenied {
+                analytics.track(event: .feedLoadFailed)
+            }
         }
     }
 
@@ -106,12 +121,15 @@ struct DiscoveryFeedView: View {
         LazyVStack(spacing: Spacing.space6) {
             ForEach(Array(viewModel.filteredItems.enumerated()), id: \.element.id) { index, item in
                 NavigationLink {
-                    PatternDetailView(item: item)
+                    PatternDetailView(item: item, analytics: analytics)
                 } label: {
                     PatternCardView(item: item, index: index)
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, Spacing.screenHorizontalMargin)
+                .simultaneousGesture(TapGesture().onEnded {
+                    analytics.track(event: .patternCardTapped(pairId: item.pairId))
+                })
             }
 
             // Show loading for pairs still computing
@@ -149,6 +167,7 @@ struct DiscoveryFeedView: View {
                                 KeychainHelper.delete(key: PatternNarrator.keychainKey)
                                 hasStoredKey = false
                                 apiKeyInput = ""
+                                analytics.track(event: .settingsAPIKeyRemoved)
                             }
                             .font(Typography.labelMD)
                             .foregroundStyle(Color("semanticError"))
@@ -168,6 +187,7 @@ struct DiscoveryFeedView: View {
                                     hasStoredKey = true
                                     apiKeyInput = ""
                                     viewModel.showSettings = false
+                                    analytics.track(event: .settingsAPIKeySaved)
                                     Task { await viewModel.renarrate() }
                                 }
                                 .font(Typography.labelMD)
@@ -200,7 +220,7 @@ struct DiscoveryFeedView: View {
 
                 Section {
                     NavigationLink {
-                        HealthMetricsView()
+                        HealthMetricsView(analytics: analytics)
                     } label: {
                         Text("View Current Health Data")
                             .font(Typography.labelMD)
@@ -223,6 +243,7 @@ struct DiscoveryFeedView: View {
                         if let url = URL(string: "x-apple-health://") {
                             UIApplication.shared.open(url)
                         }
+                        analytics.track(event: .settingsHealthAppOpened)
                     } label: {
                         HStack {
                             Text("Manage Permissions in Health App")
@@ -241,6 +262,7 @@ struct DiscoveryFeedView: View {
 
                 Section("Account") {
                     Button(role: .destructive) {
+                        analytics.track(event: .signedOut)
                         Task { await authManager.signOut() }
                     } label: {
                         Text("Sign Out")

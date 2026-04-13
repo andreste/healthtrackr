@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct HealthMetricsView: View {
+    let analytics: any AnalyticsProviding
     @State private var viewModel: HealthMetricsViewModel
 
-    init(healthKit: (any HealthKitProviding)? = nil) {
+    init(healthKit: (any HealthKitProviding)? = nil, analytics: (any AnalyticsProviding)? = nil) {
+        self.analytics = analytics ?? MixpanelAnalyticsService()
         if let healthKit {
             self._viewModel = State(initialValue: HealthMetricsViewModel(healthKit: healthKit))
         } else {
@@ -38,6 +40,9 @@ struct HealthMetricsView: View {
         .navigationTitle("Health Data")
         .navigationBarTitleDisplayMode(.large)
         .task { await viewModel.load() }
+        .onAppear {
+            analytics.track(event: .healthMetricsViewed)
+        }
     }
 
     // MARK: - Metrics content

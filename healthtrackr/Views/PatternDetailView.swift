@@ -3,8 +3,14 @@ import SwiftUI
 
 struct PatternDetailView: View {
     let item: PatternItem
+    let analytics: any AnalyticsProviding
 
     @State private var selectedPoint: ScatterPoint?
+
+    init(item: PatternItem, analytics: (any AnalyticsProviding)? = nil) {
+        self.item = item
+        self.analytics = analytics ?? MixpanelAnalyticsService()
+    }
 
     var body: some View {
         ScrollView {
@@ -23,6 +29,9 @@ struct PatternDetailView: View {
         .navigationTitle(item.pairLabel)
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("PatternDetailView")
+        .onAppear {
+            analytics.track(event: .metricDetailViewed(metricId: item.pairId))
+        }
     }
 
     // MARK: - Header
@@ -124,7 +133,11 @@ struct PatternDetailView: View {
             let xRange = (item.scatterData.map(\.metricA).max() ?? 1) - (item.scatterData.map(\.metricA).min() ?? 0)
             let yRange = (item.scatterData.map(\.metricB).max() ?? 1) - (item.scatterData.map(\.metricB).min() ?? 0)
             let threshold = max(xRange, yRange) * 0.1
-            selectedPoint = dist < threshold ? nearest : nil
+            let hit = dist < threshold ? nearest : nil
+            selectedPoint = hit
+            if hit != nil {
+                analytics.track(event: .patternDetailChartTapped(pairId: item.pairId))
+            }
         } else {
             selectedPoint = nil
         }

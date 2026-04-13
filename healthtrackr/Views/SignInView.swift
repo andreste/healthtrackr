@@ -3,7 +3,13 @@ import SwiftUI
 
 struct SignInView: View {
     @Bindable var authManager: AuthManager
+    let analytics: any AnalyticsProviding
     @Environment(\.colorScheme) private var colorScheme
+
+    init(authManager: AuthManager, analytics: (any AnalyticsProviding)? = nil) {
+        self.authManager = authManager
+        self.analytics = analytics ?? MixpanelAnalyticsService()
+    }
 
     var body: some View {
         VStack(spacing: Spacing.space6) {
@@ -34,9 +40,18 @@ struct SignInView: View {
                     .signIn,
                     onRequest: { request in
                         request.requestedScopes = [.fullName, .email]
+                        analytics.track(event: .signInTapped)
                     },
                     onCompletion: { result in
                         MainActor.assumeIsolated {
+                            if case .failure(let error) = result {
+                                if let authError = error as? ASAuthorizationError,
+                                   authError.code == .canceled {
+                                    // Ignore cancellations — not a failure worth tracking
+                                } else {
+                                    analytics.track(event: .signInFailed(reason: error.localizedDescription))
+                                }
+                            }
                             authManager.handleSignInResult(result)
                         }
                     }
@@ -57,6 +72,9 @@ struct SignInView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("bgPrimary"))
         .accessibilityIdentifier("SignInView")
+        .onAppear {
+            analytics.track(event: .signInViewed)
+        }
     }
 }
 

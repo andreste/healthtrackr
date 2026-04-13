@@ -8,6 +8,7 @@ struct HealthtrackrApp: App {
     @State private var authManager: AuthManager
     @State private var engine: CorrelationEngine
     @State private var narrator: PatternNarrator
+    private let analytics: any AnalyticsProviding = MixpanelAnalyticsService()
 
     init() {
         #if canImport(Mixpanel)
@@ -43,10 +44,13 @@ struct HealthtrackrApp: App {
                 Color("bgPrimary")
                     .ignoresSafeArea()
             } else if authManager.isAuthenticated {
-                ContentView(authManager: authManager, engine: engine, narrator: narrator)
+                ContentView(authManager: authManager, engine: engine, narrator: narrator, analytics: analytics)
                     .transition(.opacity)
+                    .onAppear {
+                        analytics.track(event: .signedIn)
+                    }
             } else {
-                SignInView(authManager: authManager)
+                SignInView(authManager: authManager, analytics: analytics)
                     .transition(.opacity)
             }
         }
