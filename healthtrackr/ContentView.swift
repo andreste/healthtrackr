@@ -5,6 +5,7 @@ struct ContentView: View {
     let healthKit: (any HealthKitProviding)?
     let engine: (any CorrelationProviding)?
     let narrator: (any NarrationProviding)?
+    let analytics: any AnalyticsProviding
 
     @State private var hasCompletedOnboarding: Bool
     @State private var hasGrantedHealthKit: Bool
@@ -14,12 +15,14 @@ struct ContentView: View {
         skipOnboarding: Bool = false,
         healthKit: (any HealthKitProviding)? = nil,
         engine: (any CorrelationProviding)? = nil,
-        narrator: (any NarrationProviding)? = nil
+        narrator: (any NarrationProviding)? = nil,
+        analytics: (any AnalyticsProviding)? = nil
     ) {
         self.authManager = authManager
         self.healthKit = healthKit
         self.engine = engine
         self.narrator = narrator
+        self.analytics = analytics ?? MixpanelAnalyticsService()
         let onboarded = skipOnboarding || UserDefaults.standard.bool(forKey: "hasCompletedDataReadiness")
         self._hasCompletedOnboarding = State(initialValue: onboarded)
         self._hasGrantedHealthKit = State(
@@ -57,6 +60,8 @@ struct ContentView: View {
                 onGranted: {
                     UserDefaults.standard.set(true, forKey: "hasGrantedHealthKitPermission")
                     UserDefaults.standard.set(true, forKey: "hasCompletedDataReadiness")
+                    analytics.track(event: .healthKitPermissionGranted)
+                    analytics.track(event: .onboardingCompleted)
                     withAnimation(.easeOut(duration: AnimationDuration.medium)) {
                         hasGrantedHealthKit = true
                         hasCompletedOnboarding = true
