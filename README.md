@@ -30,11 +30,13 @@ healthtrackr pulls 90 days of data from Apple Health, runs statistical correlati
 1. Clone the repo and open `healthtrackr.xcodeproj` in Xcode
 2. Select your target device or simulator
 3. Build and run (`⌘R`)
-4. Sign in with Apple
-5. Grant Health permissions when prompted
-6. The app fetches and analyzes your data — this takes a few seconds on first launch
+4. Sign in with Apple on the splash screen
+5. On the HealthKit permissions screen, tap **Grant Access** to authorize health data reading
+6. The app drops you into the Discovery Feed and begins analyzing your data
 
 That's it. No config files, no environment variables, no build scripts.
+
+**Fresh install note:** Keychain credentials from any previous install are automatically cleared on reinstall, so you'll always start fresh with Sign in with Apple.
 
 ---
 
@@ -43,10 +45,10 @@ That's it. No config files, no environment variables, no build scripts.
 AI narration requires a Claude API key. To add one:
 
 1. Get your key at [console.anthropic.com](https://console.anthropic.com)
-2. Open the app → tap your profile icon (top right) → **Settings**
-3. Under **API Key**, paste or type your key and tap **Save**
+2. Open the app → tap your initials avatar (top right) → **Settings**
+3. Under **API Key**, type or paste your key into the text field and tap **Save**
 
-The key is stored in Keychain and never logged or transmitted anywhere other than the Anthropic API. You can remove it at any time from the same Settings screen.
+The key is stored in Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`) and never logged or transmitted anywhere other than the Anthropic API. You can remove it at any time from the same Settings screen.
 
 ---
 
@@ -68,8 +70,8 @@ The key is stored in Keychain and never logged or transmitted anywhere other tha
 | Concurrency | Swift async/await, actors |
 | Statistics | Pearson correlation, Bonferroni correction, Cohen's d |
 | AI narration | Claude API (claude-haiku-4-5) |
-| Auth | Sign in with Apple |
-| Storage | Keychain (credentials & API key), on-disk cache with `NSFileProtectionComplete` |
+| Auth | Sign in with Apple (initials avatar, no profile photo) |
+| Storage | Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`), on-disk cache with `NSFileProtectionComplete` |
 | Health data | HealthKit |
 
 ---

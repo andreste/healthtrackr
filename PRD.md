@@ -82,8 +82,10 @@ Three approaches were evaluated:
 
 #### AuthManager
 - Wraps `ASAuthorizationAppleIDProvider` and `ASAuthorizationController`
-- On first launch: presents Sign in with Apple sheet; stores `userIdentifier` + `identityToken` in Keychain on success
+- On first launch: presents Sign in with Apple sheet; stores `userIdentifier` + `identityToken` in Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`) on success
+- On reinstall: clears any stale Keychain credentials so the user always sees Sign in with Apple fresh
 - On subsequent launches: reads Keychain; calls `getCredentialState(forUserID:)` async; routes to Sign In or Discovery Feed accordingly
+- Profile display: uses an initials avatar (first letter of the user's name in an accent-colored circle) since Sign in with Apple does not provide profile photos
 - Exposes `@Published var isAuthenticated: Bool` to drive root navigation in SwiftUI
 - Sign out: clears Keychain entry; does NOT delete cached HealthKit data or correlation results
 
@@ -121,7 +123,7 @@ Three approaches were evaluated:
 - **Input format:** Structured text summary only — never raw biometric data. Example input: `"Sleep duration and next-day HRV: r=0.71, n=14, lag=36h, avg delta=-18%"`
 - **Prompt rules:** Plain English, no medical claims, explain lag if non-zero, cite sample size
 - **Batch size:** Max 5 confirmed patterns per API call (~500 tokens input)
-- **API key:** Stored in `Config.xcconfig` (gitignored), referenced via `$(ANTHROPIC_API_KEY)` in Info.plist, read at runtime via `Bundle.main.infoDictionary`. Never committed to source. Keychain/server-side proxy deferred to V1.1.
+- **API key:** User enters the key via a TextField in Settings and taps "Save". Stored in Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`). Never committed to source or logged.
 - Narration strings cached alongside CorrelationResult in `Caches/correlations/{pairId}.json`. Refreshed only when CorrelationResult changes.
 
 #### DiscoveryFeed UI
@@ -135,7 +137,7 @@ Three approaches were evaluated:
   - "See full pattern" CTA — underlined, `accentPrimary` color, Instrument Sans 13pt semibold
 - **Loading state:** Per-pair "Analyzing..." placeholder — dashed border (`borderSubtle`), 3-line skeleton shimmer. No spinner.
 - **Empty state:** Centered text block — "No strong patterns yet." (Fraunces, 17pt) + "Check back as more data accumulates." (Instrument Sans, 14pt, `textSecondary`)
-- **Cold-start UX:** Data readiness checklist shown on first launch. Per-pair: if <30 days, show "Need more data — check back in {X} days" with estimated date
+- **Cold-start UX:** After granting HealthKit permissions, the Discovery Feed loads directly. If insufficient data exists for a pair, that pair's card shows an "Emerging" or "Missing data" badge rather than a separate gating screen
 
 #### PatternDetail UI
 - Scatter plot (Apple Charts framework): metric A on X-axis, metric B on Y-axis, at best-fit lag offset. Dot color: `accentPrimary`. Axis labels: Geist Mono, 11pt, `textSecondary`. No grid lines — Apple Charts default grid is too visually heavy for the editorial aesthetic. **Tap interaction:** `chartOverlay` modifier shows custom callout on dot tap — date (Instrument Sans, 12pt, `textSecondary`), metric A value and metric B value (Geist Mono, 14pt, `textPrimary`), in a `surfaceSecondary` rounded card (`radiusSM`). Dismiss on tap-outside.
@@ -219,18 +221,18 @@ Four screens (wireframe at `/tmp/gstack-sketch.png`):
 
 | Screen | Description |
 |--------|-------------|
-| Sign In | Sign in with Apple — required on first launch; session persists across app opens |
-| First Launch | Data readiness checklist — shows which metrics have enough history; "Start finding patterns" CTA |
+| Splash / Sign In | Sign in with Apple — required on first launch; session persists across app opens |
+| HealthKit Permissions | `HealthKitPermissionsView` with a "Grant Access" button — shown after sign-in to authorize health data reading |
 | Discovery Feed | Card feed of confirmed patterns with confidence levels |
 | Pattern Detail | Scatter plot + stat row + AI narration for a single metric pair |
 
 ### App Flow
 
 ```
-Sign In (first launch only)
+Splash / Sign In (first launch only)
     ↓ (Sign in with Apple succeeds)
-First Launch / Data Readiness
-    ↓ ("Start finding patterns" CTA)
+HealthKit Permissions
+    ↓ ("Grant Access" tapped, permissions granted)
 Discovery Feed
     ↓ (tap "See full pattern")
 Pattern Detail
@@ -238,7 +240,7 @@ Pattern Detail
 Discovery Feed
 ```
 
-Session persists — user is never shown Sign In again unless they explicitly sign out from Settings.
+Session persists — user is never shown Sign In again unless they explicitly sign out from Settings. There is no intermediate "Data Readiness" checklist screen gating the feed.
 
 ### 8.0 Sign In Screen
 
@@ -259,9 +261,11 @@ Session persists — user is never shown Sign In again unless they explicitly si
 - Use `AuthenticationServices` framework: `ASAuthorizationAppleIDProvider` + `ASAuthorizationController`
 - Request scopes: `.fullName` and `.email` (required once; Apple only provides these on first sign-in)
 - Store `userIdentifier` in Keychain for session persistence — not UserDefaults
-- On subsequent launches: check Keychain for stored `userIdentifier`; if present, skip Sign In and go directly to Discovery Feed (or First Launch if data readiness hasn't been completed)
+- On subsequent launches: check Keychain for stored `userIdentifier`; if present, skip Sign In and go directly to Discovery Feed
+- On fresh install: any stale Keychain credentials from a previous install are cleared so the user sees Sign in with Apple fresh
 - Credential state check on every launch: `ASAuthorizationAppleIDProvider().getCredentialState(forUserID:)` — handle `.revoked` and `.notFound` by returning to Sign In screen
-- Sign out: available in Settings sheet (gear icon in DiscoveryFeed nav bar); clears Keychain entry
+- Sign out: available in Settings sheet (initials avatar in DiscoveryFeed nav bar); clears Keychain entry
+- Profile display: initials avatar (first letter of the user's name in an accent-colored circle) — Sign in with Apple does not provide profile photos
 
 ### 8.1 Information Hierarchy
 
@@ -272,10 +276,10 @@ Session persists — user is never shown Sign In again unless they explicitly si
 4. Sign in with Apple button (single action — no alternatives, no skip)
 5. Privacy footnote (legal, below the fold of attention)
 
-**First Launch**
+**HealthKit Permissions**
 1. Product name + tagline (establishes intent, earns trust before asking for permissions)
-2. Data readiness checklist (per-metric status rows: metric name + days available / "Not enough yet")
-3. Primary CTA: "Start finding patterns" (full-width, prominent — only available when ≥1 pair has 30+ days)
+2. Privacy reassurance ("Your health data never leaves your device.")
+3. Primary CTA: "Grant Access" button — triggers the system HealthKit authorization prompt
 4. Privacy note (small, below CTA: "Analysis runs on your device. Only pattern summaries are sent to AI.")
 
 **Discovery Feed**
@@ -303,9 +307,10 @@ Every state below describes what the **user sees**, not backend behavior.
 |-------|---------|----------------|
 | Default | First launch (no session in Keychain) | Full-screen Sign In layout as described in §8.0 |
 | Loading | Tapped Sign in with Apple, sheet presented | System Apple ID sheet (modal, handled by OS — no custom loading state needed) |
-| Success | Sign in completes | Transition to First Launch screen (push navigation, `durationMedium` 280ms ease-out) |
+| Success | Sign in completes | Transition to HealthKit Permissions screen (push navigation, `durationMedium` 280ms ease-out) |
 | Error | Sign in fails or user cancels | Return to Sign In screen; no error message shown for user cancellation; network/system errors show system alert (ASAuthorizationError) |
 | Returning user | Keychain has valid session | Sign In screen never shown; app opens directly to Discovery Feed |
+| Fresh install | Reinstalled app, stale Keychain credentials | Stale credentials cleared automatically; user sees Sign in with Apple fresh |
 | Revoked | Apple ID credential revoked | Return to Sign In screen on next launch; no destructive data action — local HealthKit data and cached patterns remain |
 
 #### DiscoveryFeed
@@ -329,14 +334,15 @@ Every state below describes what the **user sees**, not backend behavior.
 | API error | Claude API call fails | Narration box shows: "Couldn't generate explanation right now." + "The pattern is still real — r={value}, n={n}, lag={lag}h." Stat row always visible. |
 | Cache hit | Narration was previously fetched | Narration renders immediately alongside chart; no loading state |
 
-#### First Launch / Data Readiness
+#### HealthKit Permissions
 
 | State | Trigger | What user sees |
 |-------|---------|----------------|
-| Sufficient data (both pairs ≥30 days) | First open, adequate history | Checklist rows show "✓ 90 days" (or actual count); CTA is active ("Start finding patterns") |
-| Partial data | One pair has 30+ days, one doesn't | Sufficient pair row: "✓ {N} days"; insufficient pair row: "Need more data — check back in {X} days"; CTA is still active for the ready pair |
-| Insufficient data (all pairs < 30 days) | New Apple Watch / Health user | All rows show "Need more data"; CTA is disabled and grayed out; estimated date shown for soonest-ready pair |
-| HealthKit not authorized | First launch, permissions not yet granted | Prompt screen shown first; after authorization, redirect to data readiness checklist |
+| Default | Sign in completes, HealthKit not yet authorized | `HealthKitPermissionsView` with privacy reassurance and "Grant Access" button |
+| Loading | Tapped "Grant Access", system permission dialog presented | System HealthKit authorization sheet (modal, handled by OS) |
+| Success | Permissions granted | Transition to Discovery Feed; analysis begins immediately |
+| Denied | User denied all HealthKit permissions | Full-screen "Connect Apple Health" prompt with re-authorization CTA; no feed shown |
+| Partial | Some metrics authorized, some denied | Transition to Discovery Feed; available-pair cards shown; denied-metric pairs show "Missing data" badge |
 
 #### Edge Cases
 - **45 days of data** (between the 30-day minimum and 90-day ideal): app shows "Emerging" confidence badge if n=20–29, "Confirmed" if n≥30 correlations exist in the window. No special UI state needed beyond the existing confidence chip.
@@ -380,7 +386,7 @@ Every state below describes what the **user sees**, not backend behavior.
 | Notifications? | V1 is pull-only. Push notifications for new patterns deferred to V1.1 |
 | Anthropic data retention? | Add disclosure in Settings screen pointing to Anthropic's privacy policy |
 | No patterns found state? | Show "Analyzing..." on first run; after completion, show "No strong patterns yet — check back as more data accumulates" |
-| Secret management? | Hardcoded API key for V1 prototype. Keychain/proxy required before any public release |
+| Secret management? | **Resolved:** API key entered via TextField in Settings, stored in Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`). Server-side proxy deferred to V1.1. |
 | Chart tap behavior? | **Resolved:** Custom callout overlay on dot tap — shows date + metric A value + metric B value, styled to DESIGN.md tokens (surfaceSecondary background, Geist Mono values). Use Apple Charts `chartOverlay` modifier. |
 | Filter chips? | **Resolved:** Simplified to 3 chips in V1 — "All", "Sleep + HRV", "Steps + HR". Matches actual pairs. Expand to per-metric chips in V1.1. |
 | Tab bar? | **Resolved:** No tab bar in V1. Simple nav stack: DiscoveryFeed → PatternDetail (back nav). Settings accessible via nav bar icon (gear icon, top right of DiscoveryFeed). Add tab bar in V1.1 when Metrics and History screens exist. |
@@ -395,8 +401,8 @@ Every state below describes what the **user sees**, not backend behavior.
 |------|-------------|-----------------|---------------------------|
 | 1 | Sees Sign In screen for first time | Skeptical — "another health app that wants my account" | Tagline names the mechanic before asking for anything; privacy reassurance appears before the button |
 | 2 | Signs in with Apple | Mild friction — but familiar system sheet | Apple's system sheet is trusted UI; app doesn't handle credentials at all |
-| 3 | HealthKit permission prompt | Anxious — "what will it do with my data?" | Privacy note appears *before* the system permission dialog: "Analysis runs on your device. Only pattern summaries are sent to AI." |
-| 3 | Waiting for analysis | Impatient | "Analyzing..." placeholders show per-pair progress labels — user knows exactly what's happening and for which pairs |
+| 3 | HealthKit permissions screen | Anxious — "what will it do with my data?" | `HealthKitPermissionsView` shows privacy reassurance *before* the "Grant Access" button: "Your health data never leaves your device." |
+| 3.5 | Waiting for analysis | Impatient | "Analyzing..." placeholders show per-pair progress labels — user knows exactly what's happening and for which pairs |
 | 4 | First PatternCard appears | Curious → surprised | Headline is written to surprise ("your HRV drops 36 hours after..."), not to state the obvious ("HRV correlates with sleep") |
 | 5 | Taps "See full pattern" | Skeptical — "is this real?" | Chart renders first; stat row (r-value, p-value, n) renders before narrative. Math earns the explanation, not the other way around. |
 | 6 | Reads AI narration | Converted or not | Narration passes the "would I text this?" test: specific numbers, no medical claims, acknowledges the lag effect as the surprising thing |
@@ -495,7 +501,7 @@ Step 8 of the implementation plan: verify end-to-end on real HealthKit data.
 - Sparklines on PatternCard
 - "How we found this" transparency box on PatternDetail
 - Push notifications for new pattern discoveries
-- API key secret management (Keychain or server-side proxy)
+- Server-side API key proxy (Keychain storage already implemented in V1)
 - Pattern history / trend over time view
 
 ---
