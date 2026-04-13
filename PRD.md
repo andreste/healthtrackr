@@ -41,7 +41,7 @@ healthtrackr solves this by running cross-metric statistical analysis on-device 
 - No cross-platform support (iOS only)
 - No social or sharing features
 - No sparklines or advanced visualizations (deferred to V1.1)
-- No metric pairs beyond Sleep+HRV and Steps+Resting HR (deferred to V1.1)
+- No metric pairs beyond the 20 defined in §6 (additional pairs deferred to V1.1)
 
 ---
 
@@ -53,14 +53,49 @@ Personal-use iOS user with an Apple Watch or iPhone that has accumulated 30–90
 
 ## 6. V1 Scope
 
-V1 is limited to two metric pairs:
+### Metrics (12 total)
 
-| Pair | Metrics | Why |
-|------|---------|-----|
-| Sleep + HRV | Sleep duration (HKCategoryTypeIdentifierSleepAnalysis) + HRV (HKQuantityTypeIdentifierHeartRateVariabilitySDNN) | High-signal relationship; well-documented in literature; universally available via Apple Watch |
-| Steps + Resting HR | Step count (HKQuantityTypeIdentifierStepCount) + Resting HR (HKQuantityTypeIdentifierRestingHeartRate) | Easy to observe, consistent data, good for building user confidence in the app |
+| Metric | HealthKit Identifier | Aggregation |
+|--------|---------------------|-------------|
+| Sleep | `HKCategoryTypeIdentifierSleepAnalysis` | Sum of `.asleep` intervals per day |
+| HRV | `HKQuantityTypeIdentifierHeartRateVariabilitySDNN` | Average, 5–9am window |
+| Resting HR | `HKQuantityTypeIdentifierRestingHeartRate` | Daily average |
+| Steps | `HKQuantityTypeIdentifierStepCount` | Daily sum |
+| Active Energy | `HKQuantityTypeIdentifierActiveEnergyBurned` | Daily sum |
+| Exercise Time | `HKQuantityTypeIdentifierAppleExerciseTime` | Daily sum |
+| Distance | `HKQuantityTypeIdentifierDistanceWalkingRunning` | Daily sum |
+| VO2 Max | `HKQuantityTypeIdentifierVO2Max` | Daily average |
+| Walking HR | `HKQuantityTypeIdentifierWalkingHeartRateAverage` | Daily average |
+| Blood O₂ | `HKQuantityTypeIdentifierOxygenSaturation` | Daily average |
+| Respiratory Rate | `HKQuantityTypeIdentifierRespiratoryRate` | Daily average |
+| Body Mass | `HKQuantityTypeIdentifierBodyMass` | Daily average |
 
-Additional pairs (Sleep+ExerciseTiming, HRV+WorkoutIntensity) are deferred to V1.1.
+### Metric Pairs (20 total)
+
+Each pair correlates metric A (input/behavior) against metric B (outcome/biomarker):
+
+| Pair | Metric A | Metric B |
+|------|----------|----------|
+| Sleep + HRV | Sleep | HRV |
+| Steps + HR | Steps | Resting HR |
+| Sleep + HR | Sleep | Resting HR |
+| Energy + HRV | Active Energy | HRV |
+| Energy + HR | Active Energy | Resting HR |
+| Exercise + HR | Exercise Time | Resting HR |
+| Exercise + HRV | Exercise Time | HRV |
+| Steps + HRV | Steps | HRV |
+| VO2 Max + HR | VO2 Max | Resting HR |
+| Distance + HR | Distance | Resting HR |
+| Sleep + Walking HR | Sleep | Walking HR |
+| Sleep + Resp. Rate | Sleep | Respiratory Rate |
+| Sleep + Blood O₂ | Sleep | Blood O₂ |
+| Exercise + Walking HR | Exercise Time | Walking HR |
+| Steps + Walking HR | Steps | Walking HR |
+| Body Mass + HR | Body Mass | Resting HR |
+| Body Mass + VO2 Max | Body Mass | VO2 Max |
+| VO2 Max + HRV | VO2 Max | HRV |
+| VO2 Max + Walking HR | VO2 Max | Walking HR |
+| Distance + HRV | Distance | HRV |
 
 ---
 
@@ -90,19 +125,18 @@ Three approaches were evaluated:
 - Sign out: clears Keychain entry; does NOT delete cached HealthKit data or correlation results
 
 #### HealthKitManager
-- Async data fetcher for 4 HKQuantityType metrics: HRV, sleep, step count, resting HR
-- **Query type: `HKStatisticsCollectionQuery`** — returns pre-aggregated daily values (sum for steps, average for HRV/HR, total for sleep duration). Returns ~90 data points per metric, not 25,000+ raw HKSample objects. This is the correct HealthKit API for daily-bucketed data.
+- Async data fetcher for 12 metrics (1 category type + 11 quantity types) — see §6 for full list
+- **Query type: `HKStatisticsCollectionQuery`** — returns pre-aggregated daily values (sum for steps/energy/exercise/distance, average for HRV/HR/VO2 Max/walking HR/SpO₂/respiratory rate/body mass, total for sleep duration). Returns ~90 data points per metric, not 25,000+ raw HKSample objects. This is the correct HealthKit API for daily-bucketed data.
   - Sleep: `HKCategoryTypeIdentifierSleepAnalysis` → sum of `.asleep` intervals per day
   - HRV: `HKQuantityTypeIdentifierHeartRateVariabilitySDNN` → average of samples in 5–9am window per day (use `HKSampleQuery` with time predicate for this one metric only, since `HKStatisticsCollectionQuery` doesn't support time-of-day filtering within a day bucket)
-  - Steps: `HKQuantityTypeIdentifierStepCount` → daily sum
-  - Resting HR: `HKQuantityTypeIdentifierRestingHeartRate` → daily average
+  - All other metrics: daily sum or average via `HKStatisticsCollectionQuery` (see §6 table for aggregation method)
 - Fetches up to 90-day windows; degrades gracefully to 30+ days if less data available
 - All queries run on background queue (never main thread)
 - Handles partial permissions — each metric independently authorized; missing metrics flagged in UI, not fatal
 - If authorization denied entirely: show "Connect Apple Health" re-prompt screen
 
 #### CorrelationEngine
-- On-device Spearman rank correlation across the 2 V1 metric pairs
+- On-device Spearman rank correlation across all 20 V1 metric pairs
 - **Lag offsets tested:** 0h, 12h, 24h, 36h, 48h (covers circadian and autonomic recovery cycles)
 - **Lag definition:** Lag N = Day 0 metric A correlated with Day N metric B. Example: Day 0 sleep duration vs. Day 1 morning HRV = 24h lag
 - **Time window alignment:** Daily-resolution metrics (sleep, resting HR, steps) aggregated into 24h day buckets. HRV samples aggregated into morning windows (5–9am) to match post-sleep recovery signal
@@ -116,7 +150,7 @@ Three approaches were evaluated:
   - Emerging: n < 30
 - **Caching:** CorrelationResult structs (Codable) written to `Caches/correlations/{pairId}.json` — one file per metric pair. OS can evict on low storage (appropriate for derived data). Cache timestamp + last-run date stored in UserDefaults (small, <100 bytes). Re-run only if cache is >24h stale. Fresh run triggered as background Swift Task on app open; UI shows cached results immediately.
 - **Implementation:** Use Accelerate framework (vDSP) for rank computation and Spearman r. P-value computed via t-distribution approximation: t = r√(n-2)/√(1-r²), CDF via Abramowitz & Stegun series approximation (~20 lines inline). No external dependency.
-- **Compute budget:** 2 pairs × 5 lags = 10 correlation runs (sub-second on iPhone 12+)
+- **Compute budget:** 20 pairs × 5 lags = 100 correlation runs (sub-second on iPhone 12+)
 
 #### PatternNarrator
 - Sends CorrelationResult summaries to Claude API (claude-haiku model for cost efficiency)
@@ -443,8 +477,8 @@ Use the existing `healthtrackrTests` XCTest target. No new test target needed.
 - Test task cancellation: start run(), immediately start again, verify only one result written
 
 **HealthKitManager** — use a `HKHealthStoreProtocol` mock protocol.
-- All 4 metrics authorized → 4 fetch calls made
-- HRV authorization denied → Sleep+HRV pair skipped, Steps+HR proceeds
+- All 12 metrics authorized → 12 fetch calls made
+- HRV authorization denied → pairs using HRV skipped, other pairs proceed
 - 0 HRV samples returned → `MetricSample` array empty, pair marked unavailable
 - Data window of 25 days → estimated-days-until-ready arithmetic correct
 
