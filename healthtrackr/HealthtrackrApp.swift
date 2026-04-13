@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(Mixpanel)
+import Mixpanel
+#endif
 
 @main
 struct HealthtrackrApp: App {
@@ -7,6 +10,9 @@ struct HealthtrackrApp: App {
     @State private var narrator: PatternNarrator
 
     init() {
+        #if canImport(Mixpanel)
+        Mixpanel.initialize(token: "040edcf998e1588c1728562bcef5ddb1", trackAutomaticEvents: false)
+        #endif
         let cache = CacheActor()
         _authManager = State(initialValue: AuthManager(cache: cache))
         _engine = State(initialValue: CorrelationEngine(cache: cache))
