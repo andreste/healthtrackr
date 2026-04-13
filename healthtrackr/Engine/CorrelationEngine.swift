@@ -2,9 +2,9 @@ import Foundation
 
 @MainActor
 final class CorrelationEngine {
-    private let cache: CacheActor
+    private let cache: any CorrelationCaching
 
-    init(cache: CacheActor = CacheActor()) {
+    init(cache: any CorrelationCaching = CacheActor()) {
         self.cache = cache
     }
 
@@ -41,48 +41,57 @@ final class CorrelationEngine {
 
     func run(pairs: [MetricPair]) async {
         for pair in pairs {
-            let isStale = await cache.isStale(pairId: pair.id)
+            let isStale = await cache.isStale(pairId: pair.id, maxAge: 86400)
             guard isStale else { continue }
 
-            var results: [CorrelationResult] = []
-            for lag in Self.lagOffsets {
-                guard !Task.isCancelled else { return }
+            // Run CPU-bound Spearman computation off the main thread.
+            let pairId = pair.id
+            let metricA = pair.metricA
+            let metricB = pair.metricB
+            let lagOffsets = Self.lagOffsets
 
-                let aligned = MetricAlignment.align(a: pair.metricA, b: pair.metricB, lagHours: lag)
-                guard aligned.count >= 20 else {
-                    results.append(CorrelationResult(
-                        pairId: pair.id,
+            let results = await Task.detached(priority: .userInitiated) {
+                var computed: [CorrelationResult] = []
+                for lag in lagOffsets {
+                    guard !Task.isCancelled else { return computed }
+
+                    let aligned = MetricAlignment.align(a: metricA, b: metricB, lagHours: lag)
+                    guard aligned.count >= 20 else {
+                        computed.append(CorrelationResult(
+                            pairId: pairId,
+                            lagHours: lag,
+                            r: 0,
+                            pValue: 1,
+                            n: aligned.count,
+                            effectSize: nil,
+                            confidence: .hidden,
+                            computedAt: Date()
+                        ))
+                        continue
+                    }
+
+                    let aValues = aligned.map(\.a)
+                    let bValues = aligned.map(\.b)
+
+                    let r = StatisticalMath.spearmanR(x: aValues, y: bValues)
+                    let n = aligned.count
+                    let p = StatisticalMath.pValue(r: r, n: n)
+                    let effect = StatisticalMath.effectSize(a: aValues, b: bValues)
+                    let confidence = StatisticalMath.classifyConfidence(r: r, p: p, n: n)
+
+                    computed.append(CorrelationResult(
+                        pairId: pairId,
                         lagHours: lag,
-                        r: 0,
-                        pValue: 1,
-                        n: aligned.count,
-                        effectSize: nil,
-                        confidence: .hidden,
+                        r: r,
+                        pValue: p,
+                        n: n,
+                        effectSize: effect,
+                        confidence: confidence,
                         computedAt: Date()
                     ))
-                    continue
                 }
-
-                let aValues = aligned.map(\.a)
-                let bValues = aligned.map(\.b)
-
-                let r = StatisticalMath.spearmanR(x: aValues, y: bValues)
-                let n = aligned.count
-                let p = StatisticalMath.pValue(r: r, n: n)
-                let effect = StatisticalMath.effectSize(a: aValues, b: bValues)
-                let confidence = StatisticalMath.classifyConfidence(r: r, p: p, n: n)
-
-                results.append(CorrelationResult(
-                    pairId: pair.id,
-                    lagHours: lag,
-                    r: r,
-                    pValue: p,
-                    n: n,
-                    effectSize: effect,
-                    confidence: confidence,
-                    computedAt: Date()
-                ))
-            }
+                return computed
+            }.value
 
             guard !Task.isCancelled else { return }
             await cache.save(results: results, pairId: pair.id)

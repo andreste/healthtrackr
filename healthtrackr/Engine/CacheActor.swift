@@ -2,14 +2,16 @@ import Foundation
 
 actor CacheActor {
     private let cacheDirectory: URL
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
     private let lastRunKey = "correlationLastRun"
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    init() {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        cacheDirectory = caches.appendingPathComponent("correlations", isDirectory: true)
+    init(defaults: UserDefaults = .standard) {
+        let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        cacheDirectory = base.appendingPathComponent("correlations", isDirectory: true)
+        self.defaults = defaults
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
         try? FileManager.default.setAttributes(
             [.protectionKey: FileProtectionType.complete],
@@ -17,8 +19,9 @@ actor CacheActor {
         )
     }
 
-    init(directory: URL) {
+    init(directory: URL, defaults: UserDefaults = .standard) {
         cacheDirectory = directory
+        self.defaults = defaults
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
         try? FileManager.default.setAttributes(
             [.protectionKey: FileProtectionType.complete],

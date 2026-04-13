@@ -184,6 +184,47 @@ struct CorrelationEngineTests {
         #expect(CorrelationEngine.lagOffsets == [0, 12, 24, 36, 48])
     }
 
+    @Test("run skips pair when cache is fresh (not stale)")
+    @MainActor func runSkipsFreshPair() async {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("healthtrackr_ce_tests_\(UUID().uuidString)", isDirectory: true)
+        let cache = CacheActor(directory: dir)
+        let engine = CorrelationEngine(cache: cache)
+
+        let samples = makeCorrelatedSamples(count: 30)
+        let pairId = "test_fresh_skip_\(UUID().uuidString)"
+        let pair = MetricPair(id: pairId, metricA: samples.a, metricB: samples.b)
+
+        // First run: cache is stale (empty), results get written.
+        await engine.run(pairs: [pair])
+        let firstResults = await engine.cachedResults(for: pairId)
+        #expect(!firstResults.isEmpty)
+
+        // Overwrite the cache with sentinel results to detect a second write.
+        let sentinel = firstResults.map { r in
+            CorrelationResult(
+                pairId: r.pairId,
+                lagHours: r.lagHours,
+                r: -999,
+                pValue: r.pValue,
+                n: r.n,
+                effectSize: r.effectSize,
+                confidence: r.confidence,
+                computedAt: r.computedAt
+            )
+        }
+        await cache.save(results: sentinel, pairId: pairId)
+
+        // Second run with a very large maxAge so the cache is considered fresh.
+        // However, CorrelationEngine always passes maxAge: 86400, and the cache was just written,
+        // so it will appear fresh and the pair should be skipped.
+        await engine.run(pairs: [pair])
+        let afterSecondRun = await engine.cachedResults(for: pairId)
+
+        // The sentinel r=-999 should still be present because the second run was skipped.
+        #expect(afterSecondRun.first?.r == -999)
+    }
+
     @Test("run with empty metrics produces results with zero r")
     @MainActor func emptyMetricsProduceZeroR() async {
         let engine = CorrelationEngine()

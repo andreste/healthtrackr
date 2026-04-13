@@ -6,6 +6,8 @@ struct DiscoveryFeedView: View {
     @State private var viewModel: DiscoveryFeedViewModel
     @State private var hasStoredKey: Bool = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
     @State private var apiKeyInput: String = ""
+    @State private var isRenarrating = false
+    @State private var isSigningOut = false
 
     init(
         authManager: AuthManager,
@@ -74,6 +76,16 @@ struct DiscoveryFeedView: View {
         }
         .task {
             await viewModel.load()
+        }
+        .task(id: isRenarrating) {
+            guard isRenarrating else { return }
+            await viewModel.renarrate()
+            isRenarrating = false
+        }
+        .task(id: isSigningOut) {
+            guard isSigningOut else { return }
+            await authManager.signOut()
+            isSigningOut = false
         }
         .onAppear {
             analytics.track(event: .feedViewed)
@@ -188,7 +200,7 @@ struct DiscoveryFeedView: View {
                                     apiKeyInput = ""
                                     viewModel.showSettings = false
                                     analytics.track(event: .settingsAPIKeySaved)
-                                    Task { await viewModel.renarrate() }
+                                    isRenarrating = true
                                 }
                                 .font(Typography.labelMD)
                                 .foregroundStyle(Color("accentPrimary"))
@@ -263,7 +275,7 @@ struct DiscoveryFeedView: View {
                 Section("Account") {
                     Button(role: .destructive) {
                         analytics.track(event: .signedOut)
-                        Task { await authManager.signOut() }
+                        isSigningOut = true
                     } label: {
                         Text("Sign Out")
                             .font(Typography.labelMD)
@@ -276,7 +288,7 @@ struct DiscoveryFeedView: View {
                         Text("Version")
                             .font(Typography.bodyMD)
                         Spacer()
-                        Text("1.0")
+                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                             .font(Typography.dataSM)
                             .foregroundStyle(Color("textTertiary"))
                     }

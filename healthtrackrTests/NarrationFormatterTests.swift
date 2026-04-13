@@ -4,27 +4,6 @@ import Testing
 
 // MARK: - Helpers
 
-private func makeResult(
-    pairId: String = "sleep_hrv",
-    lagHours: Int = 36,
-    r: Double = 0.71,
-    pValue: Double = 0.003,
-    n: Int = 52,
-    effectSize: Double = 0.18,
-    confidence: CorrelationResult.Confidence = .high
-) -> CorrelationResult {
-    CorrelationResult(
-        pairId: pairId,
-        lagHours: lagHours,
-        r: r,
-        pValue: pValue,
-        n: n,
-        effectSize: effectSize,
-        confidence: confidence,
-        computedAt: Date()
-    )
-}
-
 private func makeAnthropicResponse(text: String?) -> AnthropicMessageResponse {
     if let text {
         return AnthropicMessageResponse(

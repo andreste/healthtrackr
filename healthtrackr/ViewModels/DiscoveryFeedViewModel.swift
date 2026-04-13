@@ -55,18 +55,15 @@ final class DiscoveryFeedViewModel {
     private let healthKit: any HealthKitProviding
     private let engine: any CorrelationProviding
     private let narrator: any NarrationProviding
-    private let cache: CacheActor?
 
     init(
         healthKit: any HealthKitProviding,
         engine: any CorrelationProviding,
-        narrator: any NarrationProviding,
-        cache: CacheActor? = nil
+        narrator: any NarrationProviding
     ) {
         self.healthKit = healthKit
         self.engine = engine
         self.narrator = narrator
-        self.cache = cache
     }
 
     convenience init() {
@@ -74,8 +71,7 @@ final class DiscoveryFeedViewModel {
         self.init(
             healthKit: HealthKitManager(),
             engine: CorrelationEngine(cache: cache),
-            narrator: PatternNarrator(cache: cache),
-            cache: cache
+            narrator: PatternNarrator(cache: cache)
         )
     }
 
@@ -108,7 +104,7 @@ final class DiscoveryFeedViewModel {
     }
 
     func renarrate() async {
-        await cache?.clearNarrationCache()
+        await narrator.clearNarrationCache()
         var allItems: [PatternItem] = []
         for pair in CorrelationEngine.v1Pairs {
             let results = await engine.cachedResults(for: pair.id)
@@ -159,7 +155,8 @@ final class DiscoveryFeedViewModel {
         let distance = await distanceData
         let vo2Max = await vo2MaxData
         let walkingHR = await walkingHRData
-        let spo2 = await spo2Data
+        // Scale SpO2 from fractional (0.95–0.99) to percentage (95–99) for display and correlation.
+        let spo2 = (await spo2Data).map { MetricSample(date: $0.date, value: $0.value * 100) }
         let respiratoryRate = await respiratoryRateData
         let bodyMass = await bodyMassData
 

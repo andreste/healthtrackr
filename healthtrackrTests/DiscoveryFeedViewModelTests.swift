@@ -57,35 +57,18 @@ final class FakeCorrelationEngine: CorrelationProviding {
     }
 }
 
-final class FakeNarrator: NarrationProviding, @unchecked Sendable {
+@MainActor
+final class FakeNarrator: NarrationProviding {
     var narrations: [PatternNarration] = []
 
     func narrate(results: [CorrelationResult]) async -> [PatternNarration] {
         narrations
     }
+
+    func clearNarrationCache() async {}
 }
 
-// MARK: - Helper
-
-private func makeResult(
-    pairId: String = "sleep_hrv",
-    lagHours: Int = 36,
-    r: Double = 0.71,
-    pValue: Double = 0.003,
-    n: Int = 52,
-    confidence: CorrelationResult.Confidence = .high
-) -> CorrelationResult {
-    CorrelationResult(
-        pairId: pairId,
-        lagHours: lagHours,
-        r: r,
-        pValue: pValue,
-        n: n,
-        effectSize: 0.18,
-        confidence: confidence,
-        computedAt: Date()
-    )
-}
+// makeResult and makeIsolatedCache are provided by TestHelpers.swift
 
 // MARK: - Filter Tests
 
