@@ -12,9 +12,7 @@ struct HealthtrackrApp: App {
 
     init() {
         #if canImport(Mixpanel)
-        if let token = AppConfig.mixpanelToken {
-            Mixpanel.initialize(token: token, trackAutomaticEvents: false)
-        }
+        Mixpanel.initialize(token: AppConfig.mixpanelToken ?? "", trackAutomaticEvents: false)
         #endif
         let cache = CacheActor()
         _authManager = State(initialValue: AuthManager(cache: cache))
