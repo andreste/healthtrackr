@@ -455,9 +455,9 @@ struct LoadStateTests {
 
 @Suite("PatternDetailFormatter")
 struct PatternDetailFormatterTests {
-    @Test("effectSizeText returns 'small' for d=0.18")
+    @Test("effectSizeText returns 'small' for d=0.25")
     func positiveEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(0.18) == "small")
+        #expect(PatternDetailFormatter.effectSizeText(0.25) == "small")
     }
 
     @Test("effectSizeText returns 'negligible' for small d")
