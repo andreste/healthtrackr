@@ -73,7 +73,7 @@ struct HealthtrackrApp: App {
             if UITestArgument.skipAuth {
                 ContentView(
                     authManager: authManager,
-                    skipOnboarding: true,
+                    skipOnboarding: !UITestArgument.showHealthKitPermissions,
                     healthKit: StubHealthKit(denied: UITestArgument.healthKitDenied),
                     engine: StubCorrelationEngine(empty: UITestArgument.stubEmptyFeed),
                     narrator: StubNarrator()
