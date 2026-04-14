@@ -20,10 +20,11 @@ final class HealthMetricsUITests: XCTestCase {
     }
 
     @MainActor
-    func testHealthMetricsShowsSleepRow() {
+    func testHealthMetricsShowsRecoverySection() {
         let app = launchApp()
         openHealthMetrics(app)
         XCTAssertTrue(app.navigationBars["Health Data"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Sleep"].exists, "Sleep metric row should be visible")
+        // Section headers render .uppercased() so appear as "RECOVERY" in the accessibility tree
+        XCTAssertTrue(app.staticTexts["RECOVERY"].waitForExistence(timeout: 10), "RECOVERY section header should be visible")
     }
 }

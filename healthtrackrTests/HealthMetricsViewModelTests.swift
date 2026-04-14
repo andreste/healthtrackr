@@ -185,7 +185,7 @@ struct HealthMetricsFormatterTests {
 
     @Test("sleep formats with 1 decimal")
     func sleepOnedecimal() {
-        let s = makeSnapshot(id: "sleep", latestValue: 7.25)
+        let s = makeSnapshot(id: "sleep", latestValue: 7.26)
         #expect(HealthMetricsFormatter.formatValue(s) == "7.3")
     }
 

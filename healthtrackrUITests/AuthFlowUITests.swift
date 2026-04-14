@@ -19,7 +19,7 @@ final class AuthFlowUITests: XCTestCase {
 
         element(AccessibilityID.settingsButton, in: app).tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
-
+        app.collectionViews.firstMatch.swipeUp() // Scroll to Account section
         element(AccessibilityID.signOutButton, in: app).tap()
 
         XCTAssertTrue(element(AccessibilityID.signInView, in: app).waitForExistence(timeout: 5), "Sign-in screen should appear after sign out")
