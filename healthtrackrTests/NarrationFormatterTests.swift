@@ -21,6 +21,9 @@ private func makeAnthropicResponse(blocks: [AnthropicMessageResponse.ContentBloc
 
 @Suite("NarrationFormatter.humanReadablePair")
 struct HumanReadablePairFormatterTests {
+
+    // MARK: All 20 explicit pair mappings
+
     @Test("sleep_hrv maps correctly")
     func sleepHRV() {
         #expect(NarrationFormatter.humanReadablePair("sleep_hrv") == "Sleep duration and next-day HRV")
@@ -31,10 +34,104 @@ struct HumanReadablePairFormatterTests {
         #expect(NarrationFormatter.humanReadablePair("steps_rhr") == "Steps and Resting Heart Rate")
     }
 
+    @Test("sleep_rhr maps correctly")
+    func sleepRHR() {
+        #expect(NarrationFormatter.humanReadablePair("sleep_rhr") == "Sleep and Resting Heart Rate")
+    }
+
+    @Test("activeEnergy_hrv maps correctly")
+    func activeEnergyHRV() {
+        #expect(NarrationFormatter.humanReadablePair("activeEnergy_hrv") == "Active Energy and HRV")
+    }
+
+    @Test("activeEnergy_rhr maps correctly")
+    func activeEnergyRHR() {
+        #expect(NarrationFormatter.humanReadablePair("activeEnergy_rhr") == "Active Energy and Resting Heart Rate")
+    }
+
+    @Test("exerciseTime_rhr maps correctly")
+    func exerciseTimeRHR() {
+        #expect(NarrationFormatter.humanReadablePair("exerciseTime_rhr") == "Exercise Time and Resting Heart Rate")
+    }
+
+    @Test("exerciseTime_hrv maps correctly")
+    func exerciseTimeHRV() {
+        #expect(NarrationFormatter.humanReadablePair("exerciseTime_hrv") == "Exercise Time and HRV")
+    }
+
+    @Test("steps_hrv maps correctly")
+    func stepsHRV() {
+        #expect(NarrationFormatter.humanReadablePair("steps_hrv") == "Steps and HRV")
+    }
+
+    @Test("vo2Max_rhr maps correctly")
+    func vo2MaxRHR() {
+        #expect(NarrationFormatter.humanReadablePair("vo2Max_rhr") == "VO2 Max and Resting Heart Rate")
+    }
+
+    @Test("distance_rhr maps correctly")
+    func distanceRHR() {
+        #expect(NarrationFormatter.humanReadablePair("distance_rhr") == "Walking Distance and Resting Heart Rate")
+    }
+
+    @Test("sleep_walkingHR maps correctly")
+    func sleepWalkingHR() {
+        #expect(NarrationFormatter.humanReadablePair("sleep_walkingHR") == "Sleep and Walking Heart Rate")
+    }
+
+    @Test("sleep_respiratoryRate maps correctly")
+    func sleepRespiratoryRate() {
+        #expect(NarrationFormatter.humanReadablePair("sleep_respiratoryRate") == "Sleep and Respiratory Rate")
+    }
+
+    @Test("sleep_spo2 maps correctly")
+    func sleepSpo2() {
+        #expect(NarrationFormatter.humanReadablePair("sleep_spo2") == "Sleep and Blood Oxygen Saturation")
+    }
+
+    @Test("exerciseTime_walkingHR maps correctly")
+    func exerciseTimeWalkingHR() {
+        #expect(NarrationFormatter.humanReadablePair("exerciseTime_walkingHR") == "Exercise Time and Walking Heart Rate")
+    }
+
+    @Test("steps_walkingHR maps correctly")
+    func stepsWalkingHR() {
+        #expect(NarrationFormatter.humanReadablePair("steps_walkingHR") == "Steps and Walking Heart Rate")
+    }
+
+    @Test("bodyMass_rhr maps correctly")
+    func bodyMassRHR() {
+        #expect(NarrationFormatter.humanReadablePair("bodyMass_rhr") == "Body Mass and Resting Heart Rate")
+    }
+
+    @Test("bodyMass_vo2Max maps correctly")
+    func bodyMassVo2Max() {
+        #expect(NarrationFormatter.humanReadablePair("bodyMass_vo2Max") == "Body Mass and VO2 Max")
+    }
+
+    @Test("vo2Max_hrv maps correctly")
+    func vo2MaxHRV() {
+        #expect(NarrationFormatter.humanReadablePair("vo2Max_hrv") == "VO2 Max and HRV")
+    }
+
+    @Test("vo2Max_walkingHR maps correctly")
+    func vo2MaxWalkingHR() {
+        #expect(NarrationFormatter.humanReadablePair("vo2Max_walkingHR") == "VO2 Max and Walking Heart Rate")
+    }
+
+    @Test("distance_hrv maps correctly")
+    func distanceHRV() {
+        #expect(NarrationFormatter.humanReadablePair("distance_hrv") == "Walking Distance and HRV")
+    }
+
+    // MARK: Fallback behavior
+
     @Test("unknown pair replaces underscores with 'and'")
     func unknownPair() {
         #expect(NarrationFormatter.humanReadablePair("foo_bar") == "foo and bar")
     }
+
+    // MARK: Exhaustive coverage guard
 
     @Test("all v1Pairs have explicit AI-prompt labels (no fallback to underscore replacement)")
     func allV1PairsHaveExplicitLabels() {
