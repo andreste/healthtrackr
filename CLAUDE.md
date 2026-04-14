@@ -12,6 +12,10 @@ Use the format `TICKET-ID: Ticket title` for PR titles.
 
 Example: `HEA-5: Project setup & configuration`
 
+## Opening PRs after completing work
+
+After finishing any feature, bug fix, chore, or task — always open a PR using the `/create-pr` skill. Do this automatically without waiting to be asked, unless the user explicitly says not to.
+
 ## gstack
 
 For web browsing, always use the `/browse` skill.
