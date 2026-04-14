@@ -15,6 +15,7 @@ final class HealthKitPermissionsUITests: XCTestCase {
     func testGrantAccessButtonExists() {
         let app = launchApp(showHealthKitPermissions: true)
         XCTAssertTrue(element(AccessibilityID.healthKitPermissionsView, in: app).waitForExistence(timeout: 5))
-        XCTAssertTrue(element(AccessibilityID.grantHealthKitAccessButton, in: app).exists, "Grant Access button should be visible")
+        // Button label text is "Grant Access" — accessibility ID may not surface in XCUITest for disabled-capable buttons
+        XCTAssertTrue(app.buttons["Grant Access"].waitForExistence(timeout: 5), "Grant Access button should be visible")
     }
 }

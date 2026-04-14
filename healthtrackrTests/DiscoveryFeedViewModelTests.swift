@@ -21,6 +21,8 @@ final class FakeHealthKit: HealthKitProviding {
     var respiratoryRateSamples: [MetricSample] = []
     var bodyMassSamples: [MetricSample] = []
 
+    var isAlreadyAuthorized: Bool { !needsAuthorization }
+
     func requestAuthorization() async throws {
         if shouldThrowOnAuth {
             throw FakeError.denied

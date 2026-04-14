@@ -3,6 +3,7 @@ import SwiftUI
 struct DiscoveryFeedView: View {
     let authManager: AuthManager
     let analytics: any AnalyticsProviding
+    private let healthKit: (any HealthKitProviding)?
     @State private var viewModel: DiscoveryFeedViewModel
     @State private var hasStoredKey: Bool = KeychainHelper.read(key: PatternNarrator.keychainKey) != nil
     @State private var apiKeyInput: String = ""
@@ -18,6 +19,7 @@ struct DiscoveryFeedView: View {
     ) {
         self.authManager = authManager
         self.analytics = analytics ?? MixpanelAnalyticsService()
+        self.healthKit = healthKit
         if let healthKit, let engine, let narrator {
             self._viewModel = State(initialValue: DiscoveryFeedViewModel(
                 healthKit: healthKit,
@@ -232,7 +234,7 @@ struct DiscoveryFeedView: View {
 
                 Section {
                     NavigationLink {
-                        HealthMetricsView(analytics: analytics)
+                        HealthMetricsView(healthKit: healthKit, analytics: analytics)
                     } label: {
                         Text("View Current Health Data")
                             .font(Typography.labelMD)
@@ -305,7 +307,13 @@ struct DiscoveryFeedView: View {
                 }
             }
         }
+        #if DEBUG
+        .presentationDetents(
+            ProcessInfo.processInfo.arguments.contains("--uitesting") ? [.large] : [.medium, .large]
+        )
+        #else
         .presentationDetents([.medium, .large])
+        #endif
     }
 
     private func displayLabel(for pairId: String) -> String {

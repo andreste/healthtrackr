@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Create a PR for the current branch using the Linear ticket title as the PR title. Fetches the ticket details, builds a summary and writes a test plan.
+description: Create a PR for the current branch using the Linear ticket title as the PR title. Fetches the ticket details, builds a summary and writes a test plan. Do not include the screenshots section if there are no screenshots to take.
 allowed-tools:
   - Bash
   - Read

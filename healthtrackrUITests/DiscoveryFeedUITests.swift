@@ -32,9 +32,9 @@ final class DiscoveryFeedUITests: XCTestCase {
         let sleepCard = element(AccessibilityID.patternCard("sleep_hrv"), in: app)
         XCTAssertTrue(sleepCard.waitForExistence(timeout: 10))
 
-        // Tap "Sleep + HRV" filter
-        let sleepFilter = element(AccessibilityID.filterChip("Sleep + HRV"), in: app)
-        XCTAssertTrue(sleepFilter.waitForExistence(timeout: 5), "Sleep + HRV filter chip should exist")
+        // Tap "Sleep" filter (raw value from DiscoveryFeedViewModel.Filter.sleep)
+        let sleepFilter = element(AccessibilityID.filterChip("Sleep"), in: app)
+        XCTAssertTrue(sleepFilter.waitForExistence(timeout: 5), "Sleep filter chip should exist")
         sleepFilter.tap()
 
         // Sleep card should still be visible

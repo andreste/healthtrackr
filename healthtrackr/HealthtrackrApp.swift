@@ -15,7 +15,13 @@ struct HealthtrackrApp: App {
         Mixpanel.initialize(token: AppConfig.mixpanelToken ?? "", trackAutomaticEvents: false)
         #endif
         let cache = CacheActor()
-        _authManager = State(initialValue: AuthManager(cache: cache))
+        let auth = AuthManager(cache: cache)
+        #if DEBUG
+        if UITestArgument.skipAuth {
+            auth.isAuthenticated = true
+        }
+        #endif
+        _authManager = State(initialValue: auth)
         _engine = State(initialValue: CorrelationEngine(cache: cache))
         _narrator = State(initialValue: PatternNarrator(cache: cache))
     }
@@ -71,13 +77,17 @@ struct HealthtrackrApp: App {
     private var uiTestingRoot: some View {
         Group {
             if UITestArgument.skipAuth {
-                ContentView(
-                    authManager: authManager,
-                    skipOnboarding: !UITestArgument.showHealthKitPermissions,
-                    healthKit: StubHealthKit(denied: UITestArgument.healthKitDenied),
-                    engine: StubCorrelationEngine(empty: UITestArgument.stubEmptyFeed),
-                    narrator: StubNarrator()
-                )
+                if authManager.isAuthenticated {
+                    ContentView(
+                        authManager: authManager,
+                        skipOnboarding: !UITestArgument.showHealthKitPermissions,
+                        healthKit: StubHealthKit(denied: UITestArgument.healthKitDenied),
+                        engine: StubCorrelationEngine(empty: UITestArgument.stubEmptyFeed),
+                        narrator: StubNarrator()
+                    )
+                } else {
+                    SignInView(authManager: authManager)
+                }
             } else {
                 SignInView(authManager: authManager)
             }

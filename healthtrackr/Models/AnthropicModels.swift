@@ -21,10 +21,10 @@ nonisolated struct AnthropicMessageRequest: Encodable, Sendable {
 
 // MARK: - Response
 
-nonisolated struct AnthropicMessageResponse: Decodable, Sendable {
+nonisolated struct AnthropicMessageResponse: Codable, Sendable {
     let content: [ContentBlock]
 
-    nonisolated struct ContentBlock: Decodable, Sendable {
+    nonisolated struct ContentBlock: Codable, Sendable {
         let type: String
         let text: String?
     }
