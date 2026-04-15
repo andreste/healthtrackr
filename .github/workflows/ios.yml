@@ -37,8 +37,7 @@ jobs:
             -scheme healthtrackr \
             -project healthtrackr.xcodeproj \
             -destination "id=$SIMULATOR_UDID" \
-            -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
-            -parallel-testing-enabled YES
+            -derivedDataPath ~/Library/Developer/Xcode/DerivedData
 
       - name: Run unit tests
         run: |
@@ -48,7 +47,6 @@ jobs:
             -destination "id=$SIMULATOR_UDID" \
             -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
             -only-testing:healthtrackrTests \
-            -parallel-testing-enabled YES \
             -test-timeouts-enabled YES
 
   ui-tests:
