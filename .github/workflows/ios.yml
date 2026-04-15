@@ -49,8 +49,7 @@ jobs:
             -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
             -only-testing:healthtrackrTests \
             -parallel-testing-enabled YES \
-            -test-timeouts-enabled YES \
-            -defaultTestExecutionTimeAllowance 60
+            -test-timeouts-enabled YES
 
   ui-tests:
     name: UI Tests
@@ -94,5 +93,4 @@ jobs:
             -destination "id=$SIMULATOR_UDID" \
             -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
             -only-testing:healthtrackrUITests \
-            -test-timeouts-enabled YES \
-            -defaultTestExecutionTimeAllowance 120
+            -test-timeouts-enabled YES
