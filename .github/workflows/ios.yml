@@ -47,6 +47,7 @@ jobs:
             -destination "id=$SIMULATOR_UDID" \
             -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
             -only-testing:healthtrackrTests \
+            -parallel-testing-enabled NO \
             -test-timeouts-enabled YES
 
   ui-tests:
