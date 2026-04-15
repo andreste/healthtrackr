@@ -18,11 +18,40 @@ struct HealthKitPermissionsView: View {
         self.onGranted = onGranted
     }
 
-    private static let categories: [(title: String, icon: String, metrics: [String])] = [
-        ("Recovery", "bed.double.fill", ["Sleep duration", "HRV", "Blood oxygen", "Respiratory rate"]),
-        ("Activity",  "figure.walk",    ["Steps", "Active energy", "Exercise time", "Distance"]),
-        ("Fitness",   "heart.fill",     ["Resting heart rate", "Walking heart rate", "VO2 max", "Body mass"]),
-    ]
+    private static var categories: [(title: String, icon: String, metrics: [String])] {
+        [
+            (
+                String(localized: "Recovery", bundle: .localization),
+                "bed.double.fill",
+                [
+                    String(localized: "Sleep duration", bundle: .localization),
+                    String(localized: "HRV", bundle: .localization),
+                    String(localized: "Blood oxygen", bundle: .localization),
+                    String(localized: "Respiratory rate", bundle: .localization),
+                ]
+            ),
+            (
+                String(localized: "Activity", bundle: .localization),
+                "figure.walk",
+                [
+                    String(localized: "Steps", bundle: .localization),
+                    String(localized: "Active energy", bundle: .localization),
+                    String(localized: "Exercise time", bundle: .localization),
+                    String(localized: "Distance (km)", bundle: .localization),
+                ]
+            ),
+            (
+                String(localized: "Fitness", bundle: .localization),
+                "heart.fill",
+                [
+                    String(localized: "Resting heart rate", bundle: .localization),
+                    String(localized: "Walking heart rate", bundle: .localization),
+                    String(localized: "VO2 Max (mL/kg/min)", bundle: .localization),
+                    String(localized: "Body mass", bundle: .localization),
+                ]
+            ),
+        ]
+    }
 
     var body: some View {
         VStack(spacing: 0) {

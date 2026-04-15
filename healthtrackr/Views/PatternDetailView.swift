@@ -98,7 +98,13 @@ struct PatternDetailView: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Scatter plot showing \(item.metricALabel) vs \(item.metricBLabel). \(item.n) data points. Correlation r equals \(String(format: "%.2f", item.r)).")
+            .accessibilityLabel(String(
+                format: String(localized: "Scatter plot showing %@ vs %@. %lld data points. Correlation r equals %@.", bundle: .localization),
+                item.metricALabel,
+                item.metricBLabel,
+                Int64(item.n),
+                String(format: "%.2f", item.r)
+            ))
         }
         .padding(Spacing.cardInternalPadding)
         .background(Color("bgCard"))

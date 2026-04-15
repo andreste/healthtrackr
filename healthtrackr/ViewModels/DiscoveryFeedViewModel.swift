@@ -223,7 +223,11 @@ final class DiscoveryFeedViewModel {
             pairId: best.pairId,
             pairLabel: humanReadablePair(best.pairId),
             headline: narration?.headline ?? humanReadablePair(best.pairId),
-            body: narration?.body ?? "Pattern detected with r=\(String(format: "%.2f", best.r)), based on \(best.n) days of data.",
+            body: narration?.body ?? String(
+                format: String(localized: "Pattern detected with r=%@, based on %lld days of data.", bundle: .localization),
+                String(format: "%.2f", best.r),
+                Int64(best.n)
+            ),
             confidence: best.confidence,
             r: best.r,
             n: best.n,
@@ -248,18 +252,18 @@ final class DiscoveryFeedViewModel {
 
     func metricLabel(_ key: String) -> String {
         switch key {
-        case "sleep": return "Sleep (hrs)"
-        case "hrv": return "HRV (ms)"
-        case "steps": return "Steps"
-        case "rhr": return "Resting HR (bpm)"
-        case "activeEnergy": return "Active Energy (kcal)"
-        case "exerciseTime": return "Exercise (min)"
-        case "distance": return "Distance (km)"
-        case "vo2Max": return "VO2 Max (mL/kg/min)"
-        case "walkingHR": return "Walking HR (bpm)"
-        case "spo2": return "SpO2 (%)"
-        case "respiratoryRate": return "Resp. Rate (br/min)"
-        case "bodyMass": return "Body Mass (kg)"
+        case "sleep": return String(localized: "metric.label.sleep", bundle: .localization)
+        case "hrv": return String(localized: "metric.label.hrv", bundle: .localization)
+        case "steps": return String(localized: "metric.label.steps", bundle: .localization)
+        case "rhr": return String(localized: "metric.label.rhr", bundle: .localization)
+        case "activeEnergy": return String(localized: "metric.label.activeEnergy", bundle: .localization)
+        case "exerciseTime": return String(localized: "metric.label.exerciseTime", bundle: .localization)
+        case "distance": return String(localized: "metric.label.distance", bundle: .localization)
+        case "vo2Max": return String(localized: "metric.label.vo2Max", bundle: .localization)
+        case "walkingHR": return String(localized: "metric.label.walkingHR", bundle: .localization)
+        case "spo2": return String(localized: "metric.label.spo2", bundle: .localization)
+        case "respiratoryRate": return String(localized: "metric.label.respiratoryRate", bundle: .localization)
+        case "bodyMass": return String(localized: "metric.label.bodyMass", bundle: .localization)
         default: return key
         }
     }

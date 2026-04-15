@@ -15,11 +15,13 @@ struct HealthMetricsView: View {
 
     // MARK: - Section definitions (order matches ViewModel config)
 
-    private static let sections: [(title: String, ids: [String])] = [
-        ("Recovery",  ["sleep", "hrv", "spo2", "respiratoryRate"]),
-        ("Activity",  ["steps", "activeEnergy", "exerciseTime", "distance"]),
-        ("Fitness",   ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
-    ]
+    private static var sections: [(title: String, ids: [String])] {
+        [
+            (String(localized: "Recovery", bundle: .localization), ["sleep", "hrv", "spo2", "respiratoryRate"]),
+            (String(localized: "Activity", bundle: .localization), ["steps", "activeEnergy", "exerciseTime", "distance"]),
+            (String(localized: "Fitness", bundle: .localization),  ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
+        ]
+    }
 
     var body: some View {
         Group {
