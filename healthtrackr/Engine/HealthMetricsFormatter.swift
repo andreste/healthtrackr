@@ -22,14 +22,14 @@ enum HealthMetricsFormatter {
     static func formatRecency(_ date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return String(localized: "recency.today", bundle: .localization)
+            return String(localized: "recency.today", bundle: Bundle.localization)
         }
         if calendar.isDateInYesterday(date) {
-            return String(localized: "recency.yesterday", bundle: .localization)
+            return String(localized: "recency.yesterday", bundle: Bundle.localization)
         }
         let days = calendar.dateComponents([.day], from: date, to: Date()).day ?? 0
         let daysString = "\(days)d"
-        let format = String(localized: "%@ ago", bundle: .localization)
+        let format = String(localized: "%@ ago", bundle: Bundle.localization)
         return String(format: format, daysString)
     }
 
