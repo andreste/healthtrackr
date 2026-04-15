@@ -7,7 +7,7 @@ struct LoadingPlaceholderView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.space4) {
-            Text(String(format: String(localized: "Analyzing %@...", bundle: .localization), pairLabel))
+            Text(String(format: String(localized: "Analyzing %@...", bundle: Bundle.localization), pairLabel))
                 .font(Typography.bodySM)
                 .foregroundStyle(Color("textTertiary"))
 
@@ -28,10 +28,10 @@ struct LoadingPlaceholderView: View {
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(
-            format: String(localized: "Analyzing %@ patterns", bundle: .localization),
+            format: String(localized: "Analyzing %@ patterns", bundle: Bundle.localization),
             pairLabel.replacingOccurrences(of: "+", with: "plus")
         ))
-        .accessibilityValue(String(localized: "In progress", bundle: .localization))
+        .accessibilityValue(String(localized: "In progress", bundle: Bundle.localization))
         .onAppear {
             withAnimation(
                 .linear(duration: 1.5)

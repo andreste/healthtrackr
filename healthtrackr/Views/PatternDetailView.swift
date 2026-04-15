@@ -99,7 +99,7 @@ struct PatternDetailView: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(String(
-                format: String(localized: "Scatter plot showing %@ vs %@. %lld data points. Correlation r equals %@.", bundle: .localization),
+                format: String(localized: "Scatter plot showing %@ vs %@. %lld data points. Correlation r equals %@.", bundle: Bundle.localization),
                 item.metricALabel,
                 item.metricBLabel,
                 Int64(item.n),

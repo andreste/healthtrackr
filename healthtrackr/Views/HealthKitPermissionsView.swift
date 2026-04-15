@@ -21,33 +21,33 @@ struct HealthKitPermissionsView: View {
     private static var categories: [(title: String, icon: String, metrics: [String])] {
         [
             (
-                String(localized: "Recovery", bundle: .localization),
+                String(localized: "Recovery", bundle: Bundle.localization),
                 "bed.double.fill",
                 [
-                    String(localized: "Sleep duration", bundle: .localization),
-                    String(localized: "HRV", bundle: .localization),
-                    String(localized: "Blood oxygen", bundle: .localization),
-                    String(localized: "Respiratory rate", bundle: .localization),
+                    String(localized: "Sleep duration", bundle: Bundle.localization),
+                    String(localized: "HRV", bundle: Bundle.localization),
+                    String(localized: "Blood oxygen", bundle: Bundle.localization),
+                    String(localized: "Respiratory rate", bundle: Bundle.localization),
                 ]
             ),
             (
-                String(localized: "Activity", bundle: .localization),
+                String(localized: "Activity", bundle: Bundle.localization),
                 "figure.walk",
                 [
-                    String(localized: "Steps", bundle: .localization),
-                    String(localized: "Active energy", bundle: .localization),
-                    String(localized: "Exercise time", bundle: .localization),
-                    String(localized: "Distance (km)", bundle: .localization),
+                    String(localized: "Steps", bundle: Bundle.localization),
+                    String(localized: "Active energy", bundle: Bundle.localization),
+                    String(localized: "Exercise time", bundle: Bundle.localization),
+                    String(localized: "Distance (km)", bundle: Bundle.localization),
                 ]
             ),
             (
-                String(localized: "Fitness", bundle: .localization),
+                String(localized: "Fitness", bundle: Bundle.localization),
                 "heart.fill",
                 [
-                    String(localized: "Resting heart rate", bundle: .localization),
-                    String(localized: "Walking heart rate", bundle: .localization),
-                    String(localized: "VO2 Max (mL/kg/min)", bundle: .localization),
-                    String(localized: "Body mass", bundle: .localization),
+                    String(localized: "Resting heart rate", bundle: Bundle.localization),
+                    String(localized: "Walking heart rate", bundle: Bundle.localization),
+                    String(localized: "VO2 Max (mL/kg/min)", bundle: Bundle.localization),
+                    String(localized: "Body mass", bundle: Bundle.localization),
                 ]
             ),
         ]

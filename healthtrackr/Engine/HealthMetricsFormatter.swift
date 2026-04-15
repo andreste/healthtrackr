@@ -39,6 +39,6 @@ enum HealthMetricsFormatter {
         if let date = snapshot.latestDate {
             return "\(snapshot.label): \(value) \(unit), \(formatRecency(date))"
         }
-        return "\(snapshot.label): \(String(localized: "no.data", bundle: .localization))"
+        return "\(snapshot.label): \(String(localized: "no.data", bundle: Bundle.localization))"
     }
 }

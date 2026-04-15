@@ -17,9 +17,9 @@ struct HealthMetricsView: View {
 
     private static var sections: [(title: String, ids: [String])] {
         [
-            (String(localized: "Recovery", bundle: .localization), ["sleep", "hrv", "spo2", "respiratoryRate"]),
-            (String(localized: "Activity", bundle: .localization), ["steps", "activeEnergy", "exerciseTime", "distance"]),
-            (String(localized: "Fitness", bundle: .localization),  ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
+            (String(localized: "Recovery", bundle: Bundle.localization), ["sleep", "hrv", "spo2", "respiratoryRate"]),
+            (String(localized: "Activity", bundle: Bundle.localization), ["steps", "activeEnergy", "exerciseTime", "distance"]),
+            (String(localized: "Fitness", bundle: Bundle.localization),  ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
         ]
     }
 
