@@ -223,15 +223,19 @@ final class DiscoveryFeedViewModel {
             pairId: best.pairId,
             pairLabel: humanReadablePair(best.pairId),
             headline: narration?.headline ?? humanReadablePair(best.pairId),
-            body: narration?.body ?? "Pattern detected with r=\(String(format: "%.2f", best.r)), based on \(best.n) days of data.",
+            body: narration?.body ?? String(
+                format: String(localized: "Pattern detected with r=%@, based on %lld days of data.", bundle: Bundle.localization),
+                String(format: "%.2f", best.r),
+                Int64(best.n)
+            ),
             confidence: best.confidence,
             r: best.r,
             n: best.n,
             lagHours: best.lagHours,
             effectSize: best.effectSize,
             scatterData: scatter,
-            metricALabel: metricLabel(metricAKey),
-            metricBLabel: metricLabel(metricBKey)
+            metricAKey: metricAKey,
+            metricBKey: metricBKey
         )]
     }
 
@@ -244,24 +248,6 @@ final class DiscoveryFeedViewModel {
             return ("", "")
         }
         return (pair.metricAKey, pair.metricBKey)
-    }
-
-    func metricLabel(_ key: String) -> String {
-        switch key {
-        case "sleep": return "Sleep (hrs)"
-        case "hrv": return "HRV (ms)"
-        case "steps": return "Steps"
-        case "rhr": return "Resting HR (bpm)"
-        case "activeEnergy": return "Active Energy (kcal)"
-        case "exerciseTime": return "Exercise (min)"
-        case "distance": return "Distance (km)"
-        case "vo2Max": return "VO2 Max (mL/kg/min)"
-        case "walkingHR": return "Walking HR (bpm)"
-        case "spo2": return "SpO2 (%)"
-        case "respiratoryRate": return "Resp. Rate (br/min)"
-        case "bodyMass": return "Body Mass (kg)"
-        default: return key
-        }
     }
 
 }

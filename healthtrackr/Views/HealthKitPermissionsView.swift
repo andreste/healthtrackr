@@ -18,11 +18,40 @@ struct HealthKitPermissionsView: View {
         self.onGranted = onGranted
     }
 
-    private static let categories: [(title: String, icon: String, metrics: [String])] = [
-        ("Recovery", "bed.double.fill", ["Sleep duration", "HRV", "Blood oxygen", "Respiratory rate"]),
-        ("Activity",  "figure.walk",    ["Steps", "Active energy", "Exercise time", "Distance"]),
-        ("Fitness",   "heart.fill",     ["Resting heart rate", "Walking heart rate", "VO2 max", "Body mass"]),
-    ]
+    private static var categories: [(title: String, icon: String, metrics: [String])] {
+        [
+            (
+                String(localized: "Recovery", bundle: Bundle.localization),
+                "bed.double.fill",
+                [
+                    String(localized: "Sleep duration", bundle: Bundle.localization),
+                    String(localized: "HRV", bundle: Bundle.localization),
+                    String(localized: "Blood oxygen", bundle: Bundle.localization),
+                    String(localized: "Respiratory rate", bundle: Bundle.localization),
+                ]
+            ),
+            (
+                String(localized: "Activity", bundle: Bundle.localization),
+                "figure.walk",
+                [
+                    String(localized: "Steps", bundle: Bundle.localization),
+                    String(localized: "Active energy", bundle: Bundle.localization),
+                    String(localized: "Exercise time", bundle: Bundle.localization),
+                    String(localized: "Distance (km)", bundle: Bundle.localization),
+                ]
+            ),
+            (
+                String(localized: "Fitness", bundle: Bundle.localization),
+                "heart.fill",
+                [
+                    String(localized: "Resting heart rate", bundle: Bundle.localization),
+                    String(localized: "Walking heart rate", bundle: Bundle.localization),
+                    String(localized: "VO2 Max (mL/kg/min)", bundle: Bundle.localization),
+                    String(localized: "Body mass", bundle: Bundle.localization),
+                ]
+            ),
+        ]
+    }
 
     var body: some View {
         VStack(spacing: 0) {

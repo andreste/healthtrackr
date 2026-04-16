@@ -117,8 +117,8 @@ struct ConfidenceChipView: View {
             lagHours: 36,
             effectSize: 0.18,
             scatterData: [],
-            metricALabel: "Sleep (hrs)",
-            metricBLabel: "HRV (ms)"
+            metricAKey: "sleep",
+            metricBKey: "hrv"
         ),
         index: 0
     )
@@ -140,8 +140,8 @@ struct ConfidenceChipView: View {
             lagHours: 24,
             effectSize: -0.12,
             scatterData: [],
-            metricALabel: "Steps",
-            metricBLabel: "Resting HR (bpm)"
+            metricAKey: "steps",
+            metricBKey: "rhr"
         ),
         index: 0
     )

@@ -7,7 +7,7 @@ struct LoadingPlaceholderView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.space4) {
-            Text("Analyzing \(pairLabel)...")
+            Text(String(format: String(localized: "Analyzing %@...", bundle: Bundle.localization), pairLabel))
                 .font(Typography.bodySM)
                 .foregroundStyle(Color("textTertiary"))
 
@@ -27,8 +27,11 @@ struct LoadingPlaceholderView: View {
                 .foregroundStyle(Color("borderDefault"))
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Analyzing \(pairLabel.replacingOccurrences(of: "+", with: "plus")) patterns")
-        .accessibilityValue("In progress")
+        .accessibilityLabel(String(
+            format: String(localized: "Analyzing %@ patterns", bundle: Bundle.localization),
+            pairLabel.replacingOccurrences(of: "+", with: "plus")
+        ))
+        .accessibilityValue(String(localized: "In progress", bundle: Bundle.localization))
         .onAppear {
             withAnimation(
                 .linear(duration: 1.5)
@@ -66,11 +69,11 @@ struct LoadingPlaceholderView: View {
 struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: Spacing.space3) {
-            Text("No strong patterns yet.")
+            Text(String(localized: "No strong patterns yet.", bundle: Bundle.localization))
                 .font(Typography.displaySM)
                 .foregroundStyle(Color("textPrimary"))
 
-            Text("Check back as more data accumulates.")
+            Text(String(localized: "Check back as more data accumulates.", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textTertiary"))
         }
@@ -89,18 +92,18 @@ struct HealthKitDeniedView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Color("accentPrimary"))
 
-            Text("Connect Apple Health")
+            Text(String(localized: "Connect Apple Health", bundle: Bundle.localization))
                 .font(Typography.displayLG)
                 .foregroundStyle(Color("textPrimary"))
 
-            Text("healthtrackr needs access to your health data to discover cross-metric patterns.")
+            Text(String(localized: "healthtrackr needs access to your health data to discover cross-metric patterns.", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textSecondary"))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Spacing.space5)
 
             Button(action: onRetry) {
-                Text("Open Settings")
+                Text(String(localized: "Open Settings", bundle: Bundle.localization))
                     .font(Typography.labelMD)
                     .foregroundStyle(Color("textOnAccent"))
                     .padding(.vertical, 10)

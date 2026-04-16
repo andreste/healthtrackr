@@ -9,18 +9,20 @@ struct HealthPermissionItem: Identifiable {
 
 extension HealthPermissionItem {
     /// All HealthKit permissions the app requests, in display order.
-    static let all: [HealthPermissionItem] = [
-        HealthPermissionItem(id: "sleep",          icon: "bed.double.fill",      label: "Sleep Analysis"),
-        HealthPermissionItem(id: "hrv",             icon: "waveform.path.ecg",    label: "Heart Rate Variability"),
-        HealthPermissionItem(id: "steps",           icon: "figure.walk",          label: "Steps"),
-        HealthPermissionItem(id: "rhr",             icon: "heart.fill",           label: "Resting Heart Rate"),
-        HealthPermissionItem(id: "activeEnergy",    icon: "flame.fill",           label: "Active Energy"),
-        HealthPermissionItem(id: "exerciseTime",    icon: "figure.run",           label: "Exercise Time"),
-        HealthPermissionItem(id: "distance",        icon: "map.fill",             label: "Walking + Running Distance"),
-        HealthPermissionItem(id: "vo2Max",          icon: "lungs.fill",           label: "VO2 Max"),
-        HealthPermissionItem(id: "walkingHR",       icon: "figure.walk.motion",   label: "Walking Heart Rate"),
-        HealthPermissionItem(id: "bloodOxygen",     icon: "drop.circle.fill",     label: "Blood Oxygen"),
-        HealthPermissionItem(id: "respiratoryRate", icon: "wind",                 label: "Respiratory Rate"),
-        HealthPermissionItem(id: "bodyMass",        icon: "scalemass.fill",       label: "Body Mass"),
-    ]
+    static var all: [HealthPermissionItem] {
+        [
+            HealthPermissionItem(id: "sleep",          icon: "bed.double.fill",      label: String(localized: "Sleep Analysis",              bundle: Bundle.localization)),
+            HealthPermissionItem(id: "hrv",             icon: "waveform.path.ecg",    label: String(localized: "Heart Rate Variability",      bundle: Bundle.localization)),
+            HealthPermissionItem(id: "steps",           icon: "figure.walk",          label: String(localized: "Steps",                       bundle: Bundle.localization)),
+            HealthPermissionItem(id: "rhr",             icon: "heart.fill",           label: String(localized: "Resting heart rate",           bundle: Bundle.localization)),
+            HealthPermissionItem(id: "activeEnergy",    icon: "flame.fill",           label: String(localized: "Active energy",                bundle: Bundle.localization)),
+            HealthPermissionItem(id: "exerciseTime",    icon: "figure.run",           label: String(localized: "Exercise time",                bundle: Bundle.localization)),
+            HealthPermissionItem(id: "distance",        icon: "map.fill",             label: String(localized: "Walking + Running Distance",   bundle: Bundle.localization)),
+            HealthPermissionItem(id: "vo2Max",          icon: "lungs.fill",           label: String(localized: "VO2 Max (mL/kg/min)",          bundle: Bundle.localization)),
+            HealthPermissionItem(id: "walkingHR",       icon: "figure.walk.motion",   label: String(localized: "Walking heart rate",           bundle: Bundle.localization)),
+            HealthPermissionItem(id: "bloodOxygen",     icon: "drop.circle.fill",     label: String(localized: "Blood oxygen",                 bundle: Bundle.localization)),
+            HealthPermissionItem(id: "respiratoryRate", icon: "wind",                 label: String(localized: "Respiratory rate",             bundle: Bundle.localization)),
+            HealthPermissionItem(id: "bodyMass",        icon: "scalemass.fill",       label: String(localized: "Body mass",                   bundle: Bundle.localization)),
+        ]
+    }
 }

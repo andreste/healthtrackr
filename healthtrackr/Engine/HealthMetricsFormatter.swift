@@ -21,10 +21,16 @@ enum HealthMetricsFormatter {
 
     static func formatRecency(_ date: Date) -> String {
         let calendar = Calendar.current
-        if calendar.isDateInToday(date) { return "today" }
-        if calendar.isDateInYesterday(date) { return "yest." }
+        if calendar.isDateInToday(date) {
+            return String(localized: "recency.today", bundle: Bundle.localization)
+        }
+        if calendar.isDateInYesterday(date) {
+            return String(localized: "recency.yesterday", bundle: Bundle.localization)
+        }
         let days = calendar.dateComponents([.day], from: date, to: Date()).day ?? 0
-        return "\(days)d ago"
+        let daysString = "\(days)d"
+        let format = String(localized: "%@ ago", bundle: Bundle.localization)
+        return String(format: format, daysString)
     }
 
     static func accessibilityLabel(_ snapshot: MetricSnapshot) -> String {
@@ -33,6 +39,6 @@ enum HealthMetricsFormatter {
         if let date = snapshot.latestDate {
             return "\(snapshot.label): \(value) \(unit), \(formatRecency(date))"
         }
-        return "\(snapshot.label): no data"
+        return "\(snapshot.label): \(String(localized: "no.data", bundle: Bundle.localization))"
     }
 }

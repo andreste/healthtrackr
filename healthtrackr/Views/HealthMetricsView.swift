@@ -15,11 +15,13 @@ struct HealthMetricsView: View {
 
     // MARK: - Section definitions (order matches ViewModel config)
 
-    private static let sections: [(title: String, ids: [String])] = [
-        ("Recovery",  ["sleep", "hrv", "spo2", "respiratoryRate"]),
-        ("Activity",  ["steps", "activeEnergy", "exerciseTime", "distance"]),
-        ("Fitness",   ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
-    ]
+    private static var sections: [(title: String, ids: [String])] {
+        [
+            (String(localized: "Recovery", bundle: Bundle.localization), ["sleep", "hrv", "spo2", "respiratoryRate"]),
+            (String(localized: "Activity", bundle: Bundle.localization), ["steps", "activeEnergy", "exerciseTime", "distance"]),
+            (String(localized: "Fitness", bundle: Bundle.localization),  ["rhr", "walkingHR", "vo2Max", "bodyMass"]),
+        ]
+    }
 
     var body: some View {
         Group {
@@ -50,7 +52,7 @@ struct HealthMetricsView: View {
     private var metricsContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.space6) {
-                Text("Last 7 days from Apple Health")
+                Text(String(localized: "Last 7 days from Apple Health", bundle: Bundle.localization))
                     .font(Typography.bodySM)
                     .foregroundStyle(Color("textTertiary"))
                     .padding(.horizontal, Spacing.screenHorizontalMargin)
@@ -126,7 +128,8 @@ struct HealthMetricsView: View {
                 }
 
                 if let avg = snapshot.weeklyAverage {
-                    Text("avg \(HealthMetricsFormatter.formatValue(snapshot, using: avg))")
+                    Text(String(format: String(localized: "avg %@", bundle: Bundle.localization),
+                                HealthMetricsFormatter.formatValue(snapshot, using: avg)))
                         .font(Typography.dataXS)
                         .foregroundStyle(Color("textTertiary"))
                 }
@@ -154,7 +157,7 @@ struct HealthMetricsView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(Color("semanticError"))
 
-            Text("Health data access required")
+            Text(String(localized: "Health data access required", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textPrimary"))
 
@@ -163,7 +166,7 @@ struct HealthMetricsView: View {
                     UIApplication.shared.open(url)
                 }
             } label: {
-                Text("Open Settings")
+                Text(String(localized: "Open Settings", bundle: Bundle.localization))
                     .font(Typography.labelMD)
                     .foregroundStyle(Color("accentPrimary"))
             }
