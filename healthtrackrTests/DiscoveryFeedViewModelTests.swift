@@ -561,26 +561,21 @@ struct MetricKeysTests {
         #expect(b3 == "walkingHR")
     }
 
-    @Test("metricLabel returns human-readable labels")
-    @MainActor func labels() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeHealthKit(),
-            engine: FakeCorrelationEngine(),
-            narrator: FakeNarrator()
-        )
-        #expect(vm.metricLabel("sleep") == "Sleep (hrs)")
-        #expect(vm.metricLabel("hrv") == "HRV (ms)")
-        #expect(vm.metricLabel("steps") == "Steps")
-        #expect(vm.metricLabel("rhr") == "Resting HR (bpm)")
-        #expect(vm.metricLabel("activeEnergy") == "Active Energy (kcal)")
-        #expect(vm.metricLabel("exerciseTime") == "Exercise (min)")
-        #expect(vm.metricLabel("distance") == "Distance (km)")
-        #expect(vm.metricLabel("vo2Max") == "VO2 Max (mL/kg/min)")
-        #expect(vm.metricLabel("walkingHR") == "Walking HR (bpm)")
-        #expect(vm.metricLabel("spo2") == "SpO2 (%)")
-        #expect(vm.metricLabel("respiratoryRate") == "Resp. Rate (br/min)")
-        #expect(vm.metricLabel("bodyMass") == "Body Mass (kg)")
-        #expect(vm.metricLabel("unknown") == "unknown")
+    @Test("MetricLabel.label returns human-readable labels")
+    func labels() {
+        #expect(MetricLabel.label(for: "sleep") == "Sleep (hrs)")
+        #expect(MetricLabel.label(for: "hrv") == "HRV (ms)")
+        #expect(MetricLabel.label(for: "steps") == "Steps")
+        #expect(MetricLabel.label(for: "rhr") == "Resting HR (bpm)")
+        #expect(MetricLabel.label(for: "activeEnergy") == "Active Energy (kcal)")
+        #expect(MetricLabel.label(for: "exerciseTime") == "Exercise (min)")
+        #expect(MetricLabel.label(for: "distance") == "Distance (km)")
+        #expect(MetricLabel.label(for: "vo2Max") == "VO2 Max (mL/kg/min)")
+        #expect(MetricLabel.label(for: "walkingHR") == "Walking HR (bpm)")
+        #expect(MetricLabel.label(for: "spo2") == "SpO2 (%)")
+        #expect(MetricLabel.label(for: "respiratoryRate") == "Resp. Rate (br/min)")
+        #expect(MetricLabel.label(for: "bodyMass") == "Body Mass (kg)")
+        #expect(MetricLabel.label(for: "unknown") == "unknown")
     }
 }
 
@@ -670,7 +665,7 @@ struct MetricAlignmentTests {
         let items = vm.buildItems(from: [result], narrations: [])
 
         #expect(items.first?.effectSize == 0.18)
-        #expect(items.first?.metricALabel == "Sleep (hrs)")
-        #expect(items.first?.metricBLabel == "HRV (ms)")
+        #expect(items.first?.metricAKey == "sleep")
+        #expect(items.first?.metricBKey == "hrv")
     }
 }

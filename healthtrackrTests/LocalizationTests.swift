@@ -25,24 +25,24 @@ struct LocalizationTests {
 
     // MARK: - HealthMetricsFormatter
 
-    @Test("formatRecency returns non-empty string for today")
+    @Test("formatRecency returns 'today' for today")
     func recencyToday() {
         let result = HealthMetricsFormatter.formatRecency(Date())
-        #expect(!result.isEmpty)
+        #expect(result == "today")
     }
 
-    @Test("formatRecency returns non-empty string for yesterday")
+    @Test("formatRecency returns 'yest.' for yesterday")
     func recencyYesterday() {
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         let result = HealthMetricsFormatter.formatRecency(yesterday)
-        #expect(!result.isEmpty)
+        #expect(result == "yest.")
     }
 
-    @Test("formatRecency returns non-empty string for older dates")
+    @Test("formatRecency returns '<n>d ago' for older dates")
     func recencyOlderDate() {
         let oldDate = Calendar.current.date(byAdding: .day, value: -5, to: Date())!
         let result = HealthMetricsFormatter.formatRecency(oldDate)
-        #expect(!result.isEmpty)
+        #expect(result == "5d ago")
     }
 
     @Test("accessibilityLabel with no data returns non-empty string")
@@ -84,47 +84,40 @@ struct LocalizationTests {
         #expect(unique.count == 5, "Each effect size threshold should produce a distinct label")
     }
 
-    // MARK: - DiscoveryFeedViewModel metric labels
+    // MARK: - MetricLabel
 
-    @Test("metricLabel returns non-empty string for all known keys")
-    @MainActor func metricLabelNonEmpty() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeLocalizationHealthKit(),
-            engine: FakeLocalizationEngine(),
-            narrator: FakeLocalizationNarrator()
-        )
+    @Test("MetricLabel.label returns non-empty string for all known keys")
+    func metricLabelNonEmpty() {
         let keys = ["sleep", "hrv", "steps", "rhr", "activeEnergy",
                     "exerciseTime", "distance", "vo2Max", "walkingHR",
                     "spo2", "respiratoryRate", "bodyMass"]
         for key in keys {
-            let label = vm.metricLabel(key)
-            #expect(!label.isEmpty, "metricLabel(\"\(key)\") should return a non-empty string")
+            let label = MetricLabel.label(for: key)
+            #expect(!label.isEmpty, "MetricLabel.label(for: \"\(key)\") should return a non-empty string")
         }
     }
 
-    @Test("metricLabel returns the key itself for unknown keys")
-    @MainActor func metricLabelUnknownKey() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeLocalizationHealthKit(),
-            engine: FakeLocalizationEngine(),
-            narrator: FakeLocalizationNarrator()
-        )
-        #expect(vm.metricLabel("unknownKey") == "unknownKey")
+    @Test("MetricLabel.label returns the key itself for unknown keys")
+    func metricLabelUnknownKey() {
+        #expect(MetricLabel.label(for: "unknownKey") == "unknownKey")
     }
 
-    @Test("metricLabel returns distinct values for each key")
-    @MainActor func metricLabelDistinct() {
-        let vm = DiscoveryFeedViewModel(
-            healthKit: FakeLocalizationHealthKit(),
-            engine: FakeLocalizationEngine(),
-            narrator: FakeLocalizationNarrator()
-        )
+    @Test("MetricLabel.label returns distinct values for each key")
+    func metricLabelDistinct() {
         let keys = ["sleep", "hrv", "steps", "rhr", "activeEnergy",
                     "exerciseTime", "distance", "vo2Max", "walkingHR",
                     "spo2", "respiratoryRate", "bodyMass"]
-        let labels = keys.map { vm.metricLabel($0) }
+        let labels = keys.map { MetricLabel.label(for: $0) }
         let unique = Set(labels)
         #expect(unique.count == keys.count, "Each metric key should produce a distinct label")
+    }
+
+    @Test("MetricLabel.label returns expected English values for smoke-test keys")
+    func metricLabelEnglishValues() {
+        #expect(MetricLabel.label(for: "sleep") == "Sleep (hrs)")
+        #expect(MetricLabel.label(for: "hrv") == "HRV (ms)")
+        #expect(MetricLabel.label(for: "steps") == "Steps")
+        #expect(MetricLabel.label(for: "rhr") == "Resting HR (bpm)")
     }
 
     // MARK: - HealthPermissionItem

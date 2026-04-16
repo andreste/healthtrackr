@@ -54,15 +54,15 @@ struct PatternDetailView: View {
             Chart {
                 ForEach(item.scatterData) { point in
                     PointMark(
-                        x: .value(item.metricALabel, point.metricA),
-                        y: .value(item.metricBLabel, point.metricB)
+                        x: .value(MetricLabel.label(for: item.metricAKey), point.metricA),
+                        y: .value(MetricLabel.label(for: item.metricBKey), point.metricB)
                     )
                     .foregroundStyle(Color("accentPrimary"))
                     .symbolSize(40)
                 }
             }
-            .chartXAxisLabel(item.metricALabel, alignment: .center)
-            .chartYAxisLabel(item.metricBLabel, alignment: .center)
+            .chartXAxisLabel(MetricLabel.label(for: item.metricAKey), alignment: .center)
+            .chartYAxisLabel(MetricLabel.label(for: item.metricBKey), alignment: .center)
             .chartXAxis {
                 AxisMarks { _ in
                     AxisValueLabel()
@@ -100,8 +100,8 @@ struct PatternDetailView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(String(
                 format: String(localized: "Scatter plot showing %@ vs %@. %lld data points. Correlation r equals %@.", bundle: Bundle.localization),
-                item.metricALabel,
-                item.metricBLabel,
+                MetricLabel.label(for: item.metricAKey),
+                MetricLabel.label(for: item.metricBKey),
                 Int64(item.n),
                 String(format: "%.2f", item.r)
             ))
@@ -213,7 +213,7 @@ struct PatternDetailView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, Spacing.statRowPadding)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(label): \(value)")
+        .accessibilityLabel("\(String(localized: String.LocalizationValue(label), bundle: Bundle.localization)): \(value)")
     }
 
     private var divider: some View {
@@ -267,8 +267,8 @@ struct PatternDetailView: View {
                     metricB: Double.random(in: 30...80)
                 )
             },
-            metricALabel: "Sleep (hrs)",
-            metricBLabel: "HRV (ms)"
+            metricAKey: "sleep",
+            metricBKey: "hrv"
         ))
     }
 }
@@ -293,8 +293,8 @@ struct PatternDetailView: View {
                     metricB: Double.random(in: 55...72)
                 )
             },
-            metricALabel: "Steps",
-            metricBLabel: "Resting HR (bpm)"
+            metricAKey: "steps",
+            metricBKey: "rhr"
         ))
     }
     .preferredColorScheme(.dark)

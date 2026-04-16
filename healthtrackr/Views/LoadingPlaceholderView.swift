@@ -69,11 +69,11 @@ struct LoadingPlaceholderView: View {
 struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: Spacing.space3) {
-            Text("No strong patterns yet.")
+            Text(String(localized: "No strong patterns yet.", bundle: Bundle.localization))
                 .font(Typography.displaySM)
                 .foregroundStyle(Color("textPrimary"))
 
-            Text("Check back as more data accumulates.")
+            Text(String(localized: "Check back as more data accumulates.", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textTertiary"))
         }
@@ -92,18 +92,18 @@ struct HealthKitDeniedView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Color("accentPrimary"))
 
-            Text("Connect Apple Health")
+            Text(String(localized: "Connect Apple Health", bundle: Bundle.localization))
                 .font(Typography.displayLG)
                 .foregroundStyle(Color("textPrimary"))
 
-            Text("healthtrackr needs access to your health data to discover cross-metric patterns.")
+            Text(String(localized: "healthtrackr needs access to your health data to discover cross-metric patterns.", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textSecondary"))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Spacing.space5)
 
             Button(action: onRetry) {
-                Text("Open Settings")
+                Text(String(localized: "Open Settings", bundle: Bundle.localization))
                     .font(Typography.labelMD)
                     .foregroundStyle(Color("textOnAccent"))
                     .padding(.vertical, 10)

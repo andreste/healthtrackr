@@ -52,7 +52,7 @@ struct HealthMetricsView: View {
     private var metricsContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.space6) {
-                Text("Last 7 days from Apple Health")
+                Text(String(localized: "Last 7 days from Apple Health", bundle: Bundle.localization))
                     .font(Typography.bodySM)
                     .foregroundStyle(Color("textTertiary"))
                     .padding(.horizontal, Spacing.screenHorizontalMargin)
@@ -128,7 +128,8 @@ struct HealthMetricsView: View {
                 }
 
                 if let avg = snapshot.weeklyAverage {
-                    Text("avg \(HealthMetricsFormatter.formatValue(snapshot, using: avg))")
+                    Text(String(format: String(localized: "avg %@", bundle: Bundle.localization),
+                                HealthMetricsFormatter.formatValue(snapshot, using: avg)))
                         .font(Typography.dataXS)
                         .foregroundStyle(Color("textTertiary"))
                 }
@@ -156,7 +157,7 @@ struct HealthMetricsView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(Color("semanticError"))
 
-            Text("Health data access required")
+            Text(String(localized: "Health data access required", bundle: Bundle.localization))
                 .font(Typography.bodyMD)
                 .foregroundStyle(Color("textPrimary"))
 
@@ -165,7 +166,7 @@ struct HealthMetricsView: View {
                     UIApplication.shared.open(url)
                 }
             } label: {
-                Text("Open Settings")
+                Text(String(localized: "Open Settings", bundle: Bundle.localization))
                     .font(Typography.labelMD)
                     .foregroundStyle(Color("accentPrimary"))
             }
