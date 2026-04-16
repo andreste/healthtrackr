@@ -151,6 +151,14 @@ struct DiscoveryFeedView: View {
                 LoadingPlaceholderView(pairLabel: displayLabel(for: pairId))
                     .padding(.horizontal, Spacing.screenHorizontalMargin)
             }
+
+            if viewModel.showTomorrowFooter {
+                FeedFooterView()
+                    .padding(.horizontal, Spacing.screenHorizontalMargin)
+                    .onAppear {
+                        analytics.track(event: .feedFooterViewed)
+                    }
+            }
         }
     }
 

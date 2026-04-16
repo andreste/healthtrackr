@@ -50,6 +50,10 @@ final class DiscoveryFeedViewModel {
         return items.filter { allowedPairs.contains($0.pairId) }
     }
 
+    var showTomorrowFooter: Bool {
+        feedState == .loaded && loadingPairIds.isEmpty && !items.isEmpty
+    }
+
     // MARK: - Dependencies
 
     private let healthKit: any HealthKitProviding

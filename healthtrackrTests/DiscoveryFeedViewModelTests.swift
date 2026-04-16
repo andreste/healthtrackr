@@ -669,3 +669,94 @@ struct MetricAlignmentTests {
         #expect(items.first?.metricBKey == "hrv")
     }
 }
+
+// MARK: - showTomorrowFooter Tests
+
+@Suite("showTomorrowFooter")
+struct ShowTomorrowFooterTests {
+    private let mockPatternItem = PatternItem(
+        id: "sleep_hrv_0",
+        pairId: "sleep_hrv",
+        pairLabel: "SLEEP + HRV",
+        headline: "Test Headline",
+        body: "Test body.",
+        confidence: .high,
+        r: 0.71,
+        n: 30,
+        lagHours: 0,
+        effectSize: 0.18,
+        scatterData: [],
+        metricAKey: "sleep",
+        metricBKey: "hrv"
+    )
+
+    @Test("showTomorrowFooter is false when state is loading")
+    @MainActor func showTomorrowFooter_isFalse_whenStateIsLoading() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        vm.feedState = .loading
+        vm.loadingPairIds = []
+        vm.items = [mockPatternItem]
+
+        #expect(vm.showTomorrowFooter == false)
+    }
+
+    @Test("showTomorrowFooter is false when state is empty")
+    @MainActor func showTomorrowFooter_isFalse_whenStateIsEmpty() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        vm.feedState = .empty
+        vm.loadingPairIds = []
+        vm.items = [mockPatternItem]
+
+        #expect(vm.showTomorrowFooter == false)
+    }
+
+    @Test("showTomorrowFooter is false when loadingPairIds is non-empty")
+    @MainActor func showTomorrowFooter_isFalse_whenLoadingPairIdsNonEmpty() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        vm.feedState = .loaded
+        vm.loadingPairIds = ["sleep_hrv"]
+        vm.items = [mockPatternItem]
+
+        #expect(vm.showTomorrowFooter == false)
+    }
+
+    @Test("showTomorrowFooter is false when items is empty")
+    @MainActor func showTomorrowFooter_isFalse_whenItemsEmpty() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        vm.feedState = .loaded
+        vm.loadingPairIds = []
+        vm.items = []
+
+        #expect(vm.showTomorrowFooter == false)
+    }
+
+    @Test("showTomorrowFooter is true when fully loaded with items")
+    @MainActor func showTomorrowFooter_isTrue_whenFullyLoaded() {
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: FakeCorrelationEngine(),
+            narrator: FakeNarrator()
+        )
+        vm.feedState = .loaded
+        vm.loadingPairIds = []
+        vm.items = [mockPatternItem]
+
+        #expect(vm.showTomorrowFooter == true)
+    }
+}

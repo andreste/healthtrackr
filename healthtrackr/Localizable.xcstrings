@@ -900,6 +900,122 @@
         }
       }
     },
+    "feed.footer.accessibilityLabel" : {
+      "comment" : "VoiceOver label for the feed footer, read as a single announcement",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ende der heutigen Entdeckungen. Morgen könnten neue Muster erscheinen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de los descubrimientos de hoy. Mañana podrían aparecer nuevos patrones."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日发现已结束。明天可能会出现新的规律。"
+          }
+        }
+      }
+    },
+    "feed.footer.body" : {
+      "comment" : "Body text shown at the bottom of the Discoveries feed explaining when new patterns appear",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Nacht sammeln sich neue Daten an. Komm morgen wieder – deine Muster könnten sich verändert haben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los datos se acumulan durante la noche. Vuelve mañana y tus patrones podrían haber cambiado."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据在夜间持续积累。明天再来看看，你的规律可能已经发生变化。"
+          }
+        }
+      }
+    },
+    "feed.footer.eyebrow" : {
+      "comment" : "ALL-CAPS eyebrow label above the feed footer headline. Keep uppercase.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HEUTIGER BERICHT"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TODAY'S DISPATCH"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DESPACHO DE HOY"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日简报"
+          }
+        }
+      }
+    },
+    "feed.footer.headline" : {
+      "comment" : "Headline shown at the bottom of the Discoveries feed when all patterns have loaded for the day",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist alles für heute."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That's everything for today."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eso es todo por hoy."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的内容就是这些。"
+          }
+        }
+      }
+    },
     "Find patterns in your health data you wouldn't notice on your own." : {
       "comment" : "Subtitle on the sign-in screen describing the app value proposition",
       "localizations" : {
