@@ -49,7 +49,7 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Sleep Analysis"].waitForExistence(timeout: 5), "Sleep Analysis permission should be visible")
         XCTAssertTrue(app.staticTexts["Heart Rate Variability"].waitForExistence(timeout: 3), "HRV permission should be visible")
         XCTAssertTrue(app.staticTexts["Steps"].waitForExistence(timeout: 3), "Steps permission should be visible")
-        XCTAssertTrue(app.staticTexts["Resting Heart Rate"].waitForExistence(timeout: 3), "Resting Heart Rate permission should be visible")
+        XCTAssertTrue(app.staticTexts["Resting heart rate"].waitForExistence(timeout: 3), "Resting heart rate permission should be visible")
     }
 
     @MainActor
