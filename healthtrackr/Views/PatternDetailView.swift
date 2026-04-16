@@ -179,17 +179,17 @@ struct PatternDetailView: View {
         HStack(spacing: 0) {
             statCell(
                 value: PatternDetailFormatter.effectSizeText(item.effectSize),
-                label: "EFFECT"
+                label: String(localized: "stat.label.strength", bundle: Bundle.localization)
             )
             divider
             statCell(
                 value: PatternDetailFormatter.lagText(item.lagHours),
-                label: "LAG"
+                label: String(localized: "stat.label.timing", bundle: Bundle.localization)
             )
             divider
             statCell(
                 value: PatternDetailFormatter.correlationText(item.r),
-                label: "CORRELATION"
+                label: String(localized: "stat.label.connection", bundle: Bundle.localization)
             )
         }
         .background(Color("bgCard"))
@@ -213,7 +213,7 @@ struct PatternDetailView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, Spacing.statRowPadding)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(String(localized: String.LocalizationValue(label), bundle: Bundle.localization)): \(value)")
+        .accessibilityLabel("\(label): \(value)")
     }
 
     private var divider: some View {
