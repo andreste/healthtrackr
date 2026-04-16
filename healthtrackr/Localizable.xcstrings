@@ -523,6 +523,151 @@
         }
       }
     },
+    "correlation.moderate" : {
+      "comment" : "CONNECTION stat label when |r| is between 0.3 and 0.5",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderado"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中等"
+          }
+        }
+      }
+    },
+    "correlation.strong" : {
+      "comment" : "CONNECTION stat label when |r| is between 0.5 and 0.7",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stark"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strong"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuerte"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强"
+          }
+        }
+      }
+    },
+    "correlation.very_strong" : {
+      "comment" : "CONNECTION stat label when |r| >= 0.7",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr stark"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Very strong"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muy fuerte"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非常强"
+          }
+        }
+      }
+    },
+    "correlation.very_weak" : {
+      "comment" : "CONNECTION stat label when |r| < 0.1",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr schwach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Very weak"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muy débil"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非常弱"
+          }
+        }
+      }
+    },
+    "correlation.weak" : {
+      "comment" : "CONNECTION stat label when |r| is between 0.1 and 0.3",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schwach"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weak"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débil"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "弱"
+          }
+        }
+      }
+    },
     "Data & Privacy" : {
       "comment" : "Settings section header for data and privacy information",
       "localizations" : {
@@ -703,25 +848,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "groß"
+            "value" : "Stark"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "large"
+            "value" : "Strong"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "grande"
+            "value" : "Fuerte"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "大"
+            "value" : "强"
           }
         }
       }
@@ -732,25 +877,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "mittel"
+            "value" : "Moderat"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "medium"
+            "value" : "Moderate"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "medio"
+            "value" : "Moderado"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "中"
+            "value" : "中等"
           }
         }
       }
@@ -761,25 +906,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "vernachlässigbar"
+            "value" : "Schwach"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "negligible"
+            "value" : "Weak"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "insignificante"
+            "value" : "Débil"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "可忽略"
+            "value" : "微弱"
           }
         }
       }
@@ -790,25 +935,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "n/a"
+            "value" : "Unbekannt"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "n/a"
+            "value" : "Unknown"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "n/d"
+            "value" : "Desconocido"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不适用"
+            "value" : "未知"
           }
         }
       }
@@ -819,25 +964,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "klein"
+            "value" : "Leicht"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "small"
+            "value" : "Mild"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "pequeño"
+            "value" : "Leve"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "小"
+            "value" : "轻微"
           }
         }
       }
@@ -1360,6 +1505,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "延迟"
+          }
+        }
+      }
+    },
+    "lag.days_later" : {
+      "comment" : "TIMING stat label for a lag of more than 2 days. %d is the number of days.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach %d Tagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d days later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d días después"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d天后"
+          }
+        }
+      }
+    },
+    "lag.next_day" : {
+      "comment" : "TIMING stat label when the effect appears the next day (lag 24h or 36h)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al día siguiente"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次日"
+          }
+        }
+      }
+    },
+    "lag.same_day" : {
+      "comment" : "TIMING stat label when the effect appears the same day (lag 0h or 12h)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gleicher Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El mismo día"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当天"
+          }
+        }
+      }
+    },
+    "lag.two_days" : {
+      "comment" : "TIMING stat label when the effect appears two days later (lag 48h)",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach 2 Tagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 days later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 días después"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2天后"
           }
         }
       }
@@ -2143,6 +2404,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "静息心率"
+          }
+        }
+      }
+    },
+    "stat.label.connection" : {
+      "comment" : "Stat row label replacing CORRELATION — plain English for how linked two metrics are",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VERBINDUNG"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONNECTION"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONEXIÓN"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关联"
+          }
+        }
+      }
+    },
+    "stat.label.strength" : {
+      "comment" : "Stat row label replacing EFFECT — plain English for how strong the pattern is",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STÄRKE"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STRENGTH"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "INTENSIDAD"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强度"
+          }
+        }
+      }
+    },
+    "stat.label.timing" : {
+      "comment" : "Stat row label replacing LAG — plain English for when the effect appears",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ZEITPUNKT"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TIMING"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MOMENTO"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时机"
           }
         }
       }

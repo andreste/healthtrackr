@@ -455,41 +455,79 @@ struct LoadStateTests {
 
 @Suite("PatternDetailFormatter")
 struct PatternDetailFormatterTests {
-    @Test("effectSizeText returns 'small' for d=0.25")
+    // MARK: effectSizeText
+
+    @Test("effectSizeText returns 'Mild' for d=0.25")
     func positiveEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(0.25) == "small")
+        #expect(PatternDetailFormatter.effectSizeText(0.25) == "Mild")
     }
 
-    @Test("effectSizeText returns 'negligible' for small d")
+    @Test("effectSizeText returns 'Weak' for small d")
     func negativeSmallEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(-0.12) == "negligible")
+        #expect(PatternDetailFormatter.effectSizeText(-0.12) == "Weak")
     }
 
-    @Test("effectSizeText returns 'n/a' for nil")
+    @Test("effectSizeText returns 'Unknown' for nil")
     func nilEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(nil) == "n/a")
+        #expect(PatternDetailFormatter.effectSizeText(nil) == "Unknown")
     }
 
-    @Test("effectSizeText returns 'large' for d >= 0.8")
+    @Test("effectSizeText returns 'Strong' for d >= 0.8")
     func largeEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(1.2) == "large")
+        #expect(PatternDetailFormatter.effectSizeText(1.2) == "Strong")
     }
 
-    @Test("effectSizeText returns 'medium' for 0.5 <= d < 0.8")
+    @Test("effectSizeText returns 'Moderate' for 0.5 <= d < 0.8")
     func mediumEffect() {
-        #expect(PatternDetailFormatter.effectSizeText(0.6) == "medium")
+        #expect(PatternDetailFormatter.effectSizeText(0.6) == "Moderate")
     }
 
-    @Test("lagText formats hours")
-    func lagHours() {
-        #expect(PatternDetailFormatter.lagText(36) == "36h")
-        #expect(PatternDetailFormatter.lagText(0) == "0h")
+    // MARK: lagText
+
+    @Test("lagText returns 'Same day' for 0h and 12h")
+    func lagSameDay() {
+        #expect(PatternDetailFormatter.lagText(0) == "Same day")
+        #expect(PatternDetailFormatter.lagText(12) == "Same day")
     }
 
-    @Test("correlationText formats r value")
-    func correlationR() {
-        #expect(PatternDetailFormatter.correlationText(0.71) == "r=0.71")
-        #expect(PatternDetailFormatter.correlationText(-0.45) == "r=-0.45")
+    @Test("lagText returns 'Next day' for 24h and 36h")
+    func lagNextDay() {
+        #expect(PatternDetailFormatter.lagText(24) == "Next day")
+        #expect(PatternDetailFormatter.lagText(36) == "Next day")
+    }
+
+    @Test("lagText returns '2 days later' for 48h")
+    func lagTwoDays() {
+        #expect(PatternDetailFormatter.lagText(48) == "2 days later")
+    }
+
+    // MARK: correlationText
+
+    @Test("correlationText returns 'Very strong' for |r| >= 0.7")
+    func correlationVeryStrong() {
+        #expect(PatternDetailFormatter.correlationText(0.71) == "Very strong")
+        #expect(PatternDetailFormatter.correlationText(-0.9) == "Very strong")
+    }
+
+    @Test("correlationText returns 'Strong' for 0.5 <= |r| < 0.7")
+    func correlationStrong() {
+        #expect(PatternDetailFormatter.correlationText(0.55) == "Strong")
+    }
+
+    @Test("correlationText returns 'Moderate' for 0.3 <= |r| < 0.5")
+    func correlationModerate() {
+        #expect(PatternDetailFormatter.correlationText(-0.45) == "Moderate")
+        #expect(PatternDetailFormatter.correlationText(0.36) == "Moderate")
+    }
+
+    @Test("correlationText returns 'Weak' for 0.1 <= |r| < 0.3")
+    func correlationWeak() {
+        #expect(PatternDetailFormatter.correlationText(0.15) == "Weak")
+    }
+
+    @Test("correlationText returns 'Very weak' for |r| < 0.1")
+    func correlationVeryWeak() {
+        #expect(PatternDetailFormatter.correlationText(0.05) == "Very weak")
     }
 }
 
