@@ -900,6 +900,122 @@
         }
       }
     },
+    "feed.footer.accessibilityLabel" : {
+      "comment" : "VoiceOver label for the feed footer, read as a single announcement",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+          }
+        }
+      }
+    },
+    "feed.footer.body" : {
+      "comment" : "Body text shown at the bottom of the Discoveries feed explaining when new patterns appear",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+          }
+        }
+      }
+    },
+    "feed.footer.eyebrow" : {
+      "comment" : "ALL-CAPS eyebrow label above the feed footer headline. Keep uppercase.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TODAY'S DISPATCH"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TODAY'S DISPATCH"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TODAY'S DISPATCH"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "TODAY'S DISPATCH"
+          }
+        }
+      }
+    },
+    "feed.footer.headline" : {
+      "comment" : "Headline shown at the bottom of the Discoveries feed when all patterns have loaded for the day",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "That's everything for today."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That's everything for today."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "That's everything for today."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "That's everything for today."
+          }
+        }
+      }
+    },
     "Find patterns in your health data you wouldn't notice on your own." : {
       "comment" : "Subtitle on the sign-in screen describing the app value proposition",
       "localizations" : {

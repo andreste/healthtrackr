@@ -20,6 +20,7 @@ enum AnalyticsEvent {
     case feedLoadFailed
     case feedFilterChanged(filter: String)
     case patternCardTapped(pairId: String)
+    case feedFooterViewed
 
     // Pattern Detail
     case metricDetailViewed(metricId: String)
@@ -56,6 +57,7 @@ enum AnalyticsEvent {
         case .feedLoadFailed:                return "Feed Load Failed"
         case .feedFilterChanged:             return "Feed Filter Changed"
         case .patternCardTapped:             return "Pattern Card Tapped"
+        case .feedFooterViewed:              return "Feed Footer Viewed"
 
         // Pattern Detail
         case .metricDetailViewed:            return "Metric Detail Viewed"
