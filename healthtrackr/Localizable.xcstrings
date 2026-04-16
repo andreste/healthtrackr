@@ -905,8 +905,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+            "state" : "translated",
+            "value" : "Ende der heutigen Entdeckungen. Morgen könnten neue Muster erscheinen."
           }
         },
         "en" : {
@@ -917,14 +917,14 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+            "state" : "translated",
+            "value" : "Fin de los descubrimientos de hoy. Mañana podrían aparecer nuevos patrones."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "End of today's discoveries. New patterns may appear tomorrow."
+            "state" : "translated",
+            "value" : "今日发现已结束。明天可能会出现新的规律。"
           }
         }
       }
@@ -934,8 +934,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+            "state" : "translated",
+            "value" : "Über Nacht sammeln sich neue Daten an. Komm morgen wieder – deine Muster könnten sich verändert haben."
           }
         },
         "en" : {
@@ -946,14 +946,14 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+            "state" : "translated",
+            "value" : "Los datos se acumulan durante la noche. Vuelve mañana y tus patrones podrían haber cambiado."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "New data accumulates overnight. Come back tomorrow and your patterns may have shifted."
+            "state" : "translated",
+            "value" : "数据在夜间持续积累。明天再来看看，你的规律可能已经发生变化。"
           }
         }
       }
@@ -963,8 +963,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TODAY'S DISPATCH"
+            "state" : "translated",
+            "value" : "HEUTIGER BERICHT"
           }
         },
         "en" : {
@@ -975,14 +975,14 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TODAY'S DISPATCH"
+            "state" : "translated",
+            "value" : "DESPACHO DE HOY"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "TODAY'S DISPATCH"
+            "state" : "translated",
+            "value" : "今日简报"
           }
         }
       }
@@ -992,8 +992,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "That's everything for today."
+            "state" : "translated",
+            "value" : "Das ist alles für heute."
           }
         },
         "en" : {
@@ -1004,14 +1004,14 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "That's everything for today."
+            "state" : "translated",
+            "value" : "Eso es todo por hoy."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "That's everything for today."
+            "state" : "translated",
+            "value" : "今天的内容就是这些。"
           }
         }
       }
