@@ -155,7 +155,6 @@ struct DiscoveryFeedView: View {
             if viewModel.showTomorrowFooter {
                 FeedFooterView()
                     .padding(.horizontal, Spacing.screenHorizontalMargin)
-                    .transition(.opacity)
                     .onAppear {
                         analytics.track(event: .feedFooterViewed)
                     }

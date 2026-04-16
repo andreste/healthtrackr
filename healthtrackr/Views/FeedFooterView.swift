@@ -24,7 +24,7 @@ struct FeedFooterView: View {
                 Text(String(localized: "feed.footer.body", bundle: Bundle.localization))
                     .font(Typography.bodySM)
                     .foregroundStyle(Color("textSecondary"))
-                    .lineSpacing(4)
+                    .lineSpacing(Spacing.space1)
             }
             .padding(.horizontal, Spacing.space5)
             .padding(.vertical, Spacing.space5)
