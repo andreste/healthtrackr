@@ -181,22 +181,33 @@ final class DiscoveryFeedViewModel {
             )
         }
 
-        // Run correlation and await completion
-        await engine.run(pairs: pairs)
+        await withTaskGroup(of: (String, [PatternItem]).self) { group in
+            for pair in pairs {
+                group.addTask { @MainActor [self] in
+                    await self.engine.run(pairs: [pair])
+                    let results = await self.engine.cachedResults(for: pair.id)
+                    let narrations = await self.narrateResults(results)
+                    return (pair.id, self.buildItems(from: results, narrations: narrations))
+                }
+            }
 
-        var allItems: [PatternItem] = []
-
-        for pair in CorrelationEngine.v1Pairs {
-            let results = await engine.cachedResults(for: pair.id)
-            loadingPairIds.remove(pair.id)
-
-            let narrations = await narrateResults(results)
-            allItems.append(contentsOf: buildItems(from: results, narrations: narrations))
+            for await (pairId, pairItems) in group {
+                for newItem in pairItems {
+                    if let idx = items.firstIndex(where: { $0.pairId == newItem.pairId }) {
+                        items[idx] = newItem
+                    } else {
+                        items.append(newItem)
+                    }
+                }
+                loadingPairIds.remove(pairId)
+                if !items.isEmpty {
+                    feedState = .loaded
+                }
+            }
         }
 
-        items = allItems
         loadingPairIds = []
-        feedState = allItems.isEmpty ? .empty : .loaded
+        feedState = items.isEmpty ? .empty : .loaded
     }
 
     private func narrateResults(_ results: [CorrelationResult]) async -> [PatternNarration] {

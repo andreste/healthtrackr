@@ -55,7 +55,7 @@ final class FakeCorrelationEngine: CorrelationProviding {
     }
 
     func run(pairs: [MetricPair]) async {
-        runCalledWith = pairs
+        runCalledWith.append(contentsOf: pairs)
     }
 }
 
@@ -422,8 +422,8 @@ struct LoadStateTests {
         #expect(!vm.items.isEmpty)
     }
 
-    @Test("load calls run on engine with metric pairs")
-    @MainActor func callsEngineRun() async {
+    @Test("load calls run on engine once per pair")
+    @MainActor func callsEngineRunOncePerPair() async {
         let fakeEngine = FakeCorrelationEngine()
         let vm = DiscoveryFeedViewModel(
             healthKit: FakeHealthKit(),
@@ -433,9 +433,27 @@ struct LoadStateTests {
 
         await vm.load()
 
+        let calledPairIds = Set(fakeEngine.runCalledWith.map(\.id))
         #expect(fakeEngine.runCalledWith.count == 20)
-        #expect(fakeEngine.runCalledWith[0].id == "sleep_hrv")
-        #expect(fakeEngine.runCalledWith[1].id == "steps_rhr")
+        #expect(calledPairIds.contains("sleep_hrv"))
+        #expect(calledPairIds.contains("steps_rhr"))
+        #expect(calledPairIds.count == 20)
+    }
+
+    @Test("fresh results replace cached items for the same pair")
+    @MainActor func freshResultsReplaceCachedItems() async {
+        let fakeEngine = FakeCorrelationEngine()
+        fakeEngine.cachedResultsByPair["sleep_hrv"] = [makeResult(pairId: "sleep_hrv")]
+        let vm = DiscoveryFeedViewModel(
+            healthKit: FakeHealthKit(),
+            engine: fakeEngine,
+            narrator: FakeNarrator()
+        )
+
+        await vm.load()
+
+        let sleepHRVItems = vm.items.filter { $0.pairId == "sleep_hrv" }
+        #expect(sleepHRVItems.count == 1)
     }
 
     @Test("initial state is loading")
